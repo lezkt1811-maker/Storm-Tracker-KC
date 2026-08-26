@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KC Storm Grid — Neon Radar Deck</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05030C;
+    --bg2:#0D0818;
+    --panel:#120B22;
+    --panel2:#170F2C;
+    --edge:#2A2050;
+    --pink:#FF2EC4;
+    --cyan:#00E5FF;
+    --purple:#9D4EFF;
+    --green:#39FF88;
+    --text:#F5F3FF;
+    --text-dim:#B6AFD1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 700px 500px at 10% -5%, rgba(255,46,196,0.18), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 95% 10%, rgba(0,229,255,0.16), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 50% 100%, rgba(157,78,255,0.16), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.65;
+    font-size:16px;
+  }
+  a{ color: var(--cyan); }
+
+  .grid-fx{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.12;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,46,196,0.5) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  header{
+    position:relative; z-index:1;
+    text-align:center;
+    padding: 3.2rem 1.4rem 2.2rem;
+    border-bottom: 1px solid var(--edge);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.22em;
+    text-transform:uppercase; color: var(--cyan); margin-bottom:1rem;
+    display:flex; align-items:center; justify-content:center; gap:0.6rem;
+  }
+  .live-seal{
+    width:10px; height:10px; border-radius:50%; background: var(--green);
+    box-shadow: 0 0 6px var(--green), 0 0 16px var(--green);
+    animation: pulse 1.8s infinite ease-in-out;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.35); opacity:0.65; }
+  }
+  h1{
+    font-family:'Orbitron', sans-serif;
+    font-weight:800;
+    font-size: clamp(2.1rem, 6.5vw, 3.6rem);
+    margin: 0 0 0.7rem;
+    letter-spacing:0.02em;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan), var(--green), var(--pink));
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: plasma 8s linear infinite;
+    text-shadow: 0 0 34px rgba(157,78,255,0.35);
+  }
+  @keyframes plasma{
+    0%{ background-position: 0% 50%; }
+    100%{ background-position: 300% 50%; }
+  }
+  header p.sub{
+    max-width:54ch; margin: 0 auto; color: var(--text-dim); font-size:1.05rem;
+  }
+
+  main{ position:relative; z-index:1; max-width:980px; margin:0 auto; padding: 2.8rem 1.4rem 4rem; }
+
+  .plasma-rule{
+    height:3px; width:64px; border-radius:2px; margin-bottom:0.8rem;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+  }
+  .section-title{
+    font-family:'Orbitron', sans-serif; font-weight:700;
+    font-size:1.35rem; color: var(--text); margin: 0 0 0.35rem;
+    display:flex; align-items:baseline; gap:0.7rem; letter-spacing:0.01em;
+  }
+  .section-title .num{
+    font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:0.85rem; color:var(--pink);
+  }
+  .section-note{ color: var(--text-dim); font-size:0.92rem; margin: 0 0 1.2rem; }
+
+  section{ margin-bottom: 3.2rem; }
+
+  /* --- Neon HUD frame for the NWS loop --- */
+  .hud-frame{
+    position:relative;
+    max-width: 640px; margin: 0 auto;
+    padding: 4px;
+    border-radius: 16px;
+    background: linear-gradient(120deg, var(--pink), var(--purple), var(--cyan), var(--green));
+    background-size: 300% 300%;
+    animation: plasma 10s linear infinite;
+    box-shadow: 0 0 40px rgba(157,78,255,0.35), 0 0 80px rgba(0,229,255,0.15);
+  }
+  .hud-inner{
+    border-radius: 13px;
+    overflow:hidden;
+    background:#000;
+  }
+  .hud-inner img{ display:block; width:100%; height:auto; }
+  .hud-caption{
+    text-align:center; font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
+    color: var(--text-dim); margin-top:0.9rem; letter-spacing:0.04em;
+  }
+
+  /* --- Interactive dark radar map --- */
+  .map-panel{
+    background: var(--panel); border:1px solid var(--edge); border-radius:12px; overflow:hidden;
+    box-shadow: 0 0 30px rgba(0,229,255,0.08);
+  }
+  #radarMap{ height: 440px; width:100%; }
+  .map-controls{
+    display:flex; align-items:center; gap:1rem; padding: 0.95rem 1.1rem;
+    background: var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap;
+  }
+  .neon-btn{
+    background: transparent; color: var(--text); border:1px solid var(--cyan);
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem; font-weight:600; padding:0.55rem 1.1rem;
+    border-radius:8px; cursor:pointer;
+    box-shadow: 0 0 12px rgba(0,229,255,0.35) inset, 0 0 12px rgba(0,229,255,0.25);
+    transition: all 0.15s ease;
+  }
+  .neon-btn:hover{ background: rgba(0,229,255,0.12); box-shadow: 0 0 20px rgba(0,229,255,0.55); }
+  input[type=range]{ flex:1; min-width:120px; accent-color: var(--pink); }
+  .frame-time{
+    font-family:'IBM Plex Mono', monospace; font-size:0.8rem; color: var(--green);
+    min-width: 150px; text-align:right;
+  }
+
+  /* --- Windy embed --- */
+  .windy-panel{
+    border:1px solid var(--edge); border-radius:12px; overflow:hidden; background:var(--panel);
+    box-shadow: 0 0 30px rgba(255,46,196,0.08);
+  }
+  .windy-panel iframe{ width:100%; height:460px; border:0; display:block; }
+
+  /* --- Forecast deck --- */
+  .almanac{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:1rem;
+  }
+  .almanac-card{
+    background: var(--panel2); border:1px solid var(--edge); border-radius:10px;
+    padding: 1.1rem 0.95rem; text-align:center;
+    border-top: 3px solid var(--purple);
+  }
+  .almanac-card h4{
+    font-family:'Inter', sans-serif; font-weight:700; margin:0 0 0.5rem; font-size:0.98rem;
+    color: var(--cyan);
+  }
+  .almanac-card .temp{ font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:1.55rem; margin: 0.2rem 0; color: var(--text); }
+  .almanac-card .desc{ font-size:0.87rem; color: var(--text-dim); }
+  .now-card{
+    grid-column: 1 / -1;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+    background: linear-gradient(120deg, rgba(255,46,196,0.16), rgba(157,78,255,0.16), rgba(0,229,255,0.14));
+    border:1px solid var(--edge);
+    padding:1.25rem 1.4rem; border-radius:10px;
+  }
+  .now-card .big-temp{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:2.4rem; color: var(--text); }
+  .now-card .place{ font-family:'Inter', sans-serif; font-weight:600; font-size:1.05rem; color: var(--text); }
+  .now-card .desc{ color: var(--text-dim); font-size:0.92rem; }
+  .almanac-status{ color: var(--text-dim); font-family:'IBM Plex Mono', monospace; font-size:0.85rem; }
+
+  footer{
+    max-width:980px; margin: 0 auto; padding: 1.8rem 1.4rem 3rem; border-top:1px solid var(--edge);
+    color: var(--text-dim); font-size:0.8rem; text-align:center;
+  }
+  footer a{ text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="grid-fx"></div>
+
+<header>
+  <div class="kicker"><span class="live-seal"></span> KANSAS CITY · 39.10&deg;N, 94.58&deg;W</div>
+  <h1>KC STORM GRID</h1>
+  <p class="sub">Three free radar feeds running on one neon dashboard. Track incoming weather over Kansas City in real time.</p>
+</header>
+
+<main>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">01</span> Live Loop — NWS Pleasant Hill (KEAX)</p>
+    <p class="section-note">The National Weather Service's own radar feed, straight from the source. No key, no cost.</p>
+    <div class="hud-frame">
+      <div class="hud-inner">
+        <img id="nws-loop" src="" alt="NWS KEAX radar loop for Kansas City">
+      </div>
+    </div>
+    <p class="hud-caption">source: radar.weather.gov · station KEAX (Pleasant Hill, MO) · reloads on page load</p>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">02</span> Animated Precipitation Map</p>
+    <p class="section-note">Drag, scroll, and hit play to animate the last two hours of rain and snow across the metro.</p>
+    <div class="map-panel">
+      <div id="radarMap"></div>
+      <div class="map-controls">
+        <button class="neon-btn" id="playBtn">&#9654; Animate</button>
+        <input type="range" id="radar-slider" min="0" max="10" value="0">
+        <span class="frame-time" id="frame-time">loading frames&hellip;</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">03</span> Windy Overlay</p>
+    <p class="section-note">A second live view — use its own controls (bottom-left, inside the frame) to switch between radar, wind, and temperature.</p>
+    <div class="windy-panel">
+      <iframe
+        src="https://embed.windy.com/embed2.html?lat=39.0997&lon=-94.5786&detailLat=39.0997&detailLon=-94.5786&width=650&height=450&zoom=7&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+        title="Windy radar and wind map for Kansas City">
+      </iframe>
+    </div>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">04</span> Current &amp; Coming Hours</p>
+    <p class="section-note">Pulled live from the National Weather Service forecast office.</p>
+    <div class="almanac" id="almanac">
+      <div class="almanac-status">loading forecast&hellip;</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Radar imagery: <a href="https://radar.weather.gov" target="_blank" rel="noopener">NWS/NOAA radar.weather.gov</a> ·
+  Animated precipitation tiles: <a href="https://www.rainviewer.com/api.html" target="_blank" rel="noopener">RainViewer</a> ·
+  Map base: <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors ·
+  Wind/radar overlay: <a href="https://www.windy.com" target="_blank" rel="noopener">Windy.com</a> ·
+  Forecast text: <a href="https://www.weather.gov" target="_blank" rel="noopener">weather.gov</a> (api.weather.gov). All sources are free public services; none require an account.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  // ---------- NWS static loop (cache-busted) ----------
+  document.getElementById('nws-loop').src = 'https://radar.weather.gov/ridge/standard/KEAX_loop.gif?t=' + Date.now();
+
+  // ---------- Leaflet dark map ----------
+  const KC = [39.0997, -94.5786];
+  const map = L.map('radarMap', { zoomControl: true }).setView(KC, 7);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  L.marker(KC).addTo(map).bindPopup('Kansas City');
+
+  let frames = [];
+  let currentFrame = 0;
+  let tileHost = '';
+  let radarLayer = null;
+  let playing = false;
+  let timer = null;
+
+  function frameUrl(frame){
+    return tileHost + frame.path + '/256/{z}/{x}/{y}/2/1_1.png';
+  }
+
+  function fmtTime(unixSeconds){
+    const d = new Date(unixSeconds * 1000);
+    return d.toLocaleString(undefined, { weekday:'short', hour:'numeric', minute:'2-digit' });
+  }
+
+  function showFrame(i){
+    currentFrame = ((i % frames.length) + frames.length) % frames.length;
+    const url = frameUrl(frames[currentFrame]);
+    if(radarLayer){
+      radarLayer.setUrl(url);
+    } else {
+      radarLayer = L.tileLayer(url, { opacity: 0.75, zIndex: 5 }).addTo(map);
+    }
+    document.getElementById('frame-time').textContent = fmtTime(frames[currentFrame].time);
+    document.getElementById('radar-slider').value = currentFrame;
+  }
+
+  async function initRadar(){
+    try{
+      const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+      const data = await res.json();
+      tileHost = data.host;
+      const past = data.radar.past || [];
+      const nowcast = data.radar.nowcast || [];
+      frames = past.concat(nowcast);
+      const slider = document.getElementById('radar-slider');
+      slider.max = frames.length - 1;
+      showFrame(past.length - 1);
+    } catch(err){
+      document.getElementById('frame-time').textContent = 'radar unavailable';
+      console.error(err);
+    }
+  }
+
+  document.getElementById('radar-slider').addEventListener('input', (e)=>{
+    if(playing){ togglePlay(); }
+    showFrame(parseInt(e.target.value, 10));
+  });
+
+  function togglePlay(){
+    playing = !playing;
+    const btn = document.getElementById('playBtn');
+    if(playing){
+      btn.innerHTML = '&#10074;&#10074; Pause';
+      timer = setInterval(()=> showFrame(currentFrame + 1), 700);
+    } else {
+      btn.innerHTML = '&#9654; Animate';
+      clearInterval(timer);
+    }
+  }
+  document.getElementById('playBtn').addEventListener('click', togglePlay);
+
+  initRadar();
+
+  // ---------- Forecast deck (api.weather.gov) ----------
+  async function loadAlmanac(){
+    const el = document.getElementById('almanac');
+    try{
+      const pointRes = await fetch('https://api.weather.gov/points/39.0997,-94.5786');
+      const pointData = await pointRes.json();
+      const [forecastRes, obsRes] = await Promise.all([
+        fetch(pointData.properties.forecast),
+        fetch('https://api.weather.gov/stations/KMCI/observations/latest').catch(()=>null)
+      ]);
+      const forecastData = await forecastRes.json();
+      const periods = forecastData.properties.periods.slice(0, 6);
+
+      el.innerHTML = '';
+
+      if(obsRes && obsRes.ok){
+        const obsData = await obsRes.json();
+        const tempC = obsData.properties.temperature.value;
+        if(tempC !== null && tempC !== undefined){
+          const tempF = Math.round(tempC * 9/5 + 32);
+          const desc = obsData.properties.textDescription || '';
+          const nowCard = document.createElement('div');
+          nowCard.className = 'now-card';
+          nowCard.innerHTML = `
+            <div>
+              <div class="place">Right now — Kansas City Int'l</div>
+              <div class="desc">${desc}</div>
+            </div>
+            <div class="big-temp">${tempF}&deg;F</div>
+          `;
+          el.appendChild(nowCard);
+        }
+      }
+
+      periods.forEach(p=>{
+        const card = document.createElement('div');
+        card.className = 'almanac-card';
+        card.innerHTML = `
+          <h4>${p.name}</h4>
+          <div class="temp">${p.temperature}&deg;${p.temperatureUnit}</div>
+          <div class="desc">${p.shortForecast}</div>
+        `;
+        el.appendChild(card);
+      });
+    } catch(err){
+      el.innerHTML = '<div class="almanac-status">Forecast feed unavailable right now — the radars above are still live. Try reloading.</div>';
+      console.error(err);
+    }
+  }
+  loadAlmanac();
+</script>
+</body>
+</html>
