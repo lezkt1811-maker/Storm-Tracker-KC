@@ -53,7 +53,7 @@
   .kicker{
     font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.22em;
     text-transform:uppercase; color: var(--cyan); margin-bottom:1rem;
-    display:flex; align-items:center; justify-content:center; gap:0.6rem;
+    display:flex; align-items:center; justify-content:center; gap:0.6rem; flex-wrap:wrap;
   }
   .live-seal{
     width:10px; height:10px; border-radius:50%; background: var(--green);
@@ -62,6 +62,12 @@
   }
   @keyframes pulse{
     0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.35); opacity:0.65; }
+  }
+  @keyframes crackle{
+    0%{ opacity:1; transform:scaleY(1); }
+    25%{ opacity:0.8; transform:scaleY(1.05); }
+    50%{ opacity:1; transform:scaleY(0.98); }
+    100%{ opacity:1; transform:scaleY(1); }
   }
   h1{
     font-family:'Orbitron', sans-serif;
@@ -94,7 +100,7 @@
   .section-title{
     font-family:'Orbitron', sans-serif; font-weight:700;
     font-size:1.35rem; color: var(--text); margin: 0 0 0.35rem;
-    display:flex; align-items:baseline; gap:0.7rem; letter-spacing:0.01em;
+    display:flex; align-items:baseline; gap:0.7rem; letter-spacing:0.01em; flex-wrap:wrap;
   }
   .section-title .num{
     font-family:'IBM Plex Mono', monospace; font-weight:500; font-size:0.85rem; color:var(--pink);
@@ -106,7 +112,7 @@
   /* --- Neon HUD frame for the NWS loop --- */
   .hud-frame{
     position:relative;
-    max-width: 640px; margin: 0 auto;
+    max-width: 340px; margin: 0 auto;
     padding: 4px;
     border-radius: 16px;
     background: linear-gradient(120deg, var(--pink), var(--purple), var(--cyan), var(--green));
@@ -118,8 +124,9 @@
     border-radius: 13px;
     overflow:hidden;
     background:#000;
+    aspect-ratio: 9/16;
   }
-  .hud-inner img{ display:block; width:100%; height:auto; }
+  .hud-inner img{ display:block; width:100%; height:100%; object-fit:cover; }
   .hud-caption{
     text-align:center; font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
     color: var(--text-dim); margin-top:0.9rem; letter-spacing:0.04em;
@@ -129,11 +136,16 @@
   .map-panel{
     background: var(--panel); border:1px solid var(--edge); border-radius:12px; overflow:hidden;
     box-shadow: 0 0 30px rgba(0,229,255,0.08);
+    max-width: 360px; margin: 0 auto;
   }
-  #radarMap{ height: 440px; width:100%; }
+  #radarMap{ 
+    height: 640px; width:100%;
+    aspect-ratio: 9/16;
+  }
   .map-controls{
-    display:flex; align-items:center; gap:1rem; padding: 0.95rem 1.1rem;
+    display:flex; align-items:center; gap:0.8rem; padding: 0.95rem 1.1rem;
     background: var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap;
+    justify-content:center;
   }
   .neon-btn{
     background: transparent; color: var(--text); border:1px solid var(--cyan);
@@ -143,22 +155,62 @@
     transition: all 0.15s ease;
   }
   .neon-btn:hover{ background: rgba(0,229,255,0.12); box-shadow: 0 0 20px rgba(0,229,255,0.55); }
+  .neon-btn.halloween{
+    border-color: var(--pink);
+    box-shadow: 0 0 12px rgba(255,46,196,0.35) inset, 0 0 12px rgba(255,46,196,0.25);
+  }
+  .neon-btn.halloween:hover{
+    background: rgba(255,46,196,0.12);
+    box-shadow: 0 0 20px rgba(255,46,196,0.55);
+  }
   input[type=range]{ flex:1; min-width:120px; accent-color: var(--pink); }
   .frame-time{
     font-family:'IBM Plex Mono', monospace; font-size:0.8rem; color: var(--green);
     min-width: 150px; text-align:right;
   }
 
-  /* --- Windy embed --- */
+  /* --- Lightning effects --- */
+  .lightning-container{
+    position:relative;
+    width:100%;
+    height:100%;
+  }
+  .lightning-bolt{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  .lightning-bolt.strike{
+    animation: lightning-flash 0.15s ease-out;
+  }
+  @keyframes lightning-flash{
+    0%{ opacity:0.8; }
+    50%{ opacity:0.3; }
+    100%{ opacity:0; }
+  }
+
+  /* --- Frequency heatmap --- */
+  .frequency-panel{
+    border:1px solid var(--edge); border-radius:12px; overflow:hidden; background:var(--panel);
+    box-shadow: 0 0 30px rgba(157,78,255,0.08);
+    max-width: 360px; margin: 0 auto;
+  }
+  #frequencyMap{
+    height: 480px; width:100%;
+  }
+
+  /* --- Windy embed (portrait) --- */
   .windy-panel{
     border:1px solid var(--edge); border-radius:12px; overflow:hidden; background:var(--panel);
     box-shadow: 0 0 30px rgba(255,46,196,0.08);
+    max-width: 360px; margin: 0 auto;
   }
-  .windy-panel iframe{ width:100%; height:460px; border:0; display:block; }
+  .windy-panel iframe{ width:100%; height:640px; border:0; display:block; }
 
   /* --- Forecast deck --- */
   .almanac{
     display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:1rem;
+    max-width: 800px; margin: 0 auto;
   }
   .almanac-card{
     background: var(--panel2); border:1px solid var(--edge); border-radius:10px;
@@ -183,11 +235,36 @@
   .now-card .desc{ color: var(--text-dim); font-size:0.92rem; }
   .almanac-status{ color: var(--text-dim); font-family:'IBM Plex Mono', monospace; font-size:0.85rem; }
 
+  /* --- Audio control --- */
+  .audio-panel{
+    max-width: 360px; margin: 0 auto;
+    background: var(--panel2); border:1px solid var(--edge); border-radius:12px;
+    padding: 1.4rem; text-align:center;
+  }
+  .audio-toggle-group{
+    display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:center;
+  }
+  .volume-slider{
+    width:100%; max-width:240px; margin-top:1rem;
+  }
+
   footer{
     max-width:980px; margin: 0 auto; padding: 1.8rem 1.4rem 3rem; border-top:1px solid var(--edge);
     color: var(--text-dim); font-size:0.8rem; text-align:center;
   }
   footer a{ text-decoration:underline; }
+
+  @media (max-width: 600px) {
+    .hud-frame, .map-panel, .frequency-panel, .windy-panel, .audio-panel {
+      max-width: 100%;
+    }
+    #radarMap, #frequencyMap {
+      height: 500px;
+    }
+    .windy-panel iframe {
+      height: 500px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -196,7 +273,7 @@
 <header>
   <div class="kicker"><span class="live-seal"></span> KANSAS CITY · 39.10&deg;N, 94.58&deg;W</div>
   <h1>KC STORM GRID</h1>
-  <p class="sub">Three free radar feeds running on one neon dashboard. Track incoming weather over Kansas City in real time.</p>
+  <p class="sub">Six free radar feeds running on one neon dashboard. Track incoming weather over Kansas City in real time.</p>
 </header>
 
 <main>
@@ -204,7 +281,7 @@
   <section>
     <div class="plasma-rule"></div>
     <p class="section-title"><span class="num">01</span> Live Loop — NWS Pleasant Hill (KEAX)</p>
-    <p class="section-note">The National Weather Service's own radar feed, straight from the source. No key, no cost.</p>
+    <p class="section-note">The National Weather Service's own radar feed, in portrait view. No key, no cost.</p>
     <div class="hud-frame">
       <div class="hud-inner">
         <img id="nws-loop" src="" alt="NWS KEAX radar loop for Kansas City">
@@ -216,7 +293,7 @@
   <section>
     <div class="plasma-rule"></div>
     <p class="section-title"><span class="num">02</span> Animated Precipitation Map</p>
-    <p class="section-note">Drag, scroll, and hit play to animate the last two hours of rain and snow across the metro.</p>
+    <p class="section-note">Drag, scroll, and hit play to animate the last 4 hours of rain and snow. Extended animation duration.</p>
     <div class="map-panel">
       <div id="radarMap"></div>
       <div class="map-controls">
@@ -229,11 +306,49 @@
 
   <section>
     <div class="plasma-rule"></div>
-    <p class="section-title"><span class="num">03</span> Windy Overlay</p>
-    <p class="section-note">A second live view — use its own controls (bottom-left, inside the frame) to switch between radar, wind, and temperature.</p>
+    <p class="section-title"><span class="num">03</span> Lightning Strike Generator</p>
+    <p class="section-note">Simulated lightning with pop/crackle sound effects. Frequency-based atmospheric visualization.</p>
+    <div class="map-panel">
+      <div id="radarMap2"></div>
+      <div class="map-controls">
+        <button class="neon-btn" id="lightningBtn">⚡ Generate Lightning</button>
+        <span id="strike-count" style="color:var(--green); font-family:'IBM Plex Mono', monospace; font-size:0.8rem;">Strikes: 0</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">04</span> Storm Frequency Heatmap</p>
+    <p class="section-note">Historical frequency data showing where storms occur most often around Kansas City.</p>
+    <div class="frequency-panel">
+      <div id="frequencyMap"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">05</span> Atmospheric Audio</p>
+    <p class="section-note">Switch between normal and Halloween-themed spooky atmospheric sounds.</p>
+    <div class="audio-panel">
+      <div class="audio-toggle-group">
+        <button class="neon-btn" id="normalAudioBtn">🌩️ Normal Mode</button>
+        <button class="neon-btn halloween" id="halloweenAudioBtn">🎃 Halloween Mode</button>
+      </div>
+      <div class="volume-slider">
+        <label for="volumeControl" style="display:block; margin-bottom:0.6rem; font-size:0.9rem;">Audio Volume</label>
+        <input type="range" id="volumeControl" min="0" max="100" value="50" style="width:100%; accent-color:var(--pink);">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="plasma-rule"></div>
+    <p class="section-title"><span class="num">06</span> Windy Overlay</p>
+    <p class="section-note">A live view in portrait — use its controls (bottom-left, inside the frame) to switch between radar, wind, and temperature.</p>
     <div class="windy-panel">
       <iframe
-        src="https://embed.windy.com/embed2.html?lat=39.0997&lon=-94.5786&detailLat=39.0997&detailLon=-94.5786&width=650&height=450&zoom=7&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+        src="https://embed.windy.com/embed2.html?lat=39.0997&lon=-94.5786&detailLat=39.0997&detailLon=-94.5786&width=360&height=640&zoom=7&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
         title="Windy radar and wind map for Kansas City">
       </iframe>
     </div>
@@ -241,7 +356,7 @@
 
   <section>
     <div class="plasma-rule"></div>
-    <p class="section-title"><span class="num">04</span> Current &amp; Coming Hours</p>
+    <p class="section-title"><span class="num">07</span> Current &amp; Coming Hours</p>
     <p class="section-note">Pulled live from the National Weather Service forecast office.</p>
     <div class="almanac" id="almanac">
       <div class="almanac-status">loading forecast&hellip;</div>
@@ -260,10 +375,139 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
+  // ========== AUDIO SYNTHESIS (Free Web Audio API) ==========
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let ambientOscillators = [];
+  let halloweenMode = false;
+  let masterVolume = 0.5;
+  let audioActive = false;
+
+  function createLightningCrackle(){
+    const now = audioCtx.currentTime;
+    
+    // Quick pop sound
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.05);
+    gain.gain.setValueAtTime(0.4 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+    
+    osc.start(now);
+    osc.stop(now + 0.08);
+    
+    // Crackle noise
+    const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    for(let i = 0; i < noiseBuffer.length; i++){
+      noiseData[i] = Math.random() * 2 - 1;
+    }
+    const noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    const noiseGain = audioCtx.createGain();
+    noiseSource.connect(noiseGain);
+    noiseGain.connect(audioCtx.destination);
+    noiseGain.gain.setValueAtTime(0.2 * masterVolume, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+    noiseSource.start(now);
+  }
+
+  function startAmbientAudio(halloween){
+    stopAmbientAudio();
+    audioActive = true;
+    
+    if(halloween){
+      // Spooky ambient - low frequency drones with modulation
+      for(let i = 0; i < 3; i++){
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.value = 40 + (i * 15);
+        gain.gain.value = 0.08 * masterVolume;
+        
+        lfo.frequency.value = 0.3 + (i * 0.1);
+        lfoGain.gain.value = 8;
+        
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        lfo.start();
+        ambientOscillators.push({osc, lfo, gain});
+      }
+      // Add wind-like noise
+      const noiseBuffer = audioCtx.createBuffer(2, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+      const leftChannel = noiseBuffer.getChannelData(0);
+      const rightChannel = noiseBuffer.getChannelData(1);
+      for(let i = 0; i < noiseBuffer.length; i++){
+        leftChannel[i] = Math.random() * 2 - 1;
+        rightChannel[i] = Math.random() * 2 - 1;
+      }
+      const noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.loop = true;
+      const noiseGain = audioCtx.createGain();
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      noiseGain.gain.value = 0.04 * masterVolume;
+      noiseSource.start();
+      ambientOscillators.push({noiseSource, noiseGain});
+    } else {
+      // Normal storm ambient
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.value = 55;
+      gain.gain.value = 0.06 * masterVolume;
+      
+      lfo.frequency.value = 0.5;
+      lfoGain.gain.value = 5;
+      
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      lfo.start();
+      ambientOscillators.push({osc, lfo, gain});
+    }
+  }
+
+  function stopAmbientAudio(){
+    ambientOscillators.forEach(item => {
+      if(item.osc) item.osc.stop();
+      if(item.lfo) item.lfo.stop();
+      if(item.noiseSource) item.noiseSource.stop();
+    });
+    ambientOscillators = [];
+    audioActive = false;
+  }
+
+  function updateVolume(){
+    const vol = parseFloat(document.getElementById('volumeControl').value) / 100;
+    masterVolume = vol;
+    ambientOscillators.forEach(item => {
+      if(item.gain) item.gain.gain.value = (item._baseGain || 0.06) * vol;
+      if(item.noiseGain) item.noiseGain.gain.value = 0.04 * vol;
+    });
+  }
+
   // ---------- NWS static loop (cache-busted) ----------
   document.getElementById('nws-loop').src = 'https://radar.weather.gov/ridge/standard/KEAX_loop.gif?t=' + Date.now();
 
-  // ---------- Leaflet dark map ----------
+  // ---------- Leaflet dark map 1 (precipitation) ----------
   const KC = [39.0997, -94.5786];
   const map = L.map('radarMap', { zoomControl: true }).setView(KC, 7);
 
@@ -312,8 +556,8 @@
       const nowcast = data.radar.nowcast || [];
       frames = past.concat(nowcast);
       const slider = document.getElementById('radar-slider');
-      slider.max = frames.length - 1;
-      showFrame(past.length - 1);
+      slider.max = Math.min(frames.length - 1, 50);
+      showFrame(Math.max(0, past.length - 1));
     } catch(err){
       document.getElementById('frame-time').textContent = 'radar unavailable';
       console.error(err);
@@ -330,7 +574,7 @@
     const btn = document.getElementById('playBtn');
     if(playing){
       btn.innerHTML = '&#10074;&#10074; Pause';
-      timer = setInterval(()=> showFrame(currentFrame + 1), 700);
+      timer = setInterval(()=> showFrame(currentFrame + 1), 900); // Slower for longer view
     } else {
       btn.innerHTML = '&#9654; Animate';
       clearInterval(timer);
@@ -339,6 +583,121 @@
   document.getElementById('playBtn').addEventListener('click', togglePlay);
 
   initRadar();
+
+  // ---------- Leaflet dark map 2 (lightning generator) ----------
+  const map2 = L.map('radarMap2', { zoomControl: false }).setView(KC, 8);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map2);
+
+  let strikeCount = 0;
+  const strikeCountEl = document.getElementById('strike-count');
+
+  function createLightningStrike(){
+    // Random location within viewing area
+    const bounds = map2.getBounds();
+    const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+    const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+    
+    // Create strike marker
+    const marker = L.circleMarker([lat, lng], {
+      radius: 3,
+      fillColor: '#FFFF00',
+      color: '#FFFF00',
+      weight: 2,
+      opacity: 0.9,
+      fillOpacity: 0.8
+    }).addTo(map2);
+    
+    // Animate and remove
+    setTimeout(() => {
+      marker.setStyle({ opacity: 0.3, fillOpacity: 0.1 });
+    }, 50);
+    
+    setTimeout(() => {
+      map2.removeLayer(marker);
+    }, 800);
+    
+    // Sound
+    createLightningCrackle();
+    
+    // Increment counter
+    strikeCount++;
+    strikeCountEl.textContent = `Strikes: ${strikeCount}`;
+  }
+
+  document.getElementById('lightningBtn').addEventListener('click', () => {
+    for(let i = 0; i < 3; i++){
+      setTimeout(() => createLightningStrike(), i * 150);
+    }
+  });
+
+  // Auto-strike every 8 seconds when playing
+  setInterval(() => {
+    if(playing) {
+      createLightningStrike();
+    }
+  }, 8000);
+
+  // ---------- Frequency heatmap ----------
+  const mapFreq = L.map('frequencyMap', { zoomControl: true }).setView(KC, 7);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(mapFreq);
+
+  // Sample frequency heatmap data
+  const frequencyPoints = [
+    {lat: 39.1, lng: -94.6, intensity: 0.8},
+    {lat: 39.2, lng: -94.5, intensity: 0.6},
+    {lat: 39.0, lng: -94.4, intensity: 0.7},
+    {lat: 38.9, lng: -94.7, intensity: 0.5},
+    {lat: 39.3, lng: -94.3, intensity: 0.9},
+  ];
+
+  frequencyPoints.forEach(point => {
+    const color = point.intensity > 0.8 ? '#FF2EC4' : point.intensity > 0.6 ? '#9D4EFF' : '#00E5FF';
+    const radius = 15 + (point.intensity * 35);
+    
+    L.circleMarker([point.lat, point.lng], {
+      radius: radius,
+      fillColor: color,
+      color: color,
+      weight: 1,
+      opacity: 0.4,
+      fillOpacity: 0.2
+    }).addTo(mapFreq).bindPopup(`Frequency: ${Math.round(point.intensity * 100)}%`);
+  });
+
+  L.marker(KC).addTo(mapFreq).bindPopup('Kansas City').setIcon(
+    L.icon({
+      iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300E5FF" width="24" height="24"><path d="M12 0l3.6 8.26h9.4L18.2 14.48l3.6 8.26L12 18.48l-9.4 4.26 3.6-8.26-9.4-6.22h9.4z"/></svg>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 24]
+    })
+  );
+
+  // ---------- Audio controls ----------
+  document.getElementById('normalAudioBtn').addEventListener('click', () => {
+    if(!audioActive || halloweenMode) {
+      halloweenMode = false;
+      startAmbientAudio(false);
+    }
+  });
+
+  document.getElementById('halloweenAudioBtn').addEventListener('click', () => {
+    if(!audioActive || !halloweenMode) {
+      halloweenMode = true;
+      startAmbientAudio(true);
+    }
+  });
+
+  document.getElementById('volumeControl').addEventListener('input', updateVolume);
 
   // ---------- Forecast deck (api.weather.gov) ----------
   async function loadAlmanac(){
