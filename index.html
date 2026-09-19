@@ -602,37 +602,72 @@ const RadarProvider = {
   keaxLoopUrl(){ return "https://radar.weather.gov/ridge/standard/KEAX_loop.gif?t=" + Date.now(); }
 };
 
-/* ===================== PROVIDER: AIRCRAFT (OpenSky Network, anonymous/free) ===================== */
+/* ===================== PROVIDER: AIRCRAFT (OpenSky Network, anonymous/free) =====================
+   OpenSky's public REST API does not send CORS headers on states/all, so a
+   direct browser fetch is blocked by the browser itself in most cases —
+   independent of rate limits. We still try it directly first (free, and it
+   costs nothing to attempt), then fall back to a same-origin snapshot file
+   (data/aircraft.json) that .github/workflows/aircraft-snapshot.yml fetches
+   server-side on a schedule and commits into the repo, where CORS doesn't
+   apply. Both paths are real OpenSky data — the fallback is just not
+   real-time (it's as fresh as the last scheduled run, and says so). */
 const AircraftProvider = {
-  status: "unknown", // unknown | ok | error | not_connected
+  status: "unknown", // unknown | ok | cached | error | not_connected
   lastError: null,
+  lastUpdated: null,
   async getStatesNear(lat, lon, deltaDeg){
     deltaDeg = deltaDeg || 0.7;
     const lamin = lat - deltaDeg, lamax = lat + deltaDeg;
     const lomin = lon - deltaDeg, lomax = lon + deltaDeg;
+    const live = await this._fetchLive(lamin, lomin, lamax, lomax);
+    if(live) return live;
+    return await this._fetchCachedSnapshot(lamin, lomin, lamax, lomax);
+  },
+  async _fetchLive(lamin, lomin, lamax, lomax){
     const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`;
     const controller = new AbortController();
     const timer = setTimeout(()=>controller.abort(), 6000);
     try{
       const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timer);
-      if(res.status === 429){ this.status = "error"; this.lastError = "Rate limited by OpenSky anonymous tier"; return []; }
+      if(res.status === 429){ this.lastError = "Rate limited by OpenSky anonymous tier"; return null; }
       if(!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-      this.status = "ok"; this.lastError = null;
-      const rows = data.states || [];
-      return rows.filter(r=>r[5]!=null && r[6]!=null).map(r=>({
-        source: "OpenSky Network",
-        icao24: r[0], callsign: (r[1]||"").trim() || "unknown",
-        lon: r[5], lat: r[6],
-        altitude: r[7], onGround: r[8], velocity: r[9], heading: r[10]
-      }));
+      this.status = "ok"; this.lastError = null; this.lastUpdated = Date.now();
+      return this._normalize(data.states || [], "OpenSky Network (live)");
     } catch(err){
       clearTimeout(timer);
-      this.status = "not_connected"; this.lastError = err.message;
-      console.error("AircraftProvider.getStatesNear", err);
+      this.lastError = err.message;
+      return null;
+    }
+  },
+  async _fetchCachedSnapshot(lamin, lomin, lamax, lomax){
+    try{
+      const res = await fetch('data/aircraft.json', { cache: 'no-store' });
+      if(!res.ok) throw new Error('no snapshot available');
+      const data = await res.json();
+      this.lastUpdated = data.fetchedAt ? Date.parse(data.fetchedAt) : null;
+      if(!data.fetchedAt || !data.states || !data.states.length){
+        this.status = 'not_connected';
+        this.lastError = data.error || 'No scheduled snapshot has run yet';
+        return [];
+      }
+      const filtered = data.states.filter(s => s[6]>=lamin && s[6]<=lamax && s[5]>=lomin && s[5]<=lomax);
+      this.status = 'cached'; this.lastError = null;
+      return this._normalize(filtered, `OpenSky Network via scheduled GitHub Actions snapshot (updated ${fmtTime(this.lastUpdated)})`);
+    } catch(err){
+      this.status = 'not_connected'; this.lastError = err.message;
+      console.error('AircraftProvider._fetchCachedSnapshot', err);
       return [];
     }
+  },
+  _normalize(rows, sourceLabel){
+    return rows.filter(r=>r[5]!=null && r[6]!=null).map(r=>({
+      source: sourceLabel,
+      icao24: r[0], callsign: (r[1]||"").trim() || "unknown",
+      lon: r[5], lat: r[6],
+      altitude: r[7], onGround: r[8], velocity: r[9], heading: r[10]
+    }));
   }
 };
 
@@ -834,11 +869,13 @@ async function refreshAircraftLayer(){
   aircraftLayer.clearLayers();
   const statusNote = document.getElementById('aircraftStatusNote');
   const planes = await AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon);
-  if(AircraftProvider.status === 'ok'){
-    statusNote.textContent = `AIRCRAFT: ${planes.length} tracked · SOURCE: OpenSky Network (free, anonymous tier)`;
+  if(AircraftProvider.status === 'ok' || AircraftProvider.status === 'cached'){
+    statusNote.textContent = AircraftProvider.status === 'ok'
+      ? `AIRCRAFT: ${planes.length} tracked live · SOURCE: OpenSky Network`
+      : `AIRCRAFT: ${planes.length} tracked (scheduled snapshot, updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions`;
     planes.forEach(p=>{
       const marker = L.marker([p.lat, p.lon], { icon: aircraftIcon(p.heading) });
-      marker.bindPopup(`<strong>${escapeHtml(p.callsign)}</strong><br>Altitude: ${p.altitude!=null? Math.round(p.altitude)+'m':'unknown'}<br>Speed: ${p.velocity!=null? Math.round(p.velocity*1.94384)+'kt':'unknown'}<br>Heading: ${p.heading!=null? Math.round(p.heading)+'°':'unknown'}<br><span class="source-tag">SOURCE: OpenSky Network</span>`);
+      marker.bindPopup(`<strong>${escapeHtml(p.callsign)}</strong><br>Altitude: ${p.altitude!=null? Math.round(p.altitude)+'m':'unknown'}<br>Speed: ${p.velocity!=null? Math.round(p.velocity*1.94384)+'kt':'unknown'}<br>Heading: ${p.heading!=null? Math.round(p.heading)+'°':'unknown'}<br><span class="source-tag">SOURCE: ${escapeHtml(p.source)}</span>`);
       marker.addTo(aircraftLayer);
     });
   } else {
@@ -918,8 +955,9 @@ if(LEAFLET_AVAILABLE){
 // initial aircraft status probe (layer off by default, but tell the user honestly)
 AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon).then(planes=>{
   const note = document.getElementById('aircraftStatusNote');
-  if(AircraftProvider.status === 'ok') note.textContent = `AIRCRAFT: ${planes.length} nearby via OpenSky Network. Enable the layer to view on map.`;
-  else note.textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED (OpenSky Network unreachable right now). No aircraft are simulated.';
+  if(AircraftProvider.status === 'ok') note.textContent = `AIRCRAFT: ${planes.length} nearby, live via OpenSky Network. Enable the layer to view on map.`;
+  else if(AircraftProvider.status === 'cached') note.textContent = `AIRCRAFT: ${planes.length} nearby from a scheduled snapshot (updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions. Enable the layer to view on map.`;
+  else note.textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED (OpenSky Network unreachable, and no scheduled snapshot yet). No aircraft are simulated.';
 }).catch(()=>{
   document.getElementById('aircraftStatusNote').textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED. No aircraft are simulated.';
 });
@@ -1214,7 +1252,7 @@ async function renderStatusPanel(){
   const rows = [
     { label:'NWS / WEATHER', ok: WeatherProvider.status==='ok', warn: WeatherProvider.status==='unknown', text: WeatherProvider.status==='ok'?'CONNECTED':(WeatherProvider.status==='unknown'?'CHECKING':'ERROR') },
     { label:'RADAR (RainViewer)', ok: RadarProvider.status==='ok', warn: RadarProvider.status==='unknown', text: RadarProvider.status==='ok'?'CONNECTED':(RadarProvider.status==='unknown'?'CHECKING':'ERROR') },
-    { label:'AIRCRAFT (OpenSky)', ok: AircraftProvider.status==='ok', warn: AircraftProvider.status==='unknown', text: AircraftProvider.status==='ok'?'CONNECTED':(AircraftProvider.status==='unknown'?'CHECKING':'NOT CONNECTED') },
+    { label:'AIRCRAFT (OpenSky)', ok: AircraftProvider.status==='ok'||AircraftProvider.status==='cached', warn: AircraftProvider.status==='unknown', text: AircraftProvider.status==='ok'?'CONNECTED (live)':AircraftProvider.status==='cached'?'CONNECTED (snapshot)':(AircraftProvider.status==='unknown'?'CHECKING':'NOT CONNECTED') },
     { label:'AI', ok:true, warn:false, text:'LOCAL' },
     { label:'LOCATION', ok: geoState==='granted', warn: geoState==='prompt'||geoState==='unknown', text: geoState.toUpperCase() },
     { label:'STORAGE (IndexedDB)', ok: storageOk, warn:false, text: storageOk?'AVAILABLE':'ERROR' },

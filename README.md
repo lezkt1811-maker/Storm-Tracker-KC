@@ -52,10 +52,20 @@ build or install.
 | Map tiles | [CARTO](https://carto.com/attributions) / [OpenStreetMap](https://www.openstreetmap.org/copyright) | Free dark basemap |
 | Baseline / anomaly / correlation analysis | Local, client-side statistics | No external AI API |
 
-**OpenSky Network limitations:** the anonymous/keyless tier used here is rate-limited
-and occasionally blocks browser (CORS) requests outright. When it's unreachable, the
-app displays **"AIRCRAFT DATA SOURCE NOT CONNECTED"** rather than guessing or
-simulating aircraft. This is expected behavior, not a bug.
+**OpenSky Network limitations:** OpenSky's public REST API does not send CORS
+headers, so a direct request from a browser is blocked by the browser itself,
+regardless of rate limits — confirmed by testing the live site. The app still tries
+a direct fetch first (free, costs nothing to attempt), and if that's blocked, falls
+back to `data/aircraft.json` — a same-origin file with no CORS restrictions,
+produced by the free scheduled workflow `.github/workflows/aircraft-snapshot.yml`.
+That workflow runs on GitHub's own servers every 30 minutes (free for public repos,
+no secrets, no billing), fetches OpenSky states for the KC metro bounding box, and
+commits the result into the repo, where GitHub Pages serves it statically. The app
+always labels which path served the data — **"live"** for a direct fetch or
+**"scheduled snapshot, updated \<time\>"** for the fallback — so it's never presented
+as more current than it is. If the workflow hasn't run yet (e.g., right after first
+deploy) or OpenSky itself is down, the app shows **"AIRCRAFT DATA SOURCE NOT
+CONNECTED"** rather than guessing or simulating aircraft.
 
 **Infrastructure layer limitation:** no free, CORS-accessible, client-side API for
 bulk FCC antenna/tower records (ULS/ASR) was found — those datasets require
@@ -135,14 +145,17 @@ stored only in your browser.
 
 ## Known limitations
 
-- **Sentinel Mode only runs while this tab is open in your browser** — it is
-  client-side JavaScript, not a background service. Baselines will build faster with
-  the tab open longer, but true always-on collection would require a free serverless
-  scheduler (e.g., GitHub Actions on a schedule, or a Cloudflare Worker cron trigger)
-  writing into a shared free datastore; that architecture is intentionally not wired
-  up yet so no paid/committed infrastructure gets introduced without your review.
-- Aircraft data depends on OpenSky Network's free, unauthenticated tier and can be
-  rate-limited or CORS-blocked at times.
+- **Sentinel Mode (pressure/temperature/wind baseline snapshots) only runs while
+  this tab is open in your browser** — it is client-side JavaScript, not a
+  background service. The aircraft layer is the one exception: it now has a real
+  free background job (see below), and the same pattern could be extended to the
+  rest of Sentinel's metrics later if you want that — it's intentionally not done
+  yet so no additional scheduled infrastructure gets added without your review.
+- Aircraft data depends on OpenSky Network's free, unauthenticated tier, which is
+  CORS-blocked from direct browser use — worked around with a scheduled GitHub
+  Actions job (`.github/workflows/aircraft-snapshot.yml`, free for public repos)
+  that writes `data/aircraft.json` every 30 minutes. It can still show "NOT
+  CONNECTED" if OpenSky itself is down or before the workflow's first run.
 - Correlation clustering is a simple time-window co-occurrence check — it is a
   starting point for investigation, not a validated statistical test.
 - Historical Event Replay and cross-storm Pattern Discovery are not built yet; the

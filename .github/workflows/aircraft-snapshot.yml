@@ -1,0 +1,53 @@
+name: Aircraft Snapshot
+
+# Storm Tracker KC's client-side aircraft layer can't call the OpenSky Network
+# REST API directly from a browser — OpenSky does not send CORS headers on
+# that endpoint, so browsers block the response outright, regardless of
+# rate limits. This workflow fetches it server-side instead (no CORS rules
+# apply here) on a schedule and commits the result as a plain static file
+# that the app then reads same-origin from GitHub Pages. Free for public
+# repos, no secrets, no paid services.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aircraft-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch OpenSky states near Kansas City
+        run: |
+          set -e
+          mkdir -p data
+          FETCHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          # Bounding box roughly covering the KC metro area.
+          URL="https://opensky-network.org/api/states/all?lamin=38.5&lomin=-95.3&lamax=39.7&lomax=-93.8"
+
+          if curl -sS --fail --max-time 20 "$URL" -o /tmp/opensky.json && jq -e . /tmp/opensky.json >/dev/null 2>&1; then
+            jq --arg fetchedAt "$FETCHED_AT" \
+              '{fetchedAt: $fetchedAt, source: "OpenSky Network (opensky-network.org), fetched server-side via GitHub Actions", openSkyTime: (.time // null), states: (.states // [])}' \
+              /tmp/opensky.json > data/aircraft.json
+          else
+            jq -n --arg fetchedAt "$FETCHED_AT" \
+              '{fetchedAt: $fetchedAt, source: "OpenSky Network (opensky-network.org), fetched server-side via GitHub Actions", openSkyTime: null, states: [], error: "OpenSky fetch failed or returned invalid data for this run"}' \
+              > data/aircraft.json
+          fi
+
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name "storm-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/aircraft.json
+          git diff --cached --quiet || git commit -m "Update aircraft snapshot [skip ci]"
+          git push
