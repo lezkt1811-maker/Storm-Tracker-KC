@@ -453,6 +453,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/engine.js"></script>
 <script>
 (function(){
 "use strict";
@@ -634,7 +635,7 @@ const AircraftProvider = {
       if(!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       this.status = "ok"; this.lastError = null; this.lastUpdated = Date.now();
-      return this._normalize(data.states || [], "OpenSky Network (live)");
+      return normalizeAircraftStates(data.states || [], "OpenSky Network (live)");
     } catch(err){
       clearTimeout(timer);
       this.lastError = err.message;
@@ -652,22 +653,14 @@ const AircraftProvider = {
         this.lastError = data.error || 'No scheduled snapshot has run yet';
         return [];
       }
-      const filtered = data.states.filter(s => s[6]>=lamin && s[6]<=lamax && s[5]>=lomin && s[5]<=lomax);
+      const filtered = filterStatesInBox(data.states, lamin, lomin, lamax, lomax);
       this.status = 'cached'; this.lastError = null;
-      return this._normalize(filtered, `OpenSky Network via scheduled GitHub Actions snapshot (updated ${fmtTime(this.lastUpdated)})`);
+      return normalizeAircraftStates(filtered, `OpenSky Network via scheduled GitHub Actions snapshot (updated ${fmtTime(this.lastUpdated)})`);
     } catch(err){
       this.status = 'not_connected'; this.lastError = err.message;
       console.error('AircraftProvider._fetchCachedSnapshot', err);
       return [];
     }
-  },
-  _normalize(rows, sourceLabel){
-    return rows.filter(r=>r[5]!=null && r[6]!=null).map(r=>({
-      source: sourceLabel,
-      icao24: r[0], callsign: (r[1]||"").trim() || "unknown",
-      lon: r[5], lat: r[6],
-      altitude: r[7], onGround: r[8], velocity: r[9], heading: r[10]
-    }));
   }
 };
 
@@ -688,65 +681,10 @@ const InfrastructureProvider = {
   }
 };
 
-/* ===================== LOCAL STATISTICS / AI (no external calls) ===================== */
-const Stats = {
-  mean(arr){ return arr.reduce((a,b)=>a+b,0) / arr.length; },
-  stddev(arr, m){ m = (m===undefined)? this.mean(arr): m; const v = arr.reduce((a,b)=>a+Math.pow(b-m,2),0)/arr.length; return Math.sqrt(v); },
-  zscore(value, mean, sd){ if(sd === 0 || !isFinite(sd)) return 0; return (value-mean)/sd; }
-};
-
-/* ===================== BASELINE + ANOMALY ENGINE ===================== */
-const MIN_BASELINE_SAMPLES = 5;
-const AnomalyEngine = {
-  classifyMetric(key, label, units, latestValue, snapshots){
-    const values = snapshots.map(s=>s[key]).filter(v=>typeof v === "number" && isFinite(v));
-    if(latestValue == null || !isFinite(latestValue)) return null;
-    if(values.length < MIN_BASELINE_SAMPLES){
-      return { key, label, units, value: latestValue, status: "insufficient", sample: values.length,
-        explanation: `Only ${values.length} historical snapshot(s) recorded — need at least ${MIN_BASELINE_SAMPLES} before "unusual" is meaningful.` };
-    }
-    const mean = Stats.mean(values);
-    const sd = Stats.stddev(values, mean);
-    const z = Stats.zscore(latestValue, mean, sd);
-    const az = Math.abs(z);
-    let status = "normal";
-    if(az >= 3) status = "strong";
-    else if(az >= 2) status = "unusual";
-    else if(az >= 1) status = "watch";
-    return {
-      key, label, units, value: latestValue, mean, sd, z, sample: values.length, status,
-      explanation: `${label} is ${latestValue}${units} vs. a baseline mean of ${mean.toFixed(2)}${units} across ${values.length} local snapshots (z=${z.toFixed(2)}).`
-    };
-  }
-};
-
-/* ===================== CORRELATION ENGINE ===================== */
-const CorrelationEngine = {
-  findClusters(events, windowMinutes){
-    windowMinutes = windowMinutes || 30;
-    const sorted = events.slice().sort((a,b)=>a.timestamp-b.timestamp);
-    const clusters = [];
-    for(let i=0;i<sorted.length;i++){
-      const windowEvents = [sorted[i]];
-      for(let j=i+1;j<sorted.length;j++){
-        if((sorted[j].timestamp - sorted[i].timestamp) <= windowMinutes*60000){
-          windowEvents.push(sorted[j]);
-        } else break;
-      }
-      const categories = new Set(windowEvents.map(e=>e.category));
-      if(windowEvents.length >= 2 && categories.size >= 2){
-        clusters.push({ start: sorted[i].timestamp, events: windowEvents, categories: [...categories] });
-      }
-    }
-    // de-duplicate near-identical clusters (same start events count)
-    const seen = new Set();
-    return clusters.filter(c=>{
-      const key = c.start + "|" + c.events.length;
-      if(seen.has(key)) return false;
-      seen.add(key); return true;
-    }).slice(0, 20);
-  }
-};
+/* ===================== LOCAL STATISTICS / AI (no external calls) =====================
+   Stats, AnomalyEngine, CorrelationEngine, computeHypStatus, escapeHtml, fmtTime,
+   normalizeAircraftStates and filterStatesInBox now live in js/engine.js (loaded
+   above) so they can be unit tested; they're used here as globals. */
 
 /* ===================== SENTINEL ===================== */
 let sentinelTimer = null;
@@ -786,10 +724,9 @@ async function toggleSentinel(enable){
   renderSentinelUI();
 }
 
-/* ===================== UTILS ===================== */
-function fmtTime(ts){ return new Date(ts).toLocaleString(undefined, { weekday:'short', hour:'numeric', minute:'2-digit', month:'short', day:'numeric' }); }
+/* ===================== UTILS =====================
+   fmtTime/escapeHtml come from js/engine.js (loaded above) as globals. */
 function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
-function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 /* ===================== TAB NAVIGATION ===================== */
 document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -1163,14 +1100,6 @@ document.getElementById('hypSaveBtn').addEventListener('click', async ()=>{
   hypSheet.classList.remove('open');
   renderLabTab();
 });
-
-function computeHypStatus(h){
-  const s = h.supporting.length, c = h.contradicting.length;
-  if(s===0 && c===0) return 'UNTESTED';
-  if(s>0 && c===0) return 'SUPPORTED BY CURRENT OBSERVATIONS';
-  if(c>0 && s===0) return 'NOT SUPPORTED BY CURRENT OBSERVATIONS';
-  return 'MIXED';
-}
 
 async function renderLabTab(){
   const hyps = await dbGetAll('hypotheses');

@@ -1,0 +1,12 @@
+{
+  "name": "storm-tracker-kc",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Storm Tracker KC — static, no-build weather/aircraft tracking app.",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9"
+  }
+}

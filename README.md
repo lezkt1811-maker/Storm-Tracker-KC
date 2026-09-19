@@ -8,6 +8,21 @@ actually unusual?"* and separating **observation → correlation → hypothesis 
 Runs entirely as a single static `index.html` file. No build step, no server, no
 account, no billing information, ever.
 
+## Tests
+
+The statistical/analysis logic (baseline anomaly detection, event correlation,
+hypothesis status, HTML-escaping, and OpenSky data normalization) lives in
+`js/engine.js`, which `index.html` loads as a plain script. It's covered by a
+Vitest unit-test suite in `js/engine.test.js`:
+
+```
+npm install
+npm test
+```
+
+No other part of the app has automated tests yet — the UI, IndexedDB storage, and
+network providers (NWS, RainViewer, OpenSky) are still only verified by hand.
+
 ## What Storm Tracker KC does
 
 - Shows live NWS forecasts, active alerts, and animated precipitation radar over a
