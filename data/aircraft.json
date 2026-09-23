@@ -1,26 +1,6 @@
 {
-  "fetchedAt": "2026-09-23T05:24:42Z",
+  "fetchedAt": "2026-09-23T10:10:50Z",
   "source": "OpenSky Network (opensky-network.org), fetched server-side via GitHub Actions",
-  "openSkyTime": 1790141075,
-  "states": [
-    [
-      "a5c8c6",
-      "UCM472  ",
-      "United States",
-      1790141035,
-      1790141035,
-      -93.8705,
-      39.2062,
-      822.96,
-      false,
-      51.57,
-      161.38,
-      -0.33,
-      null,
-      891.54,
-      null,
-      false,
-      0
-    ]
-  ]
+  "openSkyTime": 1790158246,
+  "states": []
 }
