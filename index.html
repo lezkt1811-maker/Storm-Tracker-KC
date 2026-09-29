@@ -203,7 +203,10 @@
     font-size:0.78rem; box-shadow:0 2px 10px rgba(0,0,0,0.4);
   }
   #radarMap{ height: min(62vh, 520px); width:100%; }
-  .leaflet-baseTiles-pane{ filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+  /* saturate(0.35) mutes land-cover colors (parks/forest look green here
+     otherwise) so real weather overlays, drawn on top in full color, are
+     unambiguously the only colorful thing on the map. */
+  .leaflet-baseTiles-pane{ filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9) saturate(0.35); }
   .map-controls{ display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; background:var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap; }
   .map-controls input[type=range]{ flex:1; min-width:100px; accent-color:var(--pink); }
   .frame-time{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--green); min-width:120px; text-align:right; }
@@ -268,7 +271,7 @@
       <div id="regionalList"><div class="empty-state">loading regional points&hellip;</div></div>
 
       <p class="section-title">Command Map</p>
-      <p class="section-note">Toggle layers independently. Each layer states its own data source.</p>
+      <p class="section-note">Toggle layers independently. Each layer states its own data source. The map background is plain geography (roads, parks, rivers) in muted colors — <strong>any bright blue/green/yellow/red you see is real rain</strong> from the Precipitation layer, not land features.</p>
       <div class="chip-row">
         <button class="chip active" id="layerPrecip" data-layer="precip">🌧 Precipitation</button>
         <button class="chip active" id="layerAlerts" data-layer="alerts">⚠️ Alerts</button>
