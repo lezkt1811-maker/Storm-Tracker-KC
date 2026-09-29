@@ -197,6 +197,11 @@
     text-align:center; padding:1.5rem; background:rgba(5,3,12,0.55); color:var(--text);
     font-family:'IBM Plex Mono', monospace; font-size:0.9rem; line-height:1.6; cursor:pointer;
   }
+  .map-recenter-btn{
+    position:absolute; top:0.6rem; right:0.6rem; z-index:900; background:var(--panel2); color:var(--text);
+    border:1px solid var(--edge); border-radius:8px; padding:0.5rem 0.8rem; font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem; box-shadow:0 2px 10px rgba(0,0,0,0.4);
+  }
   #radarMap{ height: min(62vh, 520px); width:100%; }
   .leaflet-baseTiles-pane{ filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
   .map-controls{ display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; background:var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap; }
@@ -273,6 +278,7 @@
       <div class="map-panel">
         <div class="map-wrap">
           <div id="radarMap"></div>
+          <button class="map-recenter-btn" id="mapRecenterBtn">📍 Back to KC</button>
           <div class="map-lock-overlay" id="mapLockOverlay">
             <span>👆 Tap to explore the map<br><span class="field-hint" style="color:var(--text-dim);">(so the page keeps scrolling normally until you do)</span></span>
           </div>
@@ -1024,6 +1030,9 @@ function initMap(){
     map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
     lockOverlay.style.display = 'none';
   });
+  document.getElementById('mapRecenterBtn').addEventListener('click', ()=>{
+    map.setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 8);
+  });
   // CARTO's free dark_all basemap tiles now require an API key (started
   // returning "API KEY REQUIRED" placeholder tiles — confirmed on the live
   // site). Standard OpenStreetMap tiles remain genuinely free and keyless;
@@ -1105,7 +1114,7 @@ AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon).then(
 // app) rather than hidden behind a "tap to expand" control users had no way
 // to discover.
 document.getElementById('nws-loop').src = RadarProvider.keaxLoopUrl();
-document.getElementById('windyMount').innerHTML = `<iframe src="https://embed.windy.com/embed2.html?lat=${CURRENT_LOCATION.lat}&lon=${CURRENT_LOCATION.lon}&detailLat=${CURRENT_LOCATION.lat}&detailLon=${CURRENT_LOCATION.lon}&width=650&height=450&zoom=4&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" title="Windy radar, satellite, wind and temperature map"></iframe>`;
+document.getElementById('windyMount').innerHTML = `<iframe src="https://embed.windy.com/embed2.html?lat=${CURRENT_LOCATION.lat}&lon=${CURRENT_LOCATION.lon}&detailLat=${CURRENT_LOCATION.lat}&detailLon=${CURRENT_LOCATION.lon}&width=650&height=450&zoom=4&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=6" title="Windy radar, satellite, wind and temperature map"></iframe>`;
 
 async function loadAlmanac(){
   const elm = document.getElementById('almanac');
