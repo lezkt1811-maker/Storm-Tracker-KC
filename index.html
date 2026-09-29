@@ -61,6 +61,12 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
   .top-bar .loc{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; color:var(--text-dim); display:flex; align-items:center; gap:0.4rem; }
+  .hint-banner{
+    position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:0.6rem;
+    padding:0.6rem 1rem; background:linear-gradient(90deg, rgba(255,46,196,0.18), rgba(0,229,255,0.14));
+    border-bottom:1px solid var(--edge); font-size:0.82rem;
+  }
+  .hint-banner .icon-btn{ width:30px; height:30px; font-size:0.9rem; border-color:transparent; }
   .live-seal{ width:8px; height:8px; border-radius:50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.8s infinite ease-in-out; flex:0 0 auto; }
   @keyframes pulse{ 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.35); opacity:0.65; } }
   .icon-btn{
@@ -246,7 +252,15 @@
       <h1>STORM TRACKER KC</h1>
       <div class="loc"><span class="live-seal"></span><span id="locLabel">Kansas City, MO</span></div>
     </div>
-    <button class="icon-btn" id="openVaultShortcut" title="Evidence Vault &amp; Status">&#9881;&#65039;</button>
+    <div class="btn-row" style="flex:0 0 auto;">
+      <button class="icon-btn" id="openHelpBtn" title="Help &amp; Guide">&#10067;</button>
+      <button class="icon-btn" id="openVaultShortcut" title="Evidence Vault &amp; Status">&#9881;&#65039;</button>
+    </div>
+  </div>
+
+  <div class="hint-banner" id="firstVisitHint" style="display:none;">
+    <span>New here? Tap the <strong>❓</strong> button above for a quick guide to what everything does.</span>
+    <button class="icon-btn" id="dismissHintBtn" title="Dismiss">&#10005;</button>
   </div>
 
   <div class="tab-content">
@@ -396,6 +410,40 @@
     <button class="nav-btn" data-tab="lab"><span class="icon">🔬</span>LAB</button>
     <button class="nav-btn" data-tab="vault"><span class="icon">🗃</span>VAULT</button>
   </nav>
+</div>
+
+<!-- ===== Sheet: Help & Guide ===== -->
+<div class="sheet-overlay" id="helpSheetOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <p class="sheet-title">How to Use This App</p>
+    <p class="section-note">Plain-language version. Here's what each part does and a quick example to try.</p>
+
+    <p class="section-title">🗺 MAP tab</p>
+    <p class="section-note">Weather and an interactive map for Kansas City. The colored buttons above the map turn things on or off — <strong>try tapping "Aircraft"</strong> to see nearby planes appear. Scroll down and you'll find two more weather pictures (a radar loop and a country-wide Windy map) plus a rain forecast for the next few days. On the map itself, any bright blue/green/yellow/red is real rain — everything else (roads, parks, rivers) is muted on purpose so weather stands out.</p>
+
+    <p class="section-title">⏱ TIMELINE tab</p>
+    <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
+
+    <p class="section-title">⚠️ ANOMALIES tab</p>
+    <p class="section-note">This is meant to tell you when something looks unusual, but it needs data collected over time first — it'll say "insufficient data" until then. <strong>Try this:</strong> go to the Vault tab and tap "Take Snapshot Now" a few times over a few days to start building it up.</p>
+
+    <p class="section-title">🔬 LAB tab</p>
+    <p class="section-note">A notebook for tracking a guess about weather — like "planes fly more before storms." <strong>Try tapping "+ New Hypothesis"</strong> to start one and see how it works.</p>
+
+    <p class="section-title">🗃 VAULT tab</p>
+    <p class="section-note">Settings and everything you've saved. This is where you check if things are working (System Status), turn on background data collection (Sentinel Mode), change your location, and download everything as a file (Export).</p>
+
+    <p class="section-title">➕ Pink button (Map / Timeline)</p>
+    <p class="section-note">Tap this to jot down something <em>you</em> personally noticed — a weird cloud, a sound, a plane. It's saved as your own note, kept separate from official weather data.</p>
+
+    <p class="section-title">⚙️ Gear icon (top right)</p>
+    <p class="section-note">Shortcut straight to the Vault tab.</p>
+
+    <div class="btn-row" style="margin-top:1rem;">
+      <button class="btn primary" id="closeHelpBtn">Got it</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== Sheet: Add Observation ===== -->
@@ -938,6 +986,24 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
 document.getElementById('openVaultShortcut').addEventListener('click', ()=>{
   document.querySelector('.nav-btn[data-tab="vault"]').click();
 });
+
+/* ===================== HELP / GUIDE ===================== */
+const helpSheet = document.getElementById('helpSheetOverlay');
+document.getElementById('openHelpBtn').addEventListener('click', ()=>{
+  helpSheet.classList.add('open');
+  try{ localStorage.setItem('stkc_seen_help', '1'); } catch(e){}
+  document.getElementById('firstVisitHint').style.display = 'none';
+});
+document.getElementById('closeHelpBtn').addEventListener('click', ()=> helpSheet.classList.remove('open'));
+document.getElementById('dismissHintBtn').addEventListener('click', ()=>{
+  document.getElementById('firstVisitHint').style.display = 'none';
+  try{ localStorage.setItem('stkc_seen_help', '1'); } catch(e){}
+});
+try{
+  if(!localStorage.getItem('stkc_seen_help')){
+    document.getElementById('firstVisitHint').style.display = 'flex';
+  }
+} catch(e){ /* localStorage unavailable (private mode etc.) — just skip the hint */ }
 
 /* ===================== MAP TAB =====================
    Every mutable binding a Leaflet failure could otherwise leave in the
