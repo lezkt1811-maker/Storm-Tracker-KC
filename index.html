@@ -199,6 +199,7 @@
 
   .map-panel{ background:var(--panel); border:1px solid var(--edge); border-radius:12px; overflow:hidden; margin-bottom:0.8rem; }
   #radarMap{ height: min(62vh, 520px); width:100%; }
+  .leaflet-baseTiles-pane{ filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
   .map-controls{ display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; background:var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap; }
   .map-controls input[type=range]{ flex:1; min-width:100px; accent-color:var(--pink); }
   .frame-time{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--green); min-width:120px; text-align:right; }
@@ -1018,8 +1019,15 @@ function refreshInfraLayer(){
 
 function initMap(){
   map = L.map('radarMap', { zoomControl:true }).setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 8);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
+  // CARTO's free dark_all basemap tiles now require an API key (started
+  // returning "API KEY REQUIRED" placeholder tiles — confirmed on the live
+  // site). Standard OpenStreetMap tiles remain genuinely free and keyless;
+  // a CSS invert filter on this pane only (not overlays) recreates the dark
+  // look without depending on a provider that's since started gating access.
+  map.createPane('baseTiles');
+  map.getPane('baseTiles').style.zIndex = 200;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    pane: 'baseTiles', attribution: '&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19
   }).addTo(map);
   centerMarker = L.marker([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon]).addTo(map).bindPopup(CURRENT_LOCATION.label);
   alertsLayer = L.layerGroup();
@@ -1656,7 +1664,7 @@ init();
   Aircraft: <a href="https://opensky-network.org" target="_blank" rel="noopener">OpenSky Network</a> ·
   Wind overlay: <a href="https://www.windy.com" target="_blank" rel="noopener">Windy.com</a> ·
   Forecast: <a href="https://www.weather.gov" target="_blank" rel="noopener">weather.gov</a> ·
-  Map tiles: <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. All free public services, no accounts required.
+  Map tiles: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors. All free public services, no accounts required.
 </footer>
 </body>
 </html>

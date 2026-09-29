@@ -53,7 +53,7 @@ build or install.
 | Wind/temperature overlay | [Windy.com](https://www.windy.com) embed | Lazy-loaded iframe, free embed |
 | Aircraft positions | [OpenSky Network](https://opensky-network.org) anonymous REST API | See limitations below |
 | Infrastructure reference points | Public FAA/NWS station locations (hardcoded, documented) | Not a live feed — see below |
-| Map tiles | [CARTO](https://carto.com/attributions) / [OpenStreetMap](https://www.openstreetmap.org/copyright) | Free dark basemap |
+| Map tiles | [OpenStreetMap](https://www.openstreetmap.org/copyright) standard tiles | Dark look applied with a CSS filter — see note below |
 | Baseline / anomaly / correlation analysis | Local, client-side statistics | No external AI API |
 
 **OpenSky Network limitations:** OpenSky's public REST API does not send CORS
@@ -70,6 +70,12 @@ always labels which path served the data — **"live"** for a direct fetch or
 as more current than it is. If the workflow hasn't run yet (e.g., right after first
 deploy) or OpenSky itself is down, the app shows **"AIRCRAFT DATA SOURCE NOT
 CONNECTED"** rather than guessing or simulating aircraft.
+
+**Map tiles note:** CARTO's free dark basemap tiles started requiring an API key
+(confirmed live — the map background showed "API KEY REQUIRED" placeholder tiles).
+Switched to standard OpenStreetMap tiles, which remain genuinely free and keyless,
+with a CSS filter applied only to the base map layer (not the radar or other
+overlays) to keep the dark look.
 
 **Infrastructure layer limitation:** no free, CORS-accessible, client-side API for
 bulk FCC antenna/tower records (ULS/ASR) was found — those datasets require
