@@ -175,13 +175,6 @@
   .list-item .meta{ display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
   .timestamp{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--text-dim); }
 
-  details.collapsible{ border:1px solid var(--edge); border-radius:12px; background:var(--panel); margin-bottom:0.8rem; overflow:hidden; }
-  details.collapsible summary{ padding:0.8rem 1rem; font-family:'IBM Plex Mono', monospace; font-size:0.85rem; cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; }
-  details.collapsible summary::-webkit-details-marker{ display:none; }
-  details.collapsible summary::after{ content:'+'; color:var(--cyan); font-size:1.1rem; }
-  details.collapsible[open] summary::after{ content:'\2212'; }
-  .collapsible-body{ padding: 0 1rem 1rem; }
-
   /* ===== Map tab ===== */
   .now-card{
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem;
@@ -198,6 +191,12 @@
   .almanac-card .desc{ font-size:0.74rem; color:var(--text-dim); }
 
   .map-panel{ background:var(--panel); border:1px solid var(--edge); border-radius:12px; overflow:hidden; margin-bottom:0.8rem; }
+  .map-wrap{ position:relative; }
+  .map-lock-overlay{
+    position:absolute; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:1.5rem; background:rgba(5,3,12,0.55); color:var(--text);
+    font-family:'IBM Plex Mono', monospace; font-size:0.9rem; line-height:1.6; cursor:pointer;
+  }
   #radarMap{ height: min(62vh, 520px); width:100%; }
   .leaflet-baseTiles-pane{ filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
   .map-controls{ display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; background:var(--panel2); border-top:1px solid var(--edge); flex-wrap:wrap; }
@@ -267,12 +266,17 @@
       <p class="section-note">Toggle layers independently. Each layer states its own data source.</p>
       <div class="chip-row">
         <button class="chip active" id="layerPrecip" data-layer="precip">🌧 Precipitation</button>
-        <button class="chip" id="layerAlerts" data-layer="alerts">⚠️ Alerts</button>
+        <button class="chip active" id="layerAlerts" data-layer="alerts">⚠️ Alerts</button>
         <button class="chip" id="layerAircraft" data-layer="aircraft">✈️ Aircraft</button>
         <button class="chip" id="layerInfra" data-layer="infra">📡 Infrastructure</button>
       </div>
       <div class="map-panel">
-        <div id="radarMap"></div>
+        <div class="map-wrap">
+          <div id="radarMap"></div>
+          <div class="map-lock-overlay" id="mapLockOverlay">
+            <span>👆 Tap to explore the map<br><span class="field-hint" style="color:var(--text-dim);">(so the page keeps scrolling normally until you do)</span></span>
+          </div>
+        </div>
         <div class="map-controls">
           <button class="btn" id="playBtn">&#9654; Animate</button>
           <input type="range" id="radar-slider" min="0" max="10" value="0">
@@ -281,21 +285,13 @@
       </div>
       <p class="section-note" id="aircraftStatusNote">AIRCRAFT: checking OpenSky Network&hellip;</p>
 
-      <details class="collapsible">
-        <summary>NWS Radar Loop — KEAX (Pleasant Hill, MO)</summary>
-        <div class="collapsible-body">
-          <p class="section-note" style="margin-top:0.6rem;">SOURCE: radar.weather.gov · no key, no cost. Loads only when expanded.</p>
-          <div class="hud-frame"><div class="hud-inner"><img id="nws-loop" alt="NWS KEAX radar loop"></div></div>
-        </div>
-      </details>
+      <p class="section-title">NWS Radar Loop — KEAX (Pleasant Hill, MO)</p>
+      <p class="section-note">SOURCE: radar.weather.gov · no key, no cost.</p>
+      <div class="hud-frame"><div class="hud-inner"><img id="nws-loop" alt="NWS KEAX radar loop"></div></div>
 
-      <details class="collapsible">
-        <summary>Windy Wind / Temperature Overlay</summary>
-        <div class="collapsible-body windy-frame">
-          <p class="section-note" style="margin-top:0.6rem;">SOURCE: windy.com (free embed). Loads only when expanded.</p>
-          <div id="windyMount"></div>
-        </div>
-      </details>
+      <p class="section-title">Windy — Zoom Out to See the Whole Country</p>
+      <p class="section-note">SOURCE: windy.com (free embed). Use the controls inside it (bottom-left) to switch between radar, satellite, wind and temperature, and pinch out to see storm systems well beyond Kansas City.</p>
+      <div class="windy-frame"><div id="windyMount"></div></div>
     </section>
 
     <!-- ===================== TIMELINE TAB ===================== -->
@@ -943,7 +939,7 @@ let map = null, centerMarker = null;
 let precipLayer = null, frames = [], currentFrame = 0, tileHost = '', playing = false, playTimer = null;
 let alertsLayer = null, aircraftLayer = null, infraLayer = null, aircraftPollTimer = null;
 const LEAFLET_AVAILABLE = (typeof L !== 'undefined');
-const LAYER_STATE = { precip:true, alerts:false, aircraft:false, infra:false };
+const LAYER_STATE = { precip:true, alerts:true, aircraft:false, infra:false };
 
 function frameUrl(frame){ return tileHost + frame.path + '/256/{z}/{x}/{y}/2/1_1.png'; }
 function showFrame(i){
@@ -1018,7 +1014,16 @@ function refreshInfraLayer(){
 }
 
 function initMap(){
-  map = L.map('radarMap', { zoomControl:true }).setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 8);
+  map = L.map('radarMap', { zoomControl:true, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false })
+    .setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 8);
+  // Starts locked so a finger swiping over the map to scroll the page
+  // doesn't get captured as a map pan instead — a real complaint from
+  // testing on an actual phone. One tap hands control to the map.
+  const lockOverlay = document.getElementById('mapLockOverlay');
+  lockOverlay.addEventListener('click', ()=>{
+    map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
+    lockOverlay.style.display = 'none';
+  });
   // CARTO's free dark_all basemap tiles now require an API key (started
   // returning "API KEY REQUIRED" placeholder tiles — confirmed on the live
   // site). Standard OpenStreetMap tiles remain genuinely free and keyless;
@@ -1033,6 +1038,8 @@ function initMap(){
   alertsLayer = L.layerGroup();
   aircraftLayer = L.layerGroup();
   infraLayer = L.layerGroup();
+  refreshAlertsLayer();
+  alertsLayer.addTo(map);
 
   document.getElementById('radar-slider').addEventListener('input', e=>{
     if(playing) togglePlay();
@@ -1094,20 +1101,11 @@ AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon).then(
   document.getElementById('aircraftStatusNote').textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED. No aircraft are simulated.';
 });
 
-// Lazy-load heavy embeds only when opened (performance)
-document.querySelectorAll('details.collapsible').forEach(d=>{
-  d.addEventListener('toggle', ()=>{
-    if(!d.open) return;
-    if(d.querySelector('#nws-loop') && !d.querySelector('#nws-loop').src){
-      d.querySelector('#nws-loop').src = RadarProvider.keaxLoopUrl();
-    }
-    const windyMount = d.querySelector('#windyMount');
-    if(windyMount && !windyMount.dataset.loaded){
-      windyMount.dataset.loaded = '1';
-      windyMount.innerHTML = `<iframe src="https://embed.windy.com/embed2.html?lat=${CURRENT_LOCATION.lat}&lon=${CURRENT_LOCATION.lon}&detailLat=${CURRENT_LOCATION.lat}&detailLon=${CURRENT_LOCATION.lon}&width=650&height=450&zoom=7&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" title="Windy overlay"></iframe>`;
-    }
-  });
-});
+// KEAX loop + Windy load immediately (visible by default, like the original
+// app) rather than hidden behind a "tap to expand" control users had no way
+// to discover.
+document.getElementById('nws-loop').src = RadarProvider.keaxLoopUrl();
+document.getElementById('windyMount').innerHTML = `<iframe src="https://embed.windy.com/embed2.html?lat=${CURRENT_LOCATION.lat}&lon=${CURRENT_LOCATION.lon}&detailLat=${CURRENT_LOCATION.lat}&detailLon=${CURRENT_LOCATION.lon}&width=650&height=450&zoom=4&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" title="Windy radar, satellite, wind and temperature map"></iframe>`;
 
 async function loadAlmanac(){
   const elm = document.getElementById('almanac');
