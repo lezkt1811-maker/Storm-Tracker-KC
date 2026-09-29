@@ -248,6 +248,20 @@
       <p class="section-title">Current Conditions <span class="source-tag">SOURCE: National Weather Service</span></p>
       <div id="almanac"><div class="empty-state">loading forecast&hellip;</div></div>
 
+      <p class="section-title">🕐 Extended Forecast Timeline</p>
+      <p class="section-note">Forecast/model guidance from the NWS forecast grid — not a guarantee. Tap a horizon to see conditions and cumulative rainfall through that point.</p>
+      <div class="chip-row" id="horizonChips"></div>
+      <div class="card" id="horizonDetail"><div class="empty-state">loading forecast grid&hellip;</div></div>
+
+      <p class="section-title">🌧 Rainfall Accumulation</p>
+      <p class="section-note">Cumulative forecast rainfall for Kansas City by horizon. SOURCE: NWS forecast grid (api.weather.gov) — model/official guidance, not observed.</p>
+      <div class="card" id="rainfallChart"><div class="empty-state">loading&hellip;</div></div>
+      <p class="field-hint" id="observedRainNote"></p>
+
+      <p class="section-title">🌎 Nearby Region (next 6h)</p>
+      <p class="section-note">A first look at conditions approaching KC. Each point is its own real NWS forecast, not a regional map layer yet.</p>
+      <div id="regionalList"><div class="empty-state">loading regional points&hellip;</div></div>
+
       <p class="section-title">Command Map</p>
       <p class="section-note">Toggle layers independently. Each layer states its own data source.</p>
       <div class="chip-row">
@@ -580,6 +594,26 @@ const WeatherProvider = {
       console.error("WeatherProvider.getActiveAlerts", err);
       return [];
     }
+  },
+  // Raw NWS forecast grid: hourly/6-hourly time series for temperature, wind,
+  // sky cover, precip chance, and QPF (quantitative precipitation forecast)
+  // out to 7 days. This is real NWS/NDFD model guidance, not an exact
+  // prediction, and is labeled as such everywhere it's shown.
+  async getExtendedForecast(lat, lon){
+    try{
+      const pointRes = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+      if(!pointRes.ok) throw new Error("points fetch failed");
+      const pointData = await pointRes.json();
+      const gridRes = await fetch(pointData.properties.forecastGridData);
+      if(!gridRes.ok) throw new Error("grid fetch failed");
+      const gridData = await gridRes.json();
+      this.status = "ok";
+      return gridData.properties;
+    } catch(err){
+      this.status = "error";
+      console.error("WeatherProvider.getExtendedForecast", err);
+      return null;
+    }
   }
 };
 
@@ -693,6 +727,96 @@ const Stats = {
   mean(arr){ return arr.reduce((a,b)=>a+b,0) / arr.length; },
   stddev(arr, m){ m = (m===undefined)? this.mean(arr): m; const v = arr.reduce((a,b)=>a+Math.pow(b-m,2),0)/arr.length; return Math.sqrt(v); },
   zscore(value, mean, sd){ if(sd === 0 || !isFinite(sd)) return 0; return (value-mean)/sd; }
+};
+
+/* ===================== EXTENDED FORECAST ENGINE (NWS grid, real data only) =====================
+   Parses the raw NWS/NDFD forecast grid (ISO8601 interval series) into
+   values at fixed horizons (now/6h/12h/.../7d), and sums quantitative
+   precipitation across overlapping intervals for cumulative rainfall. All
+   numbers trace back to a real NWS grid value — nothing here is invented. */
+const ExtendedForecastEngine = {
+  HORIZONS: [
+    { key:'now', label:'Now', hours:0 },
+    { key:'6h', label:'6h', hours:6 },
+    { key:'12h', label:'12h', hours:12 },
+    { key:'24h', label:'24h', hours:24 },
+    { key:'48h', label:'48h', hours:48 },
+    { key:'72h', label:'72h', hours:72 },
+    { key:'5d', label:'5 Day', hours:120 },
+    { key:'7d', label:'7 Day', hours:168 }
+  ],
+  parseISODuration(s){
+    const m = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/.exec(s || '');
+    if(!m) return 0;
+    const days = parseInt(m[1]||0,10), hours = parseInt(m[2]||0,10), mins = parseInt(m[3]||0,10);
+    return ((days*24 + hours) * 60 + mins) * 60000;
+  },
+  parseInterval(validTime){
+    const [startStr, durStr] = validTime.split('/');
+    const start = Date.parse(startStr);
+    return { start, end: start + this.parseISODuration(durStr) };
+  },
+  valueAt(series, targetMs){
+    if(!series || !series.values) return null;
+    for(const v of series.values){
+      const { start, end } = this.parseInterval(v.validTime);
+      if(targetMs >= start && targetMs < end) return v.value;
+    }
+    let best = null, bestDist = Infinity;
+    for(const v of series.values){
+      const { start } = this.parseInterval(v.validTime);
+      const d = Math.abs(start - targetMs);
+      if(d < bestDist){ bestDist = d; best = v.value; }
+    }
+    return best;
+  },
+  cumulativeSum(series, fromMs, toMs){
+    if(!series || !series.values) return null;
+    let sum = 0, any = false;
+    for(const v of series.values){
+      const { start, end } = this.parseInterval(v.validTime);
+      if(end <= fromMs || start >= toMs || v.value == null) continue;
+      any = true;
+      const overlapStart = Math.max(start, fromMs), overlapEnd = Math.min(end, toMs);
+      const fraction = (end > start) ? (overlapEnd - overlapStart) / (end - start) : 1;
+      sum += v.value * fraction;
+    }
+    return any ? sum : null;
+  },
+  // True if the series' data doesn't actually reach targetMs — so a
+  // cumulative sum up to targetMs would understate the real total rather
+  // than represent it fully. Callers must show this as a caveat, not
+  // silently present a partial sum as a complete forecast.
+  coverageEndsBefore(series, targetMs){
+    if(!series || !series.values || !series.values.length) return true;
+    let maxEnd = -Infinity;
+    for(const v of series.values){ const { end } = this.parseInterval(v.validTime); if(end > maxEnd) maxEnd = end; }
+    return maxEnd < targetMs;
+  },
+  cToF(c){ return c == null ? null : (c * 9/5 + 32); },
+  kmhToMph(k){ return k == null ? null : (k * 0.621371); },
+  mmToIn(mm){ return mm == null ? null : (mm / 25.4); },
+  weatherTextAt(series, targetMs){
+    const val = this.valueAt(series, targetMs);
+    if(!val || !val.length) return null;
+    return val.map(w => [w.coverage, w.intensity, w.weather].filter(Boolean).join(' ')).join(', ');
+  },
+  buildHorizonTable(gridProps, nowMs){
+    return this.HORIZONS.map(h=>{
+      const targetMs = nowMs + h.hours*3600000;
+      return {
+        key: h.key, label: h.label, hours: h.hours, validAt: targetMs,
+        tempF: this.cToF(this.valueAt(gridProps.temperature, targetMs)),
+        windMph: this.kmhToMph(this.valueAt(gridProps.windSpeed, targetMs)),
+        windDir: this.valueAt(gridProps.windDirection, targetMs),
+        skyCoverPct: this.valueAt(gridProps.skyCover, targetMs),
+        pop: this.valueAt(gridProps.probabilityOfPrecipitation, targetMs),
+        rainAccumIn: h.hours === 0 ? 0 : this.mmToIn(this.cumulativeSum(gridProps.quantitativePrecipitation, nowMs, targetMs)),
+        rainAccumPartial: h.hours === 0 ? false : this.coverageEndsBefore(gridProps.quantitativePrecipitation, targetMs),
+        weatherText: this.weatherTextAt(gridProps.weather, targetMs)
+      };
+    });
+  }
 };
 
 /* ===================== BASELINE + ANOMALY ENGINE ===================== */
@@ -993,8 +1117,118 @@ async function loadAlmanac(){
     grid.appendChild(el(`<div class="almanac-card"><h4>${escapeHtml(p.name)}</h4><div class="temp">${p.temperature}&deg;${p.temperatureUnit}</div><div class="desc">${escapeHtml(p.shortForecast)}</div></div>`));
   });
   elm.appendChild(grid);
+
+  const obsNoteEl = document.getElementById('observedRainNote');
+  if(obsNoteEl){
+    const p = data.observation && data.observation.properties;
+    const parts = [];
+    if(p){
+      if(p.precipitationLastHour && p.precipitationLastHour.value != null) parts.push(`last hour: ${(p.precipitationLastHour.value/25.4).toFixed(2)}in`);
+      if(p.precipitationLast3Hours && p.precipitationLast3Hours.value != null) parts.push(`last 3h: ${(p.precipitationLast3Hours.value/25.4).toFixed(2)}in`);
+      if(p.precipitationLast6Hours && p.precipitationLast6Hours.value != null) parts.push(`last 6h: ${(p.precipitationLast6Hours.value/25.4).toFixed(2)}in`);
+    }
+    obsNoteEl.textContent = parts.length ? `Observed precipitation — ${parts.join(', ')} · SOURCE: NWS station` : 'Observed precipitation: NO DATA from the nearest reporting station right now.';
+  }
 }
 loadAlmanac();
+
+/* ===================== EXTENDED FORECAST TIMELINE UI ===================== */
+const REGIONAL_POINTS = [
+  { label:'Topeka, KS', lat:39.0473, lon:-95.6752 },
+  { label:'Wichita, KS', lat:37.6872, lon:-97.3301 },
+  { label:'St. Joseph, MO', lat:39.7675, lon:-94.8467 },
+  { label:'Springfield, MO', lat:37.2090, lon:-93.2923 },
+  { label:'Columbia, MO', lat:38.9517, lon:-92.3341 }
+];
+let currentHorizonTable = [];
+let selectedHorizonKey = 'now';
+
+function renderHorizonChips(){
+  const wrap = document.getElementById('horizonChips');
+  wrap.innerHTML = '';
+  ExtendedForecastEngine.HORIZONS.forEach(h=>{
+    const chip = el(`<button class="chip${h.key===selectedHorizonKey?' active':''}" data-horizon="${h.key}">${h.label}</button>`);
+    chip.addEventListener('click', ()=>{ selectedHorizonKey = h.key; renderHorizonChips(); renderHorizonDetail(); renderRainfallChart(); });
+    wrap.appendChild(chip);
+  });
+}
+
+function renderHorizonDetail(){
+  const container = document.getElementById('horizonDetail');
+  const row = currentHorizonTable.find(r=>r.key===selectedHorizonKey);
+  if(!row){ container.innerHTML = '<div class="empty-state">Forecast grid unavailable.</div>'; return; }
+  container.innerHTML = `
+    <p class="field-hint" style="margin:0 0 0.6rem;">FORECAST / MODEL GUIDANCE — not an exact prediction &middot; valid ${fmtTime(row.validAt)}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+      <div><div class="timestamp">TEMP</div><div style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;">${row.tempF!=null?Math.round(row.tempF)+'&deg;F':'NO DATA'}</div></div>
+      <div><div class="timestamp">WIND</div><div style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;">${row.windMph!=null?Math.round(row.windMph)+' mph':'NO DATA'}</div></div>
+      <div><div class="timestamp">SKY COVER</div><div style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;">${row.skyCoverPct!=null?Math.round(row.skyCoverPct)+'%':'NO DATA'}</div></div>
+      <div><div class="timestamp">RAIN CHANCE</div><div style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;">${row.pop!=null?Math.round(row.pop)+'%':'NO DATA'}</div></div>
+      <div><div class="timestamp">RAIN SO FAR</div><div style="font-family:'IBM Plex Mono',monospace;font-size:1.3rem;">${row.rainAccumIn!=null?(row.rainAccumPartial?'≥':'')+row.rainAccumIn.toFixed(2)+' in':'NO DATA'}</div></div>
+    </div>
+    ${row.rainAccumPartial ? `<p class="field-hint">&ge; means the forecast grid doesn't fully cover this horizon yet — actual total may be higher once more data is issued.</p>` : ''}
+    ${row.weatherText ? `<p class="section-note" style="margin:0.6rem 0 0;">${escapeHtml(row.weatherText)}</p>` : ''}
+    <p class="source-tag" style="display:block;margin-top:0.6rem;">SOURCE: NWS forecast grid (api.weather.gov)</p>
+  `;
+}
+
+function renderRainfallChart(){
+  const wrap = document.getElementById('rainfallChart');
+  if(!currentHorizonTable.length){ wrap.innerHTML = '<div class="empty-state">Forecast grid unavailable.</div>'; return; }
+  const maxVal = Math.max(0.5, ...currentHorizonTable.map(r=>r.rainAccumIn||0));
+  const anyPartial = currentHorizonTable.some(r=>r.rainAccumPartial);
+  const bars = currentHorizonTable.map(r=>{
+    const pct = Math.round(((r.rainAccumIn||0)/maxVal)*100);
+    const active = r.key === selectedHorizonKey;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:${active?'var(--cyan)':'var(--text-dim)'};">${r.rainAccumPartial?'≥':''}${(r.rainAccumIn||0).toFixed(2)}"</div>
+      <div style="width:100%;max-width:28px;height:90px;display:flex;align-items:flex-end;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;opacity:${r.rainAccumPartial?0.55:1};">
+        <div style="width:100%;height:${pct}%;background:${active ? 'linear-gradient(180deg,var(--cyan),var(--purple))' : 'linear-gradient(180deg,var(--purple),var(--edge))'};"></div>
+      </div>
+      <div style="font-size:0.6rem;color:var(--text-dim);">${r.label}</div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = `<div style="display:flex;gap:0.4rem;align-items:flex-end;">${bars}</div>${anyPartial?'<p class="field-hint" style="margin-top:0.6rem;">Faded bars (&ge;): forecast grid doesn\'t fully cover that horizon yet.</p>':''}`;
+}
+
+async function renderRegionalPoints(){
+  const wrap = document.getElementById('regionalList');
+  wrap.innerHTML = '';
+  const results = await Promise.all(REGIONAL_POINTS.map(async city=>{
+    const grid = await WeatherProvider.getExtendedForecast(city.lat, city.lon);
+    if(!grid) return { city, ok:false };
+    const nowMs = Date.now();
+    const pop6h = ExtendedForecastEngine.valueAt(grid.probabilityOfPrecipitation, nowMs + 6*3600000);
+    const rain6h = ExtendedForecastEngine.mmToIn(ExtendedForecastEngine.cumulativeSum(grid.quantitativePrecipitation, nowMs, nowMs + 6*3600000));
+    return { city, ok:true, pop6h, rain6h };
+  }));
+  results.forEach(r=>{
+    if(!r.ok){
+      wrap.appendChild(el(`<div class="list-item"><div class="row"><span>${escapeHtml(r.city.label)}</span><span class="badge insufficient">NO DATA</span></div></div>`));
+      return;
+    }
+    wrap.appendChild(el(`<div class="list-item">
+      <div class="row"><span>${escapeHtml(r.city.label)}</span><span class="badge info">${r.pop6h!=null?Math.round(r.pop6h)+'% rain':'NO DATA'}</span></div>
+      <div class="meta"><span class="source-tag">${r.rain6h!=null? r.rain6h.toFixed(2)+'in expected in 6h &middot; ':''}SOURCE: NWS forecast grid</span></div>
+    </div>`));
+  });
+}
+
+async function loadExtendedForecast(){
+  renderHorizonChips();
+  const grid = await WeatherProvider.getExtendedForecast(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon);
+  if(!grid){
+    document.getElementById('horizonDetail').innerHTML = '<div class="empty-state">Forecast grid unavailable right now. SOURCE: api.weather.gov</div>';
+    document.getElementById('rainfallChart').innerHTML = '<div class="empty-state">Forecast grid unavailable right now.</div>';
+    currentHorizonTable = [];
+    return;
+  }
+  currentHorizonTable = ExtendedForecastEngine.buildHorizonTable(grid, Date.now());
+  renderHorizonDetail();
+  renderRainfallChart();
+}
+loadExtendedForecast();
+renderRegionalPoints();
 
 /* ===================== OBSERVATION SHEET ===================== */
 const obsSheet = document.getElementById('obsSheetOverlay');
@@ -1294,6 +1528,7 @@ document.getElementById('saveLocationBtn').addEventListener('click', async ()=>{
     centerMarker.setLatLng([lat,lon]).bindPopup(label);
   }
   loadAlmanac();
+  loadExtendedForecast();
 });
 document.getElementById('useGpsBtn').addEventListener('click', ()=>{
   if(!navigator.geolocation) return;

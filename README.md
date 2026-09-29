@@ -12,6 +12,10 @@ account, no billing information, ever.
 
 - Shows live NWS forecasts, active alerts, and animated precipitation radar over a
   dark, mobile-first "storm command center" map.
+- Shows an **Extended Forecast Timeline** (Now/6h/12h/24h/48h/72h/5-day/7-day) built
+  from the real NWS forecast grid, with a cumulative rainfall chart and a first look
+  at conditions in nearby cities — always labeled as forecast/model guidance, never
+  as a guaranteed prediction, and honest when the grid doesn't yet cover a horizon.
 - Tracks nearby aircraft (when reachable) via the free OpenSky Network API and shows
   honestly when that data source isn't available — it never invents aircraft.
 - Lets you log sky/aircraft/weather observations from your phone (with optional GPS),
@@ -79,18 +83,26 @@ mere presence of infrastructure as evidence of anything.
 
 **Live and working today**, no configuration needed:
 - Forecast, current conditions, active alerts (NWS)
+- Extended Forecast Timeline + rainfall accumulation chart (NWS forecast grid)
+- Nearby-region forecast points (Topeka, Wichita, St. Joseph, Springfield MO, Columbia MO)
 - Animated precipitation radar (RainViewer) + KEAX static loop
 - Windy overlay
 - Sky Observation Logger, Master Timeline, Evidence Vault, Hypothesis Lab
 - Local Baseline/Anomaly/Correlation engines (once you've accumulated snapshots)
 - System Status panel
 
-**Best-effort, may show "NOT CONNECTED"** depending on network conditions, browser,
-or OpenSky's rate limits:
-- Live aircraft positions (OpenSky Network)
+**Best-effort, real data, may show "NOT CONNECTED"** if the data source itself is
+unreachable — never simulated:
+- Live aircraft positions (OpenSky Network, live fetch — falls back to a scheduled
+  server-side snapshot committed to `data/aircraft.json` every 30 minutes when the
+  live browser request is CORS-blocked, which is normal for this API)
 
-**Architecturally prepared but not built in this pass** (see Known Limitations):
-- True background/server-side Sentinel collection
+**Not built yet** (see "Regional storm intelligence roadmap" below for the full
+phased plan) or **architecturally prepared but not built in this pass**:
+- Regional rainfall/Excessive Rainfall Outlook map layer, flood watch/warning
+  explainer layer, tropical remnant tracking, moisture-flow arrows, auto-generated
+  regional event card, multi-model confidence ranges, "What's Coming?" mode
+- True background/server-side Sentinel collection (beyond the aircraft snapshot)
 - Historical Event Replay UI
 - Cross-storm Pattern Discovery scoreboard
 - Offline app-shell caching / installable PWA
@@ -136,6 +148,31 @@ alternative explanations. You link existing observations to it as **supporting**
 CURRENT OBSERVATIONS`, `NOT SUPPORTED BY CURRENT OBSERVATIONS`, or `MIXED`) purely
 from the counts of linked evidence — it is a running scoreboard, never a proof, and
 the UI never states or implies causation.
+
+## Regional storm intelligence roadmap
+
+The Extended Forecast Timeline above is **Phase 1** of a larger plan to see weather
+systems (including tropical moisture/remnants) approaching Kansas City before they
+arrive, not just current local conditions:
+
+- **Phase 1 (done):** Extended forecast timeline, rainfall accumulation chart,
+  nearby-region forecast points — all from the NWS forecast grid.
+- **Phase 2 (not built):** A dedicated flood/Excessive Rainfall Outlook layer with a
+  plain-language legend for Flood Watch/Warning, Flash Flood Warning, and WPC's ERO
+  categories.
+- **Phase 3 (not built):** Automatic regional storm-event detection and a
+  human-readable summary card.
+- **Phase 4 (not built):** Tropical cyclone remnant/moisture tracking via NHC data,
+  correctly relabeled once a system loses tropical classification.
+- **Phase 5 (not built):** Atmospheric moisture-flow visualization — only if a real,
+  verifiable free data source is confirmed; otherwise this stays undone rather than
+  showing invented arrows.
+
+Phases 2 and 4 depend on WPC/NHC GIS services this build hasn't verified a reliable,
+CORS-accessible, free endpoint for yet (unlike `api.weather.gov`, which is proven
+live in this app). They'll be built once that's confirmed, following the same
+pattern as the aircraft layer: a real fetch attempt, and an honest "NOT CONNECTED"
+rather than a guess if it can't be verified.
 
 ## Privacy
 
