@@ -1039,7 +1039,10 @@ function showFrame(i){
   currentFrame = ((i % frames.length) + frames.length) % frames.length;
   const url = frameUrl(frames[currentFrame]);
   if(precipLayer) precipLayer.setUrl(url);
-  else { precipLayer = L.tileLayer(url, { opacity:0.75, zIndex:5 }).addTo(map); }
+  // RainViewer's free tier only serves tiles up to zoom 7 and returns
+  // "Zoom Level Not Supported" placeholders above that (seen live).
+  // maxNativeZoom makes Leaflet request z7 and scale it up instead.
+  else { precipLayer = L.tileLayer(url, { opacity:0.75, zIndex:5, maxNativeZoom:7, maxZoom:19 }).addTo(map); }
   document.getElementById('frame-time').textContent = fmtTime(frames[currentFrame].time*1000);
   document.getElementById('radar-slider').value = currentFrame;
 }
