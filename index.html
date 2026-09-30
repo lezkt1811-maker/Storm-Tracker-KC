@@ -1125,7 +1125,10 @@ function initMap(){
   // a CSS invert filter on this pane only (not overlays) recreates the dark
   // look without depending on a provider that's since started gating access.
   map.createPane('baseTiles');
-  map.getPane('baseTiles').style.zIndex = 200;
+  // Must sit below Leaflet's default tilePane (z-index 200), where the
+  // RainViewer precipitation tiles live — at equal z-index this pane,
+  // created later, painted its opaque base map over the rain.
+  map.getPane('baseTiles').style.zIndex = 150;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     pane: 'baseTiles', attribution: '&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19
   }).addTo(map);
