@@ -48,6 +48,7 @@ build or install.
 |---|---|---|
 | Forecast & current conditions | [api.weather.gov](https://api.weather.gov) (NWS) | Free, keyless, official |
 | Active alerts/warnings | api.weather.gov `/alerts/active` | Rendered as map polygons + timeline events |
+| Upper-air temperature/humidity (Trail Check) | [Open-Meteo](https://open-meteo.com) pressure-level forecast (300/250/200 hPa) | Free, keyless |
 | Precipitation radar | [RainViewer](https://www.rainviewer.com/api.html) | Free public tile API |
 | NWS radar loop (KEAX) | [radar.weather.gov](https://radar.weather.gov) | Static animated GIF, lazy-loaded |
 | Wind/temperature overlay | [Windy.com](https://www.windy.com) embed | Lazy-loaded iframe, free embed |
@@ -128,6 +129,28 @@ Vault tab → **Export Investigation (JSON)** downloads a complete machine-reada
 dump. **Export Readable Report** downloads a self-contained HTML summary you can
 open in any browser or share. **Import JSON** merges a previously exported file back
 into the Vault (existing records are kept; imported records are added).
+
+## How Trail Check works
+
+Jet exhaust contains water vapor. In air colder than about −40 °C it freezes into
+ice crystals (a contrail). If the air is saturated with respect to ice, the trail
+lasts and spreads; if it's dry, it disappears within seconds to a minute. Trail
+Check pulls Open-Meteo's forecast temperature and humidity at 300, 250 and 200 hPa
+(roughly 30,000–39,000 ft), converts humidity over water to humidity over ice, and
+applies a simplified Schmidt-Appleman check:
+
+- warmer than −40 °C → no trails expected
+- colder, ice-humidity below 95% → short-lived trails
+- colder, ice-humidity 95% or more → long-lasting / spreading trails possible
+
+When you log a "Trails" observation, what you saw is compared with the forecast at
+that moment and stored as "matches the forecast" or "doesn't match the forecast."
+Model humidity at cruise altitude has real error, and a trail may come from a plane
+at a different level than the one forecast, so a single mismatch isn't meaningful —
+the value is in the pattern across many logged observations. The app draws no
+conclusion about what a mismatch means; that's yours to judge from your log.
+
+The app doesn't identify pilots, crew, or individual aircraft owners, and won't.
 
 ## How the Anomaly Engine works
 

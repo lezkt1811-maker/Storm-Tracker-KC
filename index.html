@@ -284,6 +284,10 @@
       <p class="section-note">A first look at conditions approaching KC. Each point is its own real NWS forecast, not a regional map layer yet.</p>
       <div id="regionalList"><div class="empty-state">loading regional points&hellip;</div></div>
 
+      <p class="section-title">✈️ Trail Check</p>
+      <p class="section-note">Whether plane trails (contrails) <em>should</em> form right now, from forecast temperature and humidity where jets cruise. Jet exhaust contains water vapor; below about &minus;40&deg;F/&minus;40&deg;C it freezes into ice. In dry air the trail vanishes fast; in air saturated with respect to ice it lasts and spreads. Log what you actually see with the ➕ button (pick "Trails") and it's compared with this forecast.</p>
+      <div id="trailCheck"><div class="empty-state">loading upper-air forecast&hellip;</div></div>
+
       <p class="section-title">Command Map</p>
       <p class="section-note">Toggle layers independently. Each layer states its own data source. The map background is plain geography (roads, parks, rivers) in muted colors — <strong>any bright blue/green/yellow/red you see is real rain</strong> from the Precipitation layer, not land features.</p>
       <div class="chip-row">
@@ -422,6 +426,9 @@
     <p class="section-title">🗺 MAP tab</p>
     <p class="section-note">Weather and an interactive map for Kansas City. The colored buttons above the map turn things on or off — <strong>try tapping "Aircraft"</strong> to see nearby planes appear. Scroll down and you'll find two more weather pictures (a radar loop and a country-wide Windy map) plus a rain forecast for the next few days. On the map itself, any bright blue/green/yellow/red is real rain — everything else (roads, parks, rivers) is muted on purpose so weather stands out.</p>
 
+    <p class="section-title">✈️ Trail Check (Map tab)</p>
+    <p class="section-note">Says whether plane trails <em>should</em> form and last right now, based on how cold and humid the air is up where jets fly. <strong>Try this:</strong> next time you see trails, tap ➕, pick "Trails," choose what they did, and save. It gets marked "matches the forecast" or "doesn't match." Over time your log shows how often what you see fits the weather.</p>
+
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
 
@@ -456,12 +463,22 @@
       <label>Category</label>
       <select id="obsCategory">
         <option>Aircraft</option>
+        <option>Trails</option>
         <option>Cloud</option>
         <option>Sound</option>
         <option>Weather</option>
         <option>Storm</option>
         <option>Other</option>
       </select>
+    </div>
+    <div class="field" id="trailBehaviorField" style="display:none;">
+      <label>What did the trails do?</label>
+      <select id="obsTrailBehavior">
+        <option value="none">No trails behind the planes</option>
+        <option value="short">Short trails that vanished within a minute or so</option>
+        <option value="persistent">Trails that lasted and/or spread out</option>
+      </select>
+      <p class="field-hint">This gets compared with the Trail Check forecast at the moment you save.</p>
     </div>
     <div class="field">
       <label>Classification</label>
@@ -1156,15 +1173,20 @@ function initMap(){
   });
 }
 
+function hideMapControls(){
+  ['mapRecenterBtn','mapLockOverlay'].forEach(id=>{ const e = document.getElementById(id); if(e) e.style.display = 'none'; });
+}
 if(LEAFLET_AVAILABLE){
   try{ initMap(); }
   catch(err){
     console.error('Map initialization failed', err);
     map = null;
+    hideMapControls();
     document.getElementById('radarMap').outerHTML = '<div class="empty-state">MAP UNAVAILABLE — the mapping library failed to initialize. Weather, Timeline, Anomalies, Lab and Vault are unaffected.</div>';
   }
 } else {
   console.error('Leaflet failed to load — map disabled, rest of the app continues.');
+  hideMapControls();
   document.getElementById('radarMap').outerHTML = '<div class="empty-state">MAP UNAVAILABLE — the mapping library (Leaflet, from cdnjs.cloudflare.com) did not load. Check your connection and reload. Weather, Timeline, Anomalies, Lab and Vault are unaffected.</div>';
   document.querySelectorAll('.chip[data-layer]').forEach(chip=> chip.disabled = true);
 }
@@ -1314,6 +1336,120 @@ async function loadExtendedForecast(){
 loadExtendedForecast();
 renderRegionalPoints();
 
+/* ===================== TRAIL CHECK (contrail forecast) =====================
+   Simplified Schmidt-Appleman criterion: trails need air colder than about
+   -40 C; they persist only if the air is at/near saturation over ice.
+   Open-Meteo gives RH over water, so it's converted to RH over ice with
+   Magnus-type saturation vapor pressure formulas. Model humidity at cruise
+   altitude has large, well-documented errors, so this is a rough estimate. */
+const TRAIL_LEVELS = [300, 250, 200];
+const TRAIL_LABELS = { none:'No trails expected', short:'Short-lived trails', persistent:'Long-lasting / spreading trails possible' };
+let latestTrailForecast = null;
+
+const TrailEngine = {
+  rhIce(rhWater, tC){
+    const esW = 6.112 * Math.exp(17.62 * tC / (243.12 + tC));
+    const esI = 6.112 * Math.exp(22.46 * tC / (272.62 + tC));
+    return rhWater * esW / esI;
+  },
+  classify(tC, rhWater){
+    if(tC == null || rhWater == null) return null;
+    if(tC > -40) return 'none';
+    return this.rhIce(rhWater, tC) >= 95 ? 'persistent' : 'short';
+  },
+  overall(levels){
+    const kinds = levels.map(l=>l.kind).filter(Boolean);
+    if(!kinds.length) return null;
+    if(kinds.includes('persistent')) return 'persistent';
+    if(kinds.includes('short')) return 'short';
+    return 'none';
+  }
+};
+
+async function fetchTrailForecast(lat, lon){
+  const vars = TRAIL_LEVELS.flatMap(p=>[`temperature_${p}hPa`,`relative_humidity_${p}hPa`,`geopotential_height_${p}hPa`]).join(',');
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=${vars}&forecast_days=1&timezone=GMT`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const times = data.hourly.time.map(t=>Date.parse(t + 'Z'));
+    const now = Date.now();
+    let idx = 0;
+    for(let i=0;i<times.length;i++){ if(times[i] <= now) idx = i; }
+    const levels = TRAIL_LEVELS.map(p=>{
+      const tC = data.hourly[`temperature_${p}hPa`][idx];
+      const rh = data.hourly[`relative_humidity_${p}hPa`][idx];
+      const hM = data.hourly[`geopotential_height_${p}hPa`][idx];
+      return {
+        hPa: p, tC, rh, heightFt: hM != null ? Math.round(hM * 3.28084 / 100) * 100 : null,
+        rhIce: (tC != null && rh != null) ? TrailEngine.rhIce(rh, tC) : null,
+        kind: TrailEngine.classify(tC, rh)
+      };
+    });
+    return { validAt: times[idx], levels, overall: TrailEngine.overall(levels) };
+  } catch(err){
+    console.error('fetchTrailForecast', err);
+    return null;
+  }
+}
+
+async function renderTrailCheck(){
+  const wrap = document.getElementById('trailCheck');
+  const [fc, planes] = await Promise.all([
+    fetchTrailForecast(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon),
+    AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon)
+  ]);
+  latestTrailForecast = fc;
+  if(!fc){
+    wrap.innerHTML = '<div class="empty-state">Upper-air forecast unavailable right now. SOURCE: Open-Meteo</div>';
+    return;
+  }
+  const cruise = planes.filter(p=>p.altitude != null && p.altitude >= 7620 && !p.onGround).length;
+  const aircraftLine = (AircraftProvider.status === 'ok' || AircraftProvider.status === 'cached')
+    ? `${cruise} aircraft nearby at cruise altitude (above 25,000 ft) · SOURCE: ${AircraftProvider.status === 'ok' ? 'OpenSky Network (live)' : 'OpenSky Network snapshot, updated ' + fmtTime(AircraftProvider.lastUpdated)}`
+    : 'Aircraft data not connected right now.';
+  const badge = { none:'normal', short:'watch', persistent:'unusual' };
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <strong>${fc.overall ? TRAIL_LABELS[fc.overall] : 'NO DATA'}</strong>
+        <span class="badge info">FORECAST</span>
+      </div>
+      <p class="field-hint" style="margin:0.3rem 0 0.7rem;">Valid ${fmtTime(fc.validAt)}</p>
+      ${fc.levels.map(l=>`
+        <div class="status-row">
+          <span>~${l.heightFt != null ? l.heightFt.toLocaleString() + ' ft' : l.hPa + ' hPa'}</span>
+          <span class="timestamp">${l.tC != null ? Math.round(l.tC) + '&deg;C' : 'NO DATA'} · ice-humidity ${l.rhIce != null ? Math.round(l.rhIce) + '%' : 'NO DATA'}</span>
+          <span class="badge ${l.kind ? badge[l.kind] : 'insufficient'}">${l.kind ? l.kind : 'no data'}</span>
+        </div>`).join('')}
+      <p class="section-note" style="margin:0.7rem 0 0;">${escapeHtml(aircraftLine)}</p>
+      <p class="source-tag" style="display:block;margin-top:0.5rem;">SOURCE: Open-Meteo upper-air forecast · simplified Schmidt-Appleman check. Forecast humidity this high up has real error, so treat this as a rough guide.</p>
+    </div>`;
+}
+renderTrailCheck();
+setInterval(renderTrailCheck, 30 * 60 * 1000);
+
+document.getElementById('obsCategory').addEventListener('change', e=>{
+  document.getElementById('trailBehaviorField').style.display = e.target.value === 'Trails' ? 'block' : 'none';
+});
+
+function trailComparison(observed){
+  const fc = latestTrailForecast;
+  if(!fc || !fc.overall) return { observed, predicted:null, result:'NO FORECAST AVAILABLE' };
+  return {
+    observed, predicted: fc.overall, forecastValidAt: fc.validAt,
+    result: observed === fc.overall ? 'MATCHES THE FORECAST' : "DOESN'T MATCH THE FORECAST"
+  };
+}
+function trailSummary(o){
+  if(!o.trailCheck) return '';
+  const t = o.trailCheck;
+  const pred = t.predicted ? TRAIL_LABELS[t.predicted] : 'none available';
+  const seen = { none:'no trails', short:'short trails', persistent:'lasting/spreading trails' }[t.observed] || t.observed;
+  return ` — Trails seen: ${seen}. Forecast: ${pred}. ${t.result}.`;
+}
+
 /* ===================== OBSERVATION SHEET ===================== */
 const obsSheet = document.getElementById('obsSheetOverlay');
 let obsGps = null;
@@ -1330,17 +1466,19 @@ document.getElementById('obsAttachGps').addEventListener('click', ()=>{
   }, { timeout: 8000 });
 });
 document.getElementById('obsSaveBtn').addEventListener('click', async ()=>{
-  const description = document.getElementById('obsDescription').value.trim();
-  if(!description){ return; }
+  const category = document.getElementById('obsCategory').value;
+  let description = document.getElementById('obsDescription').value.trim();
+  if(!description && category !== 'Trails'){ return; }
   const obs = {
     timestamp: Date.now(),
-    category: document.getElementById('obsCategory').value,
+    category,
     classification: document.getElementById('obsClassification').value,
-    description,
+    description: description || 'Trail observation',
     lat: obsGps ? obsGps.lat : null,
     lon: obsGps ? obsGps.lon : null,
     source: 'USER OBSERVATION'
   };
+  if(category === 'Trails') obs.trailCheck = trailComparison(document.getElementById('obsTrailBehavior').value);
   await dbAdd('observations', obs);
   document.getElementById('obsDescription').value = '';
   obsSheet.classList.remove('open');
@@ -1368,7 +1506,7 @@ async function buildTimelineEvents(){
   });
   const observations = await dbGetAll('observations');
   observations.forEach(o=>{
-    events.push({ timestamp: o.timestamp, category:'OBSERVATION', source:'USER OBSERVATION', description: `[${o.category}/${o.classification}] ${o.description}` });
+    events.push({ timestamp: o.timestamp, category:'OBSERVATION', source:'USER OBSERVATION', description: `[${o.category}/${o.classification}] ${o.description}${trailSummary(o)}` });
   });
   const snapshots = await dbGetAll('snapshots');
   const metricsList = [
@@ -1636,7 +1774,7 @@ async function renderVaultList(store){
   listEl.innerHTML = '';
   items.forEach(item=>{
     let desc = '';
-    if(store==='observations') desc = `[${item.category}/${item.classification}] ${item.description}`;
+    if(store==='observations') desc = `[${item.category}/${item.classification}] ${item.description}${trailSummary(item)}`;
     else if(store==='snapshots') desc = `temp:${item.tempC ?? 'NO DATA'} pressure:${item.pressurePa ?? 'NO DATA'} aircraft:${item.aircraftCount}`;
     else if(store==='hypotheses') desc = item.claim;
     const ts = item.timestamp || item.createdAt;
@@ -1677,7 +1815,7 @@ document.getElementById('exportHtmlBtn').addEventListener('click', async ()=>{
   <h1>Storm Tracker KC — Investigation Report</h1>
   <p>Exported ${escapeHtml(data.exportedAt)} for ${escapeHtml(data.location.label)}</p>
   <h2>Observations (${data.observations.length})</h2>
-  ${data.observations.map(o=>`<div class="item"><strong>${fmtTime(o.timestamp)}</strong> [${escapeHtml(o.category)}/${escapeHtml(o.classification)}]<br>${escapeHtml(o.description)}<br><span class="src">SOURCE: USER OBSERVATION</span></div>`).join('')}
+  ${data.observations.map(o=>`<div class="item"><strong>${fmtTime(o.timestamp)}</strong> [${escapeHtml(o.category)}/${escapeHtml(o.classification)}]<br>${escapeHtml(o.description + trailSummary(o))}<br><span class="src">SOURCE: USER OBSERVATION</span></div>`).join('')}
   <h2>Hypotheses (${data.hypotheses.length})</h2>
   ${data.hypotheses.map(h=>`<div class="item"><strong>${escapeHtml(h.claim)}</strong> — status: ${escapeHtml(computeHypStatus(h))}<br>Supporting: ${h.supporting.length}, Contradicting: ${h.contradicting.length}</div>`).join('')}
   <h2>Sentinel Snapshots (${data.snapshots.length})</h2>
