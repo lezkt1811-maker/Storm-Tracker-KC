@@ -161,6 +161,48 @@ rolling), which the Anomalies tab uses as a same-hour-of-day baseline that keeps
 growing even when nobody has the app open. Positions only — no crew or owner
 lookups.
 
+## Investigate tab: Atmospheric Operations and Infrastructure
+
+**Weather-modification records** (`data/weather-modification.json`, maintained by
+hand) hold documents as first-class objects: statutes, regulations, bills,
+operational plans, NOAA activity reports, operator statements and datasets, each
+with its agency, URL, retrieval date and how it was verified. Records reference
+documents by ID. Every state lists the sources searched and what each search found,
+so "no record found" is always tied to specific sources.
+
+Findings as of 2026-10-01 (verified against primary sources by
+`.github/workflows/research-sources.yml`):
+
+- **Kansas** regulates weather modification through licenses, annual permits,
+  operational plans and reports (K.S.A. 82a-1401 et seq., K.A.R. 98-4). Two 2026
+  bills to ban it (SB 449, HB 2439) died. One documented program: the Western Kansas
+  Weather Modification Program (hail suppression and rain enhancement in southwest and
+  west-central Kansas, based at Lakin, ~369 mi from KC). It has NOAA reports for 2002
+  through 2016, and its operator says it's suspended for funding reasons. Status:
+  HISTORICAL. License and permit numbers aren't online.
+- **Missouri**: no weather-modification permit statute was found, and the NOAA-report
+  dataset (2000–2025) has no Missouri reports. 2026 bills to ban it (SB 860, HB 2388,
+  HB 2656) aren't shown as enacted. The app displays "NO VERIFIED RECORD FOUND IN
+  SEARCHED PUBLIC SOURCES", which is not the same as "none exists". Missouri DNR
+  systems still need a manual search.
+
+To add a record, append a document and a record to the JSON with its source URL.
+
+**Atmospheric infrastructure** (`data/atmospheric-sites.json`) is rebuilt monthly by
+`.github/workflows/atmospheric-sites.yml` running `scripts/build_atmospheric_sites.py`.
+That script pulls every site within 200 miles of KC from these feeds:
+- radars from the NWS API
+- weather-balloon sites and ASOS/AWOS stations from Iowa Environmental Mesonet
+- air-quality monitors from EPA AirNow
+- airports from OurAirports
+- NWS offices from the NWS API (address only, since it gives no coordinates, so not
+  mapped)
+
+No coordinates are typed in by hand. Categories describe what a facility is (radar,
+weather monitoring, upper air, NOAA/NWS, aviation, air quality), never involvement in
+weather modification. Environmental-permit locations aren't connected yet, because
+no free machine-readable feed was found.
+
 ## Event Packets
 
 Vault → Capture Event Packet freezes everything at one moment: surface observation,

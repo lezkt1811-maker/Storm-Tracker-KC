@@ -378,6 +378,38 @@
       <div id="hypothesisList"><div class="empty-state">No hypotheses yet. Start one above — try a claim from a normal weather process, an aviation question, or a controversial theory. Same structure, same rules of evidence for all.</div></div>
     </section>
 
+    <!-- ===================== INVESTIGATE TAB ===================== -->
+    <section class="tab-panel" id="tab-investigate">
+      <p class="section-title">🔎 Investigate</p>
+      <p class="section-note">Documented records and the instruments around Kansas City. Everything here is labeled by what kind of evidence it is:</p>
+      <div class="card tight" style="font-size:0.82rem;line-height:1.7;">
+        <span class="badge normal">DOCUMENTED</span> an official record or filing &nbsp;
+        <span class="badge info">MEASURED</span> instrument data &nbsp;
+        <span class="badge watch">OBSERVED</span> a person's report (yours) &nbsp;
+        <span class="badge unusual">CORRELATED</span> things that happened at the same time — not cause &nbsp;
+        <span class="badge insufficient">HYPOTHESIZED / UNKNOWN</span> not established
+      </div>
+      <div class="chip-row" id="investigateSubnav">
+        <button class="chip active" data-inv="ops">☁️ Atmospheric Operations</button>
+        <button class="chip" data-inv="infra">📡 Infrastructure</button>
+      </div>
+
+      <div id="inv-ops">
+        <p class="section-title">☁️ Weather-Modification Records</p>
+        <p class="section-note">Only records backed by a document appear here. "No verified record found" means none turned up in the sources listed — it is <strong>not</strong> the same as "none exists."</p>
+        <div id="wxmodContent"><div class="empty-state">loading records&hellip;</div></div>
+      </div>
+
+      <div id="inv-infra" style="display:none;">
+        <p class="section-title">📡 Atmospheric Infrastructure</p>
+        <p class="section-note">Facilities within 200 miles of KC, with locations from official site lists. <strong>Map category indicates the type of record or facility, not involvement in weather modification.</strong> Being near something isn't evidence of anything.</p>
+        <div class="chip-row" id="infraCategoryChips"></div>
+        <div class="map-panel"><div class="map-wrap"><div id="infraMap" style="height:min(55vh,440px);width:100%;"></div></div></div>
+        <p class="field-hint" id="infraMeta"></p>
+        <div id="infraList"></div>
+      </div>
+    </section>
+
     <!-- ===================== VAULT TAB ===================== -->
     <section class="tab-panel" id="tab-vault">
       <p class="section-title">🖥 System Status</p>
@@ -437,6 +469,7 @@
     <button class="nav-btn" data-tab="timeline"><span class="icon">⏱</span>TIMELINE</button>
     <button class="nav-btn" data-tab="anomalies"><span class="icon">⚠️</span>ANOMALIES</button>
     <button class="nav-btn" data-tab="lab"><span class="icon">🔬</span>LAB</button>
+    <button class="nav-btn" data-tab="investigate"><span class="icon">🔎</span>INVESTIGATE</button>
     <button class="nav-btn" data-tab="vault"><span class="icon">🗃</span>VAULT</button>
   </nav>
 </div>
@@ -465,6 +498,9 @@
 
     <p class="section-title">📦 Event Packets (Vault tab)</p>
     <p class="section-note">When you see something odd, tap "Capture Event Packet Now." It saves a snapshot of every measurement plus satellite and radar pictures, with an ID and a fingerprint so it can't be quietly changed later. Open it any time to note which normal explanations fit.</p>
+
+    <p class="section-title">🔎 INVESTIGATE tab</p>
+    <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in.</p>
 
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
@@ -793,22 +829,55 @@ const AircraftProvider = {
   }
 };
 
-/* ===================== PROVIDER: INFRASTRUCTURE ===================== */
-// No free, CORS-accessible client-side API for FCC/ULS antenna & tower records
-// was found. Bulk FCC datasets require server-side download/processing, which
-// would violate the $0 / static-hosting constraint. Only publicly documented,
-// non-fabricated reference points are shown; everything else is disclosed as
-// not connected rather than invented.
-const InfrastructureProvider = {
-  status: "partial",
-  getKnownPoints(){
-    return [
-      { name: "NWS Radar KEAX (Pleasant Hill, MO)", lat: 38.8103, lon: -94.2644, type: "Weather Radar", source: "NWS public station record" },
-      { name: "Kansas City Intl Airport (MCI)", lat: 39.2976, lon: -94.7139, type: "Airport", source: "FAA public airport record" },
-      { name: "Kansas City Downtown Airport (MKC)", lat: 39.1230, lon: -94.5926, type: "Airport", source: "FAA public airport record" }
-    ];
-  }
+/* ===================== PROVIDER: INFRASTRUCTURE + DOCUMENTED OPERATIONS =====================
+   data/atmospheric-sites.json is generated by scripts/build_atmospheric_sites.py
+   from official/public site-metadata feeds (NWS API, IEM, EPA AirNow,
+   OurAirports); no coordinates are typed in by hand.
+   data/weather-modification.json is a hand-maintained record of documents
+   found in official sources, each with its URL and retrieval date.
+   Categories describe what a facility IS — never involvement in weather
+   modification. */
+const SITE_CATEGORIES = {
+  WEATHER_MODIFICATION: { label:'Documented weather-modification operation', icon:'☁️', color:'#9D4EFF', legend:'🟣' },
+  RADAR:                { label:'Radar facility', icon:'📡', color:'#FF4757', legend:'🔴' },
+  WEATHER_MONITORING:   { label:'Weather monitoring facility', icon:'🌡', color:'#2F7BFF', legend:'🔵' },
+  UPPER_AIR:            { label:'Upper-air (weather balloon) site', icon:'🎈', color:'#FFD23F', legend:'🟡' },
+  SATELLITE_NOAA:       { label:'NOAA / NWS facility', icon:'🛰', color:'#00E5FF', legend:'🛰' },
+  AVIATION:             { label:'Aircraft facility (airport)', icon:'✈️', color:'#FF9F1C', legend:'🟠' },
+  AIR_QUALITY:          { label:'Air-quality monitoring', icon:'🌫', color:'#39FF88', legend:'🟢' },
+  ENV_PERMIT:           { label:'Environmental permit', icon:'🏭', color:'#B6AFD1', legend:'⚪' }
 };
+const InfrastructureProvider = {
+  sites: null, wxmod: null, status: 'unknown',
+  async load(){
+    if(this.sites && this.wxmod) return;
+    const [a, b] = await Promise.all([
+      fetch('data/atmospheric-sites.json', { cache:'no-store' }).then(r=>r.ok ? r.json() : null).catch(()=>null),
+      fetch('data/weather-modification.json', { cache:'no-store' }).then(r=>r.ok ? r.json() : null).catch(()=>null)
+    ]);
+    this.sites = a; this.wxmod = b;
+    this.status = (a || b) ? 'ok' : 'not_connected';
+  },
+  // Documented operations that carry a verified location become map points.
+  operationPoints(){
+    if(!this.wxmod || !this.sites) return [];
+    const places = this.sites.places || {};
+    const pts = [];
+    Object.values(this.wxmod.states || {}).forEach(st=>(st.records || []).forEach(r=>{
+      const pl = r.locationRef && places[r.locationRef];
+      if(pl) pts.push({ id:r.id, category:'WEATHER_MODIFICATION', name:r.projectName, lat:pl.lat, lon:pl.lon, distanceMi:pl.distanceMi,
+        what:`${r.activityType.replace(/_/g,' ')} · status ${r.status}${r.endDate ? ' · last documented operations ' + r.endDate : ''}. Base: ${r.locationRef}.`,
+        source:`${r.sourceAgency} (record) · location from ${pl.source}`, sourceUrl:r.sourceUrl, documentation:'DOCUMENTED (official record)' });
+    }));
+    return pts;
+  },
+  all(){ return ((this.sites && this.sites.sites) || []).concat(this.operationPoints()); }
+};
+
+function sitePopup(p){
+  const c = SITE_CATEGORIES[p.category] || { label:p.category };
+  return `<strong>${escapeHtml(p.name)}</strong><br><span class="badge info">${escapeHtml(c.label)}</span><br>${escapeHtml(p.what || '')}<br>${p.distanceMi != null ? p.distanceMi + ' mi from KC<br>' : ''}<span class="source-tag">SOURCE: ${escapeHtml(p.source)}${p.sourceUrl ? ` — <a href="${escapeHtml(p.sourceUrl)}" target="_blank" rel="noopener">link</a>` : ''}<br>Documentation: ${escapeHtml(p.documentation || 'UNKNOWN / REQUIRES VERIFICATION')}</span><br><em>Category = type of facility/record, not involvement in weather modification.</em>`;
+}
 
 /* ===================== LOCAL STATISTICS / AI (no external calls) ===================== */
 const Stats = {
@@ -1015,6 +1084,7 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
     if(btn.dataset.tab === 'anomalies') renderAnomaliesTab();
     if(btn.dataset.tab === 'lab') renderLabTab();
     if(btn.dataset.tab === 'vault') { renderStatusPanel(); renderVaultList('observations'); }
+    if(btn.dataset.tab === 'investigate') renderInvestigateTab();
   });
 });
 document.getElementById('openVaultShortcut').addEventListener('click', ()=>{
@@ -1170,13 +1240,16 @@ async function refreshAircraftLayer(){
     statusNote.textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED (OpenSky Network unreachable — could be rate limiting, CORS, or an outage). No aircraft are simulated.';
   }
 }
-function refreshInfraLayer(){
+// Command Map shows the sparse categories; the Investigate tab has every
+// category with individual toggles.
+const COMMAND_MAP_SITE_CATEGORIES = ['RADAR','UPPER_AIR','AVIATION','WEATHER_MODIFICATION'];
+async function refreshInfraLayer(){
   if(!infraLayer) return;
   infraLayer.clearLayers();
-  InfrastructureProvider.getKnownPoints().forEach(p=>{
-    const marker = L.circleMarker([p.lat,p.lon], { radius:6, color:'#9D4EFF', fillColor:'#9D4EFF', fillOpacity:0.5 });
-    marker.bindPopup(`<strong>${escapeHtml(p.name)}</strong><br>${escapeHtml(p.type)}<br><span class="source-tag">SOURCE: ${escapeHtml(p.source)}</span><br><em>Location data only — presence does not imply any causal role in weather events.</em>`);
-    marker.addTo(infraLayer);
+  await InfrastructureProvider.load();
+  InfrastructureProvider.all().filter(p=>COMMAND_MAP_SITE_CATEGORIES.includes(p.category)).forEach(p=>{
+    const col = (SITE_CATEGORIES[p.category] || {}).color || '#B6AFD1';
+    L.circleMarker([p.lat,p.lon], { radius:6, color:col, fillColor:col, fillOpacity:0.5 }).bindPopup(sitePopup(p)).addTo(infraLayer);
   });
 }
 
@@ -1941,6 +2014,7 @@ async function renderStatusPanel(){
     { label:'AIRCRAFT (OpenSky)', ok: AircraftProvider.status==='cached', warn: AircraftProvider.status==='unknown', text: AircraftProvider.status==='cached'?'CONNECTED (snapshot)':(AircraftProvider.status==='unknown'?'CHECKING':'NOT CONNECTED') },
     { label:'UPPER AIR (Open-Meteo)', ok: !!latestUpperAir, warn: latestUpperAir === undefined, text: latestUpperAir ? 'CONNECTED' : (latestUpperAir === undefined ? 'CHECKING' : 'ERROR') },
     { label:'AEROSOL (Open-Meteo/CAMS)', ok: !!latestAerosol, warn: latestAerosol === undefined, text: latestAerosol ? 'CONNECTED' : (latestAerosol === undefined ? 'CHECKING' : 'ERROR') },
+    { label:'SITE LIST / RECORDS', ok: InfrastructureProvider.status==='ok', warn: InfrastructureProvider.status==='unknown', text: InfrastructureProvider.status==='ok' ? 'LOADED' : (InfrastructureProvider.status==='unknown' ? 'NOT LOADED YET' : 'NOT CONNECTED') },
     { label:'AI', ok:true, warn:false, text:'LOCAL' },
     { label:'LOCATION', ok: geoState==='granted', warn: geoState==='prompt'||geoState==='unknown', text: geoState.toUpperCase() },
     { label:'STORAGE (IndexedDB)', ok: storageOk, warn:false, text: storageOk?'AVAILABLE':'ERROR' },
@@ -2030,6 +2104,137 @@ async function renderVaultList(store){
   });
 }
 
+
+
+/* ===================== INVESTIGATE TAB ===================== */
+const INFRA_DEFAULT_ON = { WEATHER_MODIFICATION:true, RADAR:true, UPPER_AIR:true, SATELLITE_NOAA:true, AVIATION:false, WEATHER_MONITORING:false, AIR_QUALITY:false, ENV_PERMIT:false };
+const infraState = Object.assign({}, INFRA_DEFAULT_ON);
+let infraMap = null, infraMapLayers = {};
+
+document.querySelectorAll('#investigateSubnav .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#investigateSubnav .chip').forEach(c=>c.classList.toggle('active', c === chip));
+    document.getElementById('inv-ops').style.display = chip.dataset.inv === 'ops' ? 'block' : 'none';
+    document.getElementById('inv-infra').style.display = chip.dataset.inv === 'infra' ? 'block' : 'none';
+    if(chip.dataset.inv === 'infra') renderInfrastructure();
+  });
+});
+
+async function renderInvestigateTab(){
+  await InfrastructureProvider.load();
+  renderWxModRecords();
+  if(document.getElementById('inv-infra').style.display !== 'none') renderInfrastructure();
+}
+
+function docLink(d){
+  return `<div class="list-item">
+    <div class="row"><span class="badge info">${escapeHtml(d.type)}</span><span class="timestamp">${escapeHtml(d.status || '')}</span></div>
+    <div class="desc"><a href="${escapeHtml(d.url)}" target="_blank" rel="noopener">${escapeHtml(d.title)}</a></div>
+    ${d.summary ? `<div class="desc" style="font-size:0.82rem;color:var(--text-dim);">${escapeHtml(d.summary)}</div>` : ''}
+    <div class="meta"><span class="source-tag">SOURCE: ${escapeHtml(d.agency)} · ${escapeHtml(d.verified || '')} · retrieved ${escapeHtml(d.retrievedAt || '')}</span></div>
+  </div>`;
+}
+
+function renderWxModRecords(){
+  const wrap = document.getElementById('wxmodContent');
+  const W = InfrastructureProvider.wxmod;
+  if(!W){ wrap.innerHTML = '<div class="empty-state">Weather-modification records file not available. SOURCE: data/weather-modification.json</div>'; return; }
+  const docs = Object.fromEntries((W.documents || []).map(d=>[d.id, d]));
+  const places = (InfrastructureProvider.sites && InfrastructureProvider.sites.places) || {};
+  const stateBlock = (code, st) => {
+    const recs = st.records || [];
+    const recHtml = recs.length ? recs.map(r=>{
+      const pl = places[r.locationRef];
+      const rDocs = (r.documentIds || []).map(id=>docs[id]).filter(Boolean);
+      const plan = rDocs.filter(d=>d.type === 'OPERATIONAL PLAN' || d.type === 'OPERATOR STATEMENT');
+      const reps = rDocs.filter(d=>d.type.startsWith('ACTIVITY REPORT'));
+      return `<div class="card">
+        <div class="row" style="display:flex;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+          <strong>${escapeHtml(r.projectName)}</strong>
+          <span><span class="badge normal">DOCUMENTED OPERATION</span> <span class="badge insufficient">${escapeHtml(r.status)}</span></span>
+        </div>
+        <div class="status-row"><span>Operator</span><span class="timestamp">${escapeHtml(r.operator)}</span></div>
+        <div class="status-row"><span>Activity</span><span class="timestamp">${escapeHtml((r.activityTypes || [r.activityType]).map(x=>x.replace(/_/g,' ')).join(', '))}</span></div>
+        <div class="status-row"><span>Period</span><span class="timestamp">${escapeHtml(r.startDate || '?')} → ${escapeHtml(r.endDate || '?')}</span></div>
+        <div class="status-row"><span>Base</span><span class="timestamp">${escapeHtml(r.locationRef || 'not documented')}${pl ? ` · <strong>${pl.distanceMi} mi from KC</strong>` : ''}</span></div>
+        <div class="status-row"><span>Target area</span><span class="timestamp">${escapeHtml(r.targetArea || '—')}</span></div>
+        <div class="status-row"><span>Affected area</span><span class="timestamp">${escapeHtml(r.affectedArea || '—')}</span></div>
+        <div class="status-row"><span>Materials</span><span class="timestamp">${escapeHtml((r.materials || []).join('; ') || '—')}</span></div>
+        <div class="status-row"><span>Equipment</span><span class="timestamp">${escapeHtml((r.equipment || []).join('; ') || '—')}</span></div>
+        <div class="status-row"><span>License / permit no.</span><span class="timestamp">${escapeHtml(r.licenseNumber || 'not found online')} / ${escapeHtml(r.permitNumber || 'not found online')}</span></div>
+        <p class="section-note" style="margin:0.6rem 0;">${escapeHtml(r.notes || '')}</p>
+        <p class="section-title" style="font-size:0.9rem;">Plan & operator statement</p>${plan.map(docLink).join('')}
+        <details><summary class="btn ghost" style="display:inline-block;margin:0.4rem 0;">Show ${reps.length} NOAA activity reports (${reps.length ? escapeHtml(r.seasons[0].year + '–' + r.seasons[r.seasons.length-1].year) : ''})</summary>${reps.map(docLink).join('')}</details>
+        <p class="source-tag" style="display:block;">Record status: ${escapeHtml(r.verification)} · last verified ${escapeHtml(W.lastVerified)}</p>
+      </div>`;
+    }).join('') : `<div class="card"><span class="badge insufficient">${escapeHtml(st.noRecordMessage || 'NO VERIFIED RECORD FOUND IN SEARCHED PUBLIC SOURCES')}</span><p class="field-hint" style="margin-top:0.5rem;">This is not the same as "no weather modification exists" — it means none turned up in the sources below.</p></div>`;
+    const fw = (st.frameworkDocumentIds || []).map(id=>docs[id]).filter(Boolean);
+    return `<p class="section-title">${code === 'KS' ? '🌾' : '🏞'} ${escapeHtml(st.name)}</p>
+      <p class="section-note">${escapeHtml(st.summary)}</p>
+      ${recHtml}
+      <details><summary class="btn ghost" style="display:inline-block;margin:0.3rem 0;">Laws, regulations & bills (${fw.length})</summary>${fw.map(docLink).join('')}</details>
+      <details><summary class="btn ghost" style="display:inline-block;margin:0.3rem 0;">Sources searched (${(st.searchedSources || []).length})</summary>
+        ${(st.searchedSources || []).map(x=>`<div class="list-item"><div class="desc">${x.url ? `<a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.source)}</a>` : escapeHtml(x.source)}</div><div class="meta"><span class="timestamp">${escapeHtml(x.result)}${x.searchedAt ? ' · searched ' + escapeHtml(x.searchedAt) : ''}</span></div></div>`).join('')}
+      </details>`;
+  };
+  const fed = (W.documents || []).filter(d=>d.state === 'US');
+  wrap.innerHTML = Object.entries(W.states).map(([c, st])=>stateBlock(c, st)).join('') + `
+    <p class="section-title">🇺🇸 Federal reporting</p>
+    <p class="section-note">Anyone doing weather modification in the U.S. must report it to NOAA (15 CFR 908). NOAA collects these reports but doesn't regulate the activity.</p>
+    ${fed.map(docLink).join('')}
+    <p class="field-hint">Found a record that isn't here? Send me the link and it gets added with its source.</p>`;
+}
+
+function renderInfrastructure(){
+  const P = InfrastructureProvider;
+  const chips = document.getElementById('infraCategoryChips');
+  const all = P.all();
+  const counts = {};
+  all.forEach(s=>counts[s.category] = (counts[s.category] || 0) + 1);
+  const offices = (P.sites && P.sites.listOnly) || [];
+  counts.SATELLITE_NOAA = (counts.SATELLITE_NOAA || 0) + offices.length;
+  chips.innerHTML = Object.entries(SITE_CATEGORIES).map(([k, c])=>`<button class="chip${infraState[k] ? ' active' : ''}" data-cat="${k}">${c.legend} ${c.icon} ${escapeHtml(c.label.split(' (')[0])} (${counts[k] || 0})</button>`).join('');
+  chips.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click', ()=>{ infraState[ch.dataset.cat] = !infraState[ch.dataset.cat]; renderInfrastructure(); }));
+
+  if(LEAFLET_AVAILABLE && !infraMap){
+    infraMap = L.map('infraMap', { zoomControl:true }).setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 6);
+    infraMap.createPane('baseTiles'); infraMap.getPane('baseTiles').style.zIndex = 150;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { pane:'baseTiles', attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19 }).addTo(infraMap);
+    L.circle([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], { radius: 200 * 1609.34, color:'#9D4EFF', weight:1.5, dashArray:'6 6', fill:false }).addTo(infraMap).bindPopup('200-mile investigation radius around Kansas City');
+    L.marker([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon]).addTo(infraMap).bindPopup(CURRENT_LOCATION.label);
+  }
+  if(infraMap){
+    Object.values(infraMapLayers).forEach(l=>infraMap.removeLayer(l));
+    infraMapLayers = {};
+    Object.keys(SITE_CATEGORIES).forEach(k=>{
+      if(!infraState[k]) return;
+      const col = SITE_CATEGORIES[k].color;
+      const g = L.layerGroup();
+      all.filter(s=>s.category === k).forEach(s=>L.circleMarker([s.lat, s.lon], { radius: k === 'WEATHER_MODIFICATION' ? 9 : 6, color:col, fillColor:col, fillOpacity:0.55, weight:2 }).bindPopup(sitePopup(s)).addTo(g));
+      g.addTo(infraMap); infraMapLayers[k] = g;
+    });
+    setTimeout(()=>infraMap.invalidateSize(), 50);
+  }
+  const meta = document.getElementById('infraMeta');
+  meta.textContent = P.sites ? `Site list built ${fmtTime(Date.parse(P.sites.generatedAt))} from: ${P.sites.sources.map(x=>x.name).join('; ')}.` : 'Site list not available yet.';
+  const list = document.getElementById('infraList');
+  const sections = Object.entries(SITE_CATEGORIES).filter(([k])=>infraState[k]).map(([k, c])=>{
+    let items = all.filter(s=>s.category === k).sort((a,b)=>a.distanceMi-b.distanceMi);
+    let html = items.slice(0, 40).map(s=>`<div class="list-item"><div class="row"><span>${escapeHtml(s.name)}</span><span class="timestamp">${s.distanceMi} mi</span></div>
+      <div class="desc" style="font-size:0.82rem;color:var(--text-dim);">${escapeHtml(s.what || '')}</div>
+      <div class="meta"><span class="source-tag">SOURCE: ${s.sourceUrl ? `<a href="${escapeHtml(s.sourceUrl)}" target="_blank" rel="noopener">${escapeHtml(s.source)}</a>` : escapeHtml(s.source)} · ${escapeHtml(s.documentation || '')}</span></div></div>`).join('');
+    if(items.length > 40) html += `<p class="field-hint">Showing the 40 closest of ${items.length}. All are on the map.</p>`;
+    if(k === 'SATELLITE_NOAA') html += offices.map(o=>`<div class="list-item"><div class="row"><span>${escapeHtml(o.name)}</span><span class="badge insufficient">address only</span></div>
+      <div class="desc" style="font-size:0.82rem;color:var(--text-dim);">${escapeHtml(o.address)} — ${escapeHtml(o.what)}</div>
+      <div class="meta"><span class="source-tag">SOURCE: <a href="${escapeHtml(o.sourceUrl)}" target="_blank" rel="noopener">${escapeHtml(o.source)}</a> · not mapped (the API gives an address, not coordinates)</span></div></div>`).join('');
+    if(k === 'WEATHER_MODIFICATION' && items.length) html += `<p class="field-hint">Shown even though it's outside the 200-mile circle, so its distance from KC is clear.</p>`;
+    const nc = ((P.sites && P.sites.notConnected) || []).find(n=>n.category === k);
+    if(nc) html += `<div class="empty-state">DATA SOURCE NOT CONNECTED — ${escapeHtml(nc.reason)}</div>`;
+    if(!html) html = '<div class="empty-state">None in this category.</div>';
+    return `<p class="section-title" style="font-size:0.95rem;">${c.legend} ${c.icon} ${escapeHtml(c.label)}</p>${html}`;
+  });
+  list.innerHTML = sections.join('') || '<div class="empty-state">Turn on a category above.</div>';
+}
 
 /* ===================== EVENT PACKETS =====================
    A frozen, timestamped record of every data source at one moment, with
@@ -2299,6 +2504,7 @@ async function init(){
   const sentinelSetting = await dbGet('settings', 'sentinelEnabled').catch(()=>null);
   if(sentinelSetting && sentinelSetting.value){ toggleSentinel(true); }
   renderSentinelUI();
+  await InfrastructureProvider.load();
   renderStatusPanel();
   renderTimelineTab();
 }

@@ -1,0 +1,703 @@
+{
+ "schemaVersion": 1,
+ "lastVerified": "2026-10-01",
+ "about": "Documented weather-modification records and the legal framework for Kansas and Missouri, collected from official and public sources. A record appears here only if a document was found; absence of a record means none was found in the sources listed, NOT that no activity exists.",
+ "documents": [
+  {
+   "id": "KSA-82a-1401",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1401",
+   "summary": "Citation: \"Kansas weather modification act\" (L. 1974)",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0001.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1402",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1402",
+   "summary": "Definitions; names the Kansas Water Authority and the director",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0002.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1405",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1405",
+   "summary": "Licenses for weather modification activities; permits for projects",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0005.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1406",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1406",
+   "summary": "License and permit required to engage in weather modification",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0006.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1411",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1411",
+   "summary": "Permit requirements, including an operational plan",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0011.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1414",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1414",
+   "summary": "A separate permit is required each calendar year per project",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0014.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KSA-82a-1417",
+   "state": "KS",
+   "type": "STATUTE",
+   "title": "K.S.A. 82a-1417",
+   "summary": "Reports of activities: methods, equipment, materials, times and places, participants, environmental effects",
+   "agency": "Kansas Office of Revisor of Statutes",
+   "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0017.html",
+   "status": "IN FORCE (no repeal shown on the official page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KAR-98-4-1",
+   "state": "KS",
+   "type": "REGULATION",
+   "title": "K.A.R. 98-4-1 — Licenses",
+   "summary": "Kansas Water Office regulations implementing the weather modification act.",
+   "agency": "Kansas Administrative Regulations (via Cornell LII mirror)",
+   "url": "https://www.law.cornell.edu/regulations/kansas/K-A-R-98-4-1",
+   "status": "Published regulation",
+   "verified": "Fetched (mirror of official regulations)",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KAR-98-4-2",
+   "state": "KS",
+   "type": "REGULATION",
+   "title": "K.A.R. 98-4-2 — Permits",
+   "summary": "Kansas Water Office regulations implementing the weather modification act.",
+   "agency": "Kansas Administrative Regulations (via Cornell LII mirror)",
+   "url": "https://www.law.cornell.edu/regulations/kansas/K-A-R-98-4-2",
+   "status": "Published regulation",
+   "verified": "Fetched (mirror of official regulations)",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KAR-98-4-4",
+   "state": "KS",
+   "type": "REGULATION",
+   "title": "K.A.R. 98-4-4 — Reports: monthly reports, preliminary and final annual reports",
+   "summary": "Kansas Water Office regulations implementing the weather modification act.",
+   "agency": "Kansas Administrative Regulations (via Cornell LII mirror)",
+   "url": "https://www.law.cornell.edu/regulations/kansas/K-A-R-98-4-4",
+   "status": "Published regulation",
+   "verified": "Fetched (mirror of official regulations)",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KS-SB449",
+   "state": "KS",
+   "type": "PROPOSED LEGISLATION",
+   "title": "SB 449 (2025–2026) — Clean Air Preservation Act",
+   "summary": "Would have prohibited solar radiation modification, geoengineering, weather modification and cloud seeding.",
+   "agency": "Kansas Legislature",
+   "url": "https://www.kslegislature.gov/li/b2025_26/measures/sb449/",
+   "status": "DIED (per official bill page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "KS-HB2439",
+   "state": "KS",
+   "type": "PROPOSED LEGISLATION",
+   "title": "HB 2439 (2025–2026) — Kansas Geoengineering and Weather Modification Prohibition Act",
+   "summary": "Would have prohibited geoengineering and weather modification, with enforcement by KDHE.",
+   "agency": "Kansas Legislature",
+   "url": "https://www.kslegislature.gov/li/b2025_26/measures/hb2439/",
+   "status": "DIED (per official bill page)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "WKWMP-OPPLAN-2014",
+   "state": "KS",
+   "type": "OPERATIONAL PLAN",
+   "title": "Operational Plan for Weather Modification Project — Western Kansas Weather Modification 2014",
+   "summary": "Continuation of the program run during growing seasons 1975–2013; 3 counties in 2014. Operations April 16–September 15, 2014. Methods: dry ice injected into clouds, silver iodide vaporized into cloud-base updrafts (3% solution in wing-tip generators, and pyrotechnics), hygroscopic pyrotechnic flares. Aircraft: two single-engine Piper Comanche (cloud base) and a twin-engine Piper Cheyenne (cloud top), owned by WKGMD #1. Field headquarters at Kearny County Airport, Lakin. Expected area of influence about 10 miles upwind and 25 miles downwind of the target counties.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Operational%20Plan%20For%20Weather%20Modification%20Project%20-%20Western%20Kansas%20Weather%20Modification%202014.pdf",
+   "date": "2014",
+   "status": "Historical",
+   "verified": "PDF read directly",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-02-1141",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 02-1141: Western Kansas Weather Modification Program, 2002",
+   "summary": "Reported operations 2002-04-22 to 2002-09-20. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modifucation_02-1141_04.22.2002-09.20.2002.pdf",
+   "date": "2002-04-22 – 2002-09-20",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-03-1188",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 03-1188: Western Kansas Weather Modification Program, 2003",
+   "summary": "Reported operations 2003-04-21 to 2003-09-19. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_03-1188_04.21.2003-09.19.2003.pdf",
+   "date": "2003-04-21 – 2003-09-19",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-04-1240",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 04-1240: Western Kansas Weather Modification Program, 2004",
+   "summary": "Reported operations 2004-04-19 to 2004-09-17. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_04-1240_04.19.2004-09.17.2004.pdf",
+   "date": "2004-04-19 – 2004-09-17",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-05-1292",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 05-1292: Western Kansas Weather Modification Program, 2005",
+   "summary": "Reported operations 2005-04-18 to 2005-09-16. Purpose: hail suppression, precipitation increase. Agent: silver iodide, dry ice. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_05-1292_04.18.2005-09.16.2005.pdf",
+   "date": "2005-04-18 – 2005-09-16",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-06-1330",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 06-1330: Western Kansas Weather Modification Program, 2006",
+   "summary": "Reported operations 2006-04-17 to 2006-09-22. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas region.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_06-1330_04.17.2006-09.22.2006.pdf",
+   "date": "2006-04-17 – 2006-09-22",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-07-1377",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 07-1377: Western Kansas Weather Modification Program, 2007",
+   "summary": "Reported operations 2007-04-16 to 2007-09-21. Purpose: hail suppression, precipitation increase. Agent: ionized air (likely extraction error — check PDF). Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_07-1377_04.16.2007-09.21.2007.pdf",
+   "date": "2007-04-16 – 2007-09-21",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-08-1412",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 08-1412: Western Kansas Weather Modification Program, 2008",
+   "summary": "Reported operations 2008-04-15 to 2008-09-19. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_08-1412_04.15.2008-09.19.2008.pdf",
+   "date": "2008-04-15 – 2008-09-19",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-09-1456",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 09-1456: Western Kansas Weather Modification Program, 2009",
+   "summary": "Reported operations 2009-04-17 to 2009-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_09-1456_04.17.2009-09.15.2009.pdf",
+   "date": "2009-04-17 – 2009-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-10-1491",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 10-1491: Western Kansas Weather Modification Program, 2010",
+   "summary": "Reported operations 2010-04-15 to 2010-09-14. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification_10-1491_04.15.2010-09.14.2010.pdf",
+   "date": "2010-04-15 – 2010-09-14",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-11-1527",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 11-1527: Western Kansas Weather Modification Program, 2011",
+   "summary": "Reported operations 2011-04-16 to 2011-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide (read directly in PDF; dataset says 'ionized air'). Target: 6,766 sq mi per report; see attached operational plan.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_11-1527_04.16.2011-09.15.2011.pdf",
+   "date": "2011-04-16 – 2011-09-15",
+   "status": "Historical",
+   "verified": "PDF read directly",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-12-1552",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 12-1552: Western Kansas Weather Modification Program, 2012",
+   "summary": "Reported operations 2012-04-16 to 2012-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_12-1552_04.16.2012-09.15.2012.pdf",
+   "date": "2012-04-16 – 2012-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-13-1588",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 13-1588: Western Kansas Weather Modification Program, 2013",
+   "summary": "Reported operations 2013-04-16 to 2013-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_13-1588_04.16.2013-09.15.2013.pdf",
+   "date": "2013-04-16 – 2013-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-14-1617",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 14-1617: Western Kansas Weather Modification Program, 2014",
+   "summary": "Reported operations 2014-04-16 to 2014-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_14-1617_04.16.2014-09.15.2014.pdf",
+   "date": "2014-04-16 – 2014-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-15-1650",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 15-1650: Western Kansas Weather Modification Program, 2015",
+   "summary": "Reported operations 2015-04-16 to 2015-09-15. Purpose: hail suppression, precipitation increase. Agent: ionized air (likely extraction error — check PDF). Target: western kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_15-1650_04.16.2015-09.15.2015.pdf",
+   "date": "2015-04-16 – 2015-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-16-1683",
+   "state": "KS",
+   "type": "ACTIVITY REPORT (NOAA Form 17-4/17-4A)",
+   "title": "NOAA file 16-1683: Western Kansas Weather Modification Program, 2016",
+   "summary": "Reported operations 2016-04-16 to 2016-09-15. Purpose: hail suppression, precipitation increase. Agent: silver iodide. Target: Scott and Lane counties, Kansas.",
+   "agency": "NOAA Central Library (filed under 15 CFR 908)",
+   "url": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Western%20Kansas%20Weather%20Modification%20Program_16-1683_04.16.2016-09.15.2016.pdf",
+   "date": "2016-04-16 – 2016-09-15",
+   "status": "Historical",
+   "verified": "Listed in the Zenodo dataset of NOAA reports; fields are machine-extracted — open the PDF to confirm",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "GMD1-PAGE",
+   "state": "KS",
+   "type": "OPERATOR STATEMENT",
+   "title": "Weather Program — Western Kansas Groundwater Management District No. 1",
+   "summary": "Operator's own page states: \"The program has been suspended due to funding issues.\" No suspension date is given.",
+   "agency": "Western Kansas Groundwater Management District No. 1",
+   "url": "https://www.gmd1.org/weather-program",
+   "status": "Current page",
+   "verified": "Fetched",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "MO-SB860",
+   "state": "MO",
+   "type": "PROPOSED LEGISLATION",
+   "title": "SB 860 (2026) — creates provisions relating to weather modification (would make weather modification unlawful; disclosure and $25M bond for atmospheric chemical deployment; reports to DNR)",
+   "summary": "Proposed legislation is not evidence that any program operates.",
+   "agency": "Missouri General Assembly",
+   "url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2026&billid=379",
+   "status": "Last status shown: committee substitute voted do pass in Senate Agriculture committee (retrieved 2026-10-01). Not shown as enacted.",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "MO-HB2388",
+   "state": "MO",
+   "type": "PROPOSED LEGISLATION",
+   "title": "HB 2388 (2026) — \"Clean Skies Act\" (new section 640.870 RSMo, would prohibit geoengineering, weather modification, cloud seeding)",
+   "summary": "Proposed legislation is not evidence that any program operates.",
+   "agency": "Missouri General Assembly",
+   "url": "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/5461H.01I.pdf",
+   "status": "Introduced version (retrieved 2026-10-01)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "MO-HB2656",
+   "state": "MO",
+   "type": "PROPOSED LEGISLATION",
+   "title": "HB 2656 (2026) — same \"Clean Skies Act\" text as HB 2388",
+   "summary": "Proposed legislation is not evidence that any program operates.",
+   "agency": "Missouri General Assembly",
+   "url": "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/6079H.01I.pdf",
+   "status": "Introduced version (retrieved 2026-10-01)",
+   "verified": "Fetched from official site",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "CFR-908",
+   "state": "US",
+   "type": "FEDERAL REGULATION",
+   "title": "15 CFR Part 908 — Maintaining Records and Submitting Reports on Weather Modification Activities",
+   "summary": "Anyone doing weather modification in the U.S. must report to NOAA at least 10 days before starting, and file activity reports. NOAA collects reports but does not regulate the activity.",
+   "agency": "eCFR (Office of the Federal Register)",
+   "url": "https://www.ecfr.gov/current/title-15/subtitle-B/chapter-IX/subchapter-A/part-908",
+   "status": "In force",
+   "verified": "Linked from NOAA Library page (fetched)",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "NOAA-LIB",
+   "state": "US",
+   "type": "RECORD ARCHIVE",
+   "title": "NOAA Central Library — Weather Modification Project Reports",
+   "summary": "NOAA's archive of reports filed under 15 CFR 908.",
+   "agency": "NOAA Central Library",
+   "url": "https://library.noaa.gov/weather-climate/weather-modification-project-reports",
+   "status": "Current",
+   "verified": "Fetched",
+   "retrievedAt": "2026-10-01"
+  },
+  {
+   "id": "ZENODO-2025",
+   "state": "US",
+   "type": "RESEARCH DATASET",
+   "title": "Cloud Seeding Activities in the United States (2000–2025) — 832 NOAA project reports as one CSV",
+   "summary": "Searched 2026-10-01: Kansas 15 reports (all Western Kansas program, 2002–2016); Missouri 0. Fields were extracted from the NOAA PDFs by a language model; GAO has also found many NOAA reports contain errors, so open the original PDF before relying on a field.",
+   "agency": "Zenodo (published with Scientific Data, 2025)",
+   "url": "https://doi.org/10.5281/zenodo.14925811",
+   "date": "2025-08-06",
+   "status": "Published dataset",
+   "verified": "Downloaded and filtered",
+   "retrievedAt": "2026-10-01"
+  }
+ ],
+ "states": {
+  "KS": {
+   "name": "Kansas",
+   "summary": "Kansas licenses and permits weather modification under the Kansas Weather Modification Act (K.S.A. 82a-1401 et seq., 1974), administered by the Kansas Water Office / Kansas Water Authority. Two 2026 bills to ban it died. One program is documented: the Western Kansas Weather Modification Program (HISTORICAL — last NOAA report 2016; operator says suspended).",
+   "frameworkDocumentIds": [
+    "KSA-82a-1401",
+    "KSA-82a-1402",
+    "KSA-82a-1405",
+    "KSA-82a-1406",
+    "KSA-82a-1411",
+    "KSA-82a-1414",
+    "KSA-82a-1417",
+    "KAR-98-4-1",
+    "KAR-98-4-2",
+    "KAR-98-4-4",
+    "KS-SB449",
+    "KS-HB2439"
+   ],
+   "records": [
+    {
+     "id": "KS-WKWMP",
+     "state": "KS",
+     "operator": "Western Kansas Groundwater Management District No. 1 (WKGMD #1)",
+     "licenseNumber": null,
+     "permitNumber": null,
+     "projectName": "Western Kansas Weather Modification Program (WKWMP)",
+     "activityType": "HAIL_SUPPRESSION",
+     "activityTypes": [
+      "HAIL_SUPPRESSION",
+      "PRECIPITATION_ENHANCEMENT"
+     ],
+     "targetArea": "Groups of counties in southwest and west-central Kansas, varying by year (2016 NOAA report: Scott and Lane counties). Map in the 2014 operational plan.",
+     "affectedArea": "Per 2014 operational plan: about 10 miles upwind and 25 miles downwind of the target counties.",
+     "startDate": "1975 (per 2014 operational plan)",
+     "endDate": "2016-09-15 (last NOAA report found)",
+     "status": "HISTORICAL",
+     "materials": [
+      "silver iodide (3% solution; pyrotechnics)",
+      "dry ice",
+      "hygroscopic pyrotechnic flares"
+     ],
+     "equipment": [
+      "2 Piper Comanche (cloud-base seeding)",
+      "Piper Cheyenne (cloud-top seeding)",
+      "wing-tip silver iodide–acetone generators",
+      "project radar at Lakin"
+     ],
+     "seasons": [
+      {
+       "year": 2002,
+       "noaaFile": "02-1141",
+       "start": "2002-04-22",
+       "end": "2002-09-20",
+       "documentId": "NOAA-02-1141"
+      },
+      {
+       "year": 2003,
+       "noaaFile": "03-1188",
+       "start": "2003-04-21",
+       "end": "2003-09-19",
+       "documentId": "NOAA-03-1188"
+      },
+      {
+       "year": 2004,
+       "noaaFile": "04-1240",
+       "start": "2004-04-19",
+       "end": "2004-09-17",
+       "documentId": "NOAA-04-1240"
+      },
+      {
+       "year": 2005,
+       "noaaFile": "05-1292",
+       "start": "2005-04-18",
+       "end": "2005-09-16",
+       "documentId": "NOAA-05-1292"
+      },
+      {
+       "year": 2006,
+       "noaaFile": "06-1330",
+       "start": "2006-04-17",
+       "end": "2006-09-22",
+       "documentId": "NOAA-06-1330"
+      },
+      {
+       "year": 2007,
+       "noaaFile": "07-1377",
+       "start": "2007-04-16",
+       "end": "2007-09-21",
+       "documentId": "NOAA-07-1377"
+      },
+      {
+       "year": 2008,
+       "noaaFile": "08-1412",
+       "start": "2008-04-15",
+       "end": "2008-09-19",
+       "documentId": "NOAA-08-1412"
+      },
+      {
+       "year": 2009,
+       "noaaFile": "09-1456",
+       "start": "2009-04-17",
+       "end": "2009-09-15",
+       "documentId": "NOAA-09-1456"
+      },
+      {
+       "year": 2010,
+       "noaaFile": "10-1491",
+       "start": "2010-04-15",
+       "end": "2010-09-14",
+       "documentId": "NOAA-10-1491"
+      },
+      {
+       "year": 2011,
+       "noaaFile": "11-1527",
+       "start": "2011-04-16",
+       "end": "2011-09-15",
+       "documentId": "NOAA-11-1527"
+      },
+      {
+       "year": 2012,
+       "noaaFile": "12-1552",
+       "start": "2012-04-16",
+       "end": "2012-09-15",
+       "documentId": "NOAA-12-1552"
+      },
+      {
+       "year": 2013,
+       "noaaFile": "13-1588",
+       "start": "2013-04-16",
+       "end": "2013-09-15",
+       "documentId": "NOAA-13-1588"
+      },
+      {
+       "year": 2014,
+       "noaaFile": "14-1617",
+       "start": "2014-04-16",
+       "end": "2014-09-15",
+       "documentId": "NOAA-14-1617"
+      },
+      {
+       "year": 2015,
+       "noaaFile": "15-1650",
+       "start": "2015-04-16",
+       "end": "2015-09-15",
+       "documentId": "NOAA-15-1650"
+      },
+      {
+       "year": 2016,
+       "noaaFile": "16-1683",
+       "start": "2016-04-16",
+       "end": "2016-09-15",
+       "documentId": "NOAA-16-1683"
+      }
+     ],
+     "sourceAgency": "NOAA Central Library (reports filed under 15 CFR 908)",
+     "sourceUrl": "https://library.noaa.gov/weather-climate/weather-modification-project-reports",
+     "documentUrl": "https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/Operational%20Plan%20For%20Weather%20Modification%20Project%20-%20Western%20Kansas%20Weather%20Modification%202014.pdf",
+     "locationRef": "Kearny County Airport, Lakin, KS",
+     "documentIds": [
+      "WKWMP-OPPLAN-2014",
+      "NOAA-02-1141",
+      "NOAA-03-1188",
+      "NOAA-04-1240",
+      "NOAA-05-1292",
+      "NOAA-06-1330",
+      "NOAA-07-1377",
+      "NOAA-08-1412",
+      "NOAA-09-1456",
+      "NOAA-10-1491",
+      "NOAA-11-1527",
+      "NOAA-12-1552",
+      "NOAA-13-1588",
+      "NOAA-14-1617",
+      "NOAA-15-1650",
+      "NOAA-16-1683",
+      "GMD1-PAGE"
+     ],
+     "notes": "The operator's website says the program has been suspended for funding reasons (no date given). No NOAA report after the 2016 season appears in the 2000–2025 dataset. Its operating area is in western Kansas, roughly 350–370 miles west of Kansas City — far outside the KC area. Kansas license and permit numbers were not found in any online source; the Kansas Water Office holds those records.",
+     "verification": "verified",
+     "retrievedAt": "2026-10-01"
+    }
+   ],
+   "searchedSources": [
+    {
+     "source": "Zenodo dataset of NOAA weather-modification reports, 2000–2025",
+     "url": "https://doi.org/10.5281/zenodo.14925811",
+     "searchedAt": "2026-10-01",
+     "result": "15 Kansas reports, all Western Kansas Weather Modification Program, 2002–2016"
+    },
+    {
+     "source": "Kansas Legislature bill pages (2025–2026)",
+     "url": "https://www.kslegislature.gov/li/b2025_26/measures/sb449/",
+     "searchedAt": "2026-10-01",
+     "result": "SB 449 and HB 2439 (bans) both DIED"
+    },
+    {
+     "source": "Kansas Revisor of Statutes, K.S.A. 82a-1401 to 1417",
+     "url": "https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_0001.html",
+     "searchedAt": "2026-10-01",
+     "result": "Act in force; no repeal shown"
+    },
+    {
+     "source": "WKGMD #1 weather program page",
+     "url": "https://www.gmd1.org/weather-program",
+     "searchedAt": "2026-10-01",
+     "result": "\"The program has been suspended due to funding issues.\""
+    },
+    {
+     "source": "Web search for Kansas weather-modification permits issued 2025–2026",
+     "url": null,
+     "searchedAt": "2026-10-01",
+     "result": "No permit or license record found online"
+    },
+    {
+     "source": "Kansas Water Office license/permit files",
+     "url": null,
+     "searchedAt": null,
+     "result": "NOT SEARCHED — no online database found. Records may be requestable from the Kansas Water Office."
+    }
+   ]
+  },
+  "MO": {
+   "name": "Missouri",
+   "summary": "No Missouri weather-modification licensing or permit statute was found. 2026 bills to ban weather modification (SB 860, HB 2388, HB 2656) were introduced; none is shown as enacted on the official pages retrieved. No NOAA weather-modification report for Missouri appears in the 2000–2025 dataset.",
+   "frameworkDocumentIds": [
+    "MO-SB860",
+    "MO-HB2388",
+    "MO-HB2656"
+   ],
+   "records": [],
+   "noRecordMessage": "NO VERIFIED RECORD FOUND IN SEARCHED PUBLIC SOURCES",
+   "searchedSources": [
+    {
+     "source": "Zenodo dataset of NOAA weather-modification reports, 2000–2025",
+     "url": "https://doi.org/10.5281/zenodo.14925811",
+     "searchedAt": "2026-10-01",
+     "result": "0 Missouri reports out of 832"
+    },
+    {
+     "source": "Missouri Senate and House bill pages (2026)",
+     "url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2026&billid=379",
+     "searchedAt": "2026-10-01",
+     "result": "3 proposed bans; none shown as enacted"
+    },
+    {
+     "source": "Revised Statutes of Missouri search for \"weather modification\"",
+     "url": "https://revisor.mo.gov",
+     "searchedAt": "2026-10-01",
+     "result": "Automated search failed (site returned an error) — needs a manual search"
+    },
+    {
+     "source": "Missouri Department of Natural Resources permit and document systems",
+     "url": "https://dnr.mo.gov",
+     "searchedAt": null,
+     "result": "NOT SEARCHED — no machine-readable search available; needs a manual search"
+    }
+   ]
+  }
+ }
+}

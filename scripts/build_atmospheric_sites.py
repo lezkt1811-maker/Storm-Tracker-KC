@@ -76,7 +76,9 @@ try:
     d = json.loads(get(url))
     for f in d["features"]:
         p = f["properties"]
-        if not p.get("online") or p.get("archive_end"):
+        # IEM lists each launch site under its historical IDs too; the "_XXX"
+        # entries are its combined current records ("Topeka Area -- KFOE KTOP").
+        if not p.get("online") or p.get("archive_end") or not p["sid"].startswith("_"):
             continue
         lon, lat = f["geometry"]["coordinates"][:2]
         add(id="RAOB" + p["sid"], category="UPPER_AIR", name=p.get("sname", p["sid"]), lat=lat, lon=lon,
