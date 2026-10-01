@@ -392,6 +392,7 @@
       <div class="chip-row" id="investigateSubnav">
         <button class="chip active" data-inv="ops">☁️ Atmospheric Operations</button>
         <button class="chip" data-inv="infra">📡 Infrastructure</button>
+        <button class="chip" data-inv="flights">✈️ Flight History</button>
       </div>
 
       <div id="inv-ops">
@@ -407,6 +408,33 @@
         <div class="map-panel"><div class="map-wrap"><div id="infraMap" style="height:min(55vh,440px);width:100%;"></div></div></div>
         <p class="field-hint" id="infraMeta"></p>
         <div id="infraList"></div>
+      </div>
+
+      <div id="inv-flights" style="display:none;">
+        <p class="section-title">✈️ Flight History (last 24 hours)</p>
+        <p class="section-note">Every 30 minutes a GitHub robot records the aircraft over the KC area for about 4 minutes. This screen keeps the last 24 hours of those recordings. Each line is a real recorded path. <strong>The time between recordings is not drawn</strong>, because we don't know where the aircraft went in that gap.</p>
+        <p class="field-hint">Pick how far back to look:</p>
+        <div class="chip-row" id="flightWindowChips">
+          <button class="chip" data-win="1">1 h</button>
+          <button class="chip active" data-win="3">3 h</button>
+          <button class="chip" data-win="6">6 h</button>
+          <button class="chip" data-win="12">12 h</button>
+          <button class="chip" data-win="24">24 h</button>
+        </div>
+        <div class="chip-row" id="flightAltChips">
+          <button class="chip active" data-alt="all">All heights</button>
+          <button class="chip" data-alt="high">Above 25,000 ft</button>
+          <button class="chip" data-alt="low">Below 25,000 ft</button>
+        </div>
+        <div class="map-panel"><div class="map-wrap"><div id="flightMap" style="height:min(55vh,440px);width:100%;"></div></div></div>
+        <p class="field-hint">Magenta lines = above 25,000 ft (where trails can form) · cyan = lower. Brighter = more recent. Tap a line for details.</p>
+        <div class="card" id="flightMeta"><div class="empty-state">loading flight history&hellip;</div></div>
+        <p class="section-title">📊 Heights flown</p>
+        <div class="card" id="flightAltChart"></div>
+        <p class="section-title">🔁 Seen in more than one recording</p>
+        <p class="section-note">Aircraft recorded in two or more separate 30-minute recordings in this time window. This is common and usually ordinary: scheduled flights on the same route, helicopters, training flights, aircraft circling to land, survey or photo flights.</p>
+        <div id="flightRepeat"></div>
+        <details class="card"><summary>Every recorded track in this window</summary><div id="flightAll"></div></details>
       </div>
     </section>
 
@@ -500,7 +528,7 @@
     <p class="section-note">When you see something odd, tap "Capture Event Packet Now." It saves a snapshot of every measurement plus satellite and radar pictures, with an ID and a fingerprint so it can't be quietly changed later. Open it any time to note which normal explanations fit.</p>
 
     <p class="section-title">🔎 INVESTIGATE tab</p>
-    <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in.</p>
+    <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in. <strong>Flight History</strong> shows every aircraft path recorded over KC in the last 1–24 hours, which heights they flew, and which aircraft showed up more than once. Pick a time window, then tap a line on the map.</p>
 
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
@@ -2106,6 +2134,18 @@ async function renderVaultList(store){
 
 
 
+// Second/third maps (Investigate tab) start locked like the Command Map so a
+// swipe over them still scrolls the page; one tap hands control to the map.
+function lockedMap(id, center, zoom){
+  const m = L.map(id, { zoomControl:true, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false }).setView(center, zoom);
+  const ov = document.createElement('div');
+  ov.className = 'map-lock-overlay';
+  ov.innerHTML = '<span>👆 Tap to explore the map</span>';
+  ov.addEventListener('click', ()=>{ m.dragging.enable(); m.touchZoom.enable(); m.scrollWheelZoom.enable(); m.doubleClickZoom.enable(); ov.remove(); });
+  document.getElementById(id).parentElement.appendChild(ov);
+  return m;
+}
+
 /* ===================== INVESTIGATE TAB ===================== */
 const INFRA_DEFAULT_ON = { WEATHER_MODIFICATION:true, RADAR:true, UPPER_AIR:true, SATELLITE_NOAA:true, AVIATION:false, WEATHER_MONITORING:false, AIR_QUALITY:false, ENV_PERMIT:false };
 const infraState = Object.assign({}, INFRA_DEFAULT_ON);
@@ -2114,16 +2154,157 @@ let infraMap = null, infraMapLayers = {};
 document.querySelectorAll('#investigateSubnav .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
     document.querySelectorAll('#investigateSubnav .chip').forEach(c=>c.classList.toggle('active', c === chip));
-    document.getElementById('inv-ops').style.display = chip.dataset.inv === 'ops' ? 'block' : 'none';
-    document.getElementById('inv-infra').style.display = chip.dataset.inv === 'infra' ? 'block' : 'none';
+    ['ops','infra','flights'].forEach(k=>{ document.getElementById('inv-' + k).style.display = chip.dataset.inv === k ? 'block' : 'none'; });
     if(chip.dataset.inv === 'infra') renderInfrastructure();
+    if(chip.dataset.inv === 'flights') renderFlightHistory(true);
   });
 });
+
+/* ---- Flight History: data/aircraft-tracks.json, a rolling 24-hour archive
+   written by .github/workflows/aircraft-snapshot.yml (one ~4-minute
+   recording every 30 minutes). Only recorded positions are drawn; the gaps
+   between recordings are never filled in. ---- */
+const flightState = { windowH: 3, alt: 'all' };
+let flightMap = null, flightLayer = null, flightArchive = null, flightArchiveError = null;
+const CRUISE_M = 7620; // 25,000 ft
+const mToFt = m => Math.round(m * 3.28084);
+
+async function loadFlightArchive(force){
+  if(flightArchive && !force) return flightArchive;
+  try{
+    const res = await fetch('data/aircraft-tracks.json', { cache:'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    flightArchive = await res.json(); flightArchiveError = null;
+  } catch(e){
+    flightArchiveError = e.message; console.error('loadFlightArchive', e);
+  }
+  return flightArchive;
+}
+
+// Track list for the chosen window: one entry per aircraft per recording.
+function flightSegments(arch, windowH, alt){
+  const since = Date.now() / 1000 - windowH * 3600;
+  const segs = [];
+  (arch.runs || []).filter(r=>(r.t || 0) >= since).forEach(run=>{
+    Object.entries(run.tracks || {}).forEach(([icao, tr])=>{
+      const pts = (tr.pts || []).filter(p=>p[1] != null && p[2] != null);
+      if(!pts.length) return;
+      const alts = pts.map(p=>p[3]).filter(a=>a != null);
+      const maxAlt = alts.length ? Math.max(...alts) : null;
+      if(alt === 'high' && !(maxAlt != null && maxAlt >= CRUISE_M)) return;
+      if(alt === 'low' && !(maxAlt != null && maxAlt < CRUISE_M)) return;
+      segs.push({ icao, callsign: tr.callsign || '', runT: run.t, pts, alts, maxAlt, minAlt: alts.length ? Math.min(...alts) : null });
+    });
+  });
+  return segs;
+}
+
+function segPopup(sg){
+  const last = sg.pts[sg.pts.length - 1];
+  const mins = Math.round((last[0] - sg.pts[0][0]) / 60);
+  const altText = sg.alts.length ? `${(Math.round(mToFt(sg.minAlt) / 100) * 100).toLocaleString()}–${(Math.round(mToFt(sg.maxAlt) / 100) * 100).toLocaleString()} ft` : 'unknown';
+  return `<strong>${escapeHtml(sg.callsign || 'no callsign')}</strong> <span class="timestamp">${escapeHtml(sg.icao)}</span><br>`
+    + `${fmtTime(sg.pts[0][0] * 1000)} → ${fmtTime(last[0] * 1000)} (${mins} min, ${sg.pts.length} position${sg.pts.length === 1 ? '' : 's'})<br>`
+    + `Altitude: ${altText}<br>Heading: ${last[4] != null ? Math.round(last[4]) + '°' : 'unknown'} · Ground speed: ${last[5] != null ? Math.round(last[5] * 1.94384) + ' kt' : 'unknown'}<br>`
+    + `<span class="source-tag">MEASURED · SOURCE: OpenSky Network via GitHub Actions</span>`;
+}
+
+async function renderFlightHistory(refetch){
+  const meta = document.getElementById('flightMeta');
+  const arch = await loadFlightArchive(refetch);
+  document.querySelectorAll('#flightWindowChips .chip').forEach(c=>c.classList.toggle('active', +c.dataset.win === flightState.windowH));
+  document.querySelectorAll('#flightAltChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.alt === flightState.alt));
+  if(!arch || !(arch.runs || []).length){
+    meta.innerHTML = `<span class="badge insufficient">NO DATA YET</span> <p class="field-hint">${flightArchiveError ? 'Flight history file could not be loaded (' + escapeHtml(flightArchiveError) + ').' : 'The flight history starts filling after the next 30-minute aircraft run.'} No flights are simulated.</p>`;
+    ['flightAltChart','flightRepeat','flightAll'].forEach(id=>{ document.getElementById(id).innerHTML = ''; });
+    return;
+  }
+  const segs = flightSegments(arch, flightState.windowH, flightState.alt);
+  const since = Date.now() / 1000 - flightState.windowH * 3600;
+  const runs = arch.runs.filter(r=>(r.t || 0) >= since);
+  const expected = Math.max(1, Math.round(flightState.windowH * 60 / (arch.runEveryMinutes || 30)));
+  const newest = arch.runs[arch.runs.length - 1].t;
+  const staleMin = Math.round((Date.now() / 1000 - newest) / 60);
+  const pct = Math.min(100, Math.round(runs.length / expected * 100));
+  const uniq = new Set(segs.map(s=>s.icao));
+
+  // Map
+  if(LEAFLET_AVAILABLE && !flightMap){
+    flightMap = lockedMap('flightMap', [CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 8);
+    flightMap.createPane('baseTiles'); flightMap.getPane('baseTiles').style.zIndex = 150;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { pane:'baseTiles', attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19 }).addTo(flightMap);
+    L.rectangle([[38.5, -95.3], [39.7, -93.8]], { color:'#7a8699', weight:1, dashArray:'4 6', fill:false }).addTo(flightMap).bindPopup('Area the aircraft robot records (OpenSky bounding box)');
+    L.marker([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon]).addTo(flightMap).bindPopup(CURRENT_LOCATION.label);
+    flightLayer = L.layerGroup().addTo(flightMap);
+  }
+  if(flightMap){
+    flightLayer.clearLayers();
+    const span = Math.max(1, newest - since);
+    segs.slice().sort((a,b)=>a.runT - b.runT).forEach(sg=>{
+      const color = sg.maxAlt != null && sg.maxAlt >= CRUISE_M ? '#FF2EC4' : '#00E5FF';
+      const opacity = 0.3 + 0.65 * Math.max(0, Math.min(1, (sg.runT - since) / span));
+      const shape = sg.pts.length >= 2
+        ? L.polyline(sg.pts.map(p=>[p[1], p[2]]), { color, weight: 3, opacity })
+        : L.circleMarker([sg.pts[0][1], sg.pts[0][2]], { radius: 3, color, weight: 1, opacity, fillOpacity: opacity });
+      shape.bindPopup(segPopup(sg)).addTo(flightLayer);
+    });
+    setTimeout(()=>flightMap.invalidateSize(), 50);
+  }
+
+  // Coverage / completeness
+  const badge = pct >= 90 ? 'normal' : (pct >= 50 ? 'watch' : 'insufficient');
+  meta.innerHTML = `<div class="row"><span class="badge ${badge}">DATA COMPLETENESS ${pct}%</span><span class="timestamp">newest recording ${fmtTime(newest * 1000)}</span></div>
+    <p style="margin:0.5rem 0 0;">${runs.length} of ${expected} expected recordings in the last ${flightState.windowH} h · ${segs.length} track${segs.length === 1 ? '' : 's'} · ${uniq.size} different aircraft</p>
+    ${staleMin > 75 ? `<p class="field-hint" style="color:var(--warning, #ffb020);">The newest recording is ${staleMin} minutes old — the aircraft robot may have skipped runs (GitHub sometimes delays scheduled jobs, or OpenSky was unavailable).</p>` : ''}
+    <p class="field-hint">Missing recordings mean the robot didn't run or OpenSky didn't answer — not that the sky was empty. Aircraft without a working transponder signal (ADS-B) aren't in this data at all.</p>
+    <span class="source-tag">MEASURED · SOURCE: OpenSky Network via GitHub Actions · data/aircraft-tracks.json</span>`;
+
+  // Altitude distribution (highest point of each track, 5,000 ft bands)
+  const bands = [];
+  for(let lo = 0; lo < 45000; lo += 5000) bands.push({ lo, hi: lo + 5000, n: 0 });
+  let unknownAlt = 0;
+  segs.forEach(sg=>{
+    if(sg.maxAlt == null){ unknownAlt++; return; }
+    const ft = mToFt(sg.maxAlt);
+    const b = bands[Math.min(bands.length - 1, Math.floor(Math.max(0, ft) / 5000))]; b.n++;
+  });
+  const maxN = Math.max(1, ...bands.map(b=>b.n));
+  document.getElementById('flightAltChart').innerHTML = bands.slice().reverse().map(b=>`
+    <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin:2px 0;">
+      <span style="width:7.5em;text-align:right;color:var(--text-dim, #9aa4b2);">${(b.lo/1000)}–${(b.hi/1000)}k ft</span>
+      <span style="flex:1;background:rgba(255,255,255,0.06);border-radius:3px;height:12px;overflow:hidden;"><span style="display:block;height:100%;width:${b.n / maxN * 100}%;background:${b.lo >= 25000 ? '#FF2EC4' : '#00E5FF'};"></span></span>
+      <span style="width:2.5em;">${b.n}</span>
+    </div>`).join('')
+    + `<p class="field-hint">Highest altitude of each track (barometric).${unknownAlt ? ` ${unknownAlt} track${unknownAlt === 1 ? '' : 's'} had no altitude reported.` : ''} Compare with <strong>🎈 Atmosphere Above KC</strong> and <strong>✈️ Trail Check</strong> on the Map tab to see whether those heights were cold and humid enough for lasting trails.</p>`;
+
+  // Repeats across separate recordings
+  const byIcao = {};
+  segs.forEach(sg=>{ (byIcao[sg.icao] = byIcao[sg.icao] || []).push(sg); });
+  const repeats = Object.entries(byIcao).map(([icao, list])=>({ icao, list, runs: new Set(list.map(x=>x.runT)).size }))
+    .filter(x=>x.runs >= 2).sort((a,b)=>b.runs - a.runs || a.icao.localeCompare(b.icao));
+  const aircraftCard = (icao, list, extra) => {
+    const alts = list.flatMap(x=>x.alts);
+    const callsigns = [...new Set(list.map(x=>x.callsign).filter(Boolean))];
+    const first = Math.min(...list.map(x=>x.pts[0][0])), last = Math.max(...list.map(x=>x.pts[x.pts.length - 1][0]));
+    return `<div class="list-item"><div class="row"><strong>${escapeHtml(callsigns.join(' / ') || 'no callsign')}</strong><span class="timestamp">${escapeHtml(icao)}</span></div>
+      <p style="margin:0.25rem 0 0;font-size:0.85rem;">${extra}${fmtTime(first * 1000)} → ${fmtTime(last * 1000)} · ${alts.length ? `${(Math.round(mToFt(Math.min(...alts)) / 100) * 100).toLocaleString()}–${(Math.round(mToFt(Math.max(...alts)) / 100) * 100).toLocaleString()} ft` : 'altitude unknown'}</p></div>`;
+  };
+  document.getElementById('flightRepeat').innerHTML = repeats.length
+    ? repeats.slice(0, 40).map(x=>aircraftCard(x.icao, x.list, `<span class="badge info">${x.runs} recordings</span> `)).join('') + (repeats.length > 40 ? `<p class="field-hint">+${repeats.length - 40} more.</p>` : '')
+    : `<div class="empty-state">No aircraft appeared in more than one recording in this window.</div>`;
+  document.getElementById('flightAll').innerHTML = segs.length
+    ? segs.slice().sort((a,b)=>b.runT - a.runT).map(sg=>`<div class="list-item" style="font-size:0.82rem;">${segPopup(sg)}</div>`).join('')
+    : `<div class="empty-state">No tracks in this window.</div>`;
+}
+
+document.querySelectorAll('#flightWindowChips .chip').forEach(c=>c.addEventListener('click', ()=>{ flightState.windowH = +c.dataset.win; renderFlightHistory(false); }));
+document.querySelectorAll('#flightAltChips .chip').forEach(c=>c.addEventListener('click', ()=>{ flightState.alt = c.dataset.alt; renderFlightHistory(false); }));
 
 async function renderInvestigateTab(){
   await InfrastructureProvider.load();
   renderWxModRecords();
   if(document.getElementById('inv-infra').style.display !== 'none') renderInfrastructure();
+  if(document.getElementById('inv-flights').style.display !== 'none') renderFlightHistory(true);
 }
 
 function docLink(d){
@@ -2197,7 +2378,7 @@ function renderInfrastructure(){
   chips.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click', ()=>{ infraState[ch.dataset.cat] = !infraState[ch.dataset.cat]; renderInfrastructure(); }));
 
   if(LEAFLET_AVAILABLE && !infraMap){
-    infraMap = L.map('infraMap', { zoomControl:true }).setView([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 6);
+    infraMap = lockedMap('infraMap', [CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 6);
     infraMap.createPane('baseTiles'); infraMap.getPane('baseTiles').style.zIndex = 150;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { pane:'baseTiles', attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19 }).addTo(infraMap);
     L.circle([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], { radius: 200 * 1609.34, color:'#9D4EFF', weight:1.5, dashArray:'6 6', fill:false }).addTo(infraMap).bindPopup('200-mile investigation radius around Kansas City');
@@ -2292,6 +2473,8 @@ async function capturePacket(){
   const obsP = weather && weather.observation ? weather.observation.properties : null;
   const allObs = await dbGetAll('observations');
   const nearbyObs = allObs.filter(o=>Math.abs(o.timestamp - capturedAt) <= 2 * 3600000);
+  const flightArch = await loadFlightArchive(true);
+  const recentFlights = flightArch ? flightSegments(flightArch, 1, 'all') : null;
   const airborne = planes.filter(p=>!p.onGround);
   const radarFrame = frames.length ? frames[frames.length - 1].time * 1000 : null;
 
@@ -2299,6 +2482,7 @@ async function capturePacket(){
     { name:'National Weather Service', product:'Latest station observation', url:'https://api.weather.gov', status: obsP ? 'OK' : 'UNAVAILABLE', validAt: obsP && obsP.timestamp ? Date.parse(obsP.timestamp) : null },
     { name:'National Weather Service', product:'Active alerts (CAP)', url:`https://api.weather.gov/alerts/active?point=${lat},${lon}`, status: WeatherProvider.status === 'ok' ? 'OK' : 'UNAVAILABLE', validAt: capturedAt },
     { name:'OpenSky Network via GitHub Actions', product:'Aircraft positions + tracks', url:'data/aircraft.json', status: AircraftProvider.status === 'cached' ? 'OK' : 'UNAVAILABLE', validAt: AircraftProvider.lastUpdated },
+    { name:'OpenSky Network via GitHub Actions', product:'Recorded flight history, previous hour', url:'data/aircraft-tracks.json', status: recentFlights ? 'OK' : 'UNAVAILABLE', validAt: flightArch && flightArch.runs && flightArch.runs.length ? flightArch.runs[flightArch.runs.length - 1].t * 1000 : null },
     { name:'Open-Meteo', product:'Pressure-level forecast (850–200 hPa)', url: ua ? ua.url : 'https://api.open-meteo.com', status: ua ? 'OK' : 'UNAVAILABLE', validAt: ua ? ua.validAt : null },
     { name:'Open-Meteo / Copernicus CAMS', product:'Aerosol optical depth, dust, PM2.5 (model)', url: ae ? ae.url : 'https://air-quality-api.open-meteo.com', status: ae ? 'OK' : 'UNAVAILABLE', validAt: ae ? ae.validAt : null },
     { name:'RainViewer', product:'Radar composite frame time', url:'https://api.rainviewer.com/public/weather-maps.json', status: radarFrame ? 'OK' : 'UNAVAILABLE', validAt: radarFrame },
@@ -2322,6 +2506,10 @@ async function capturePacket(){
       noCallsign: airborne.filter(p=>!p.callsign || p.callsign === 'unknown').length,
       tracks: Object.keys(AircraftProvider.tracks || {}).length,
       list: airborne.map(p=>({ callsign: p.callsign, altFt: p.altitude != null ? Math.round(p.altitude * 3.28084) : null, heading: p.heading != null ? Math.round(p.heading) : null, speedKt: p.velocity != null ? Math.round(p.velocity * 1.94384) : null }))
+    } : null,
+    flightHistory: recentFlights ? {
+      windowHours: 1, recordings: new Set(recentFlights.map(x=>x.runT)).size, tracks: recentFlights.length,
+      list: recentFlights.map(x=>({ icao: x.icao, callsign: x.callsign || null, recordedAt: x.runT * 1000, positions: x.pts.length, maxAltFt: x.maxAlt != null ? mToFt(x.maxAlt) : null, path: x.pts.map(p=>[p[0], p[1], p[2], p[3]]) }))
     } : null,
     upperAir: ua ? ua.levels.map(l=>({ hPa:l.hPa, heightFt:l.heightFt, tC:l.tC, rh:l.rh, windKt:l.windKt, windDir:l.windDir })) : null,
     trailForecast: ua ? ua.overall : null,
@@ -2382,6 +2570,7 @@ async function openPacketDetail(id){
       <div class="status-row"><span>Surface</span><span class="timestamp">${d.surface ? `${escapeHtml(d.surface.description || '')} ${d.surface.tempC != null ? Math.round(d.surface.tempC) + '°C' : ''} · ${d.surface.pressurePa != null ? Math.round(d.surface.pressurePa / 100) + ' hPa' : ''}` : 'NO DATA'}</span></div>
       <div class="status-row"><span>Alerts</span><span class="timestamp">${d.alerts.length ? d.alerts.map(a=>escapeHtml(a.event)).join(', ') : 'none active'}</span></div>
       <div class="status-row"><span>Aircraft</span><span class="timestamp">${d.aircraft ? `${d.aircraft.airborne} airborne · ${d.aircraft.cruise} above 25,000 ft · ${d.aircraft.tracks} tracks · ${d.aircraft.noCallsign} no callsign` : 'NO DATA'}</span></div>
+      <div class="status-row"><span>Flight history (prev. hour)</span><span class="timestamp">${d.flightHistory ? `${d.flightHistory.tracks} tracks from ${d.flightHistory.recordings} recording${d.flightHistory.recordings === 1 ? '' : 's'}` : 'NO DATA'}</span></div>
       <div class="status-row"><span>Trail forecast</span><span class="timestamp">${d.trailForecast ? TRAIL_LABELS[d.trailForecast] : 'NO DATA'}</span></div>
       <div class="status-row"><span>Aerosol (AOD)</span><span class="timestamp">${d.aerosol && d.aerosol.aod != null ? d.aerosol.aod.toFixed(2) + (d.aerosol.aodZ != null ? ` (z=${d.aerosol.aodZ.toFixed(1)} vs 7 days)` : '') : 'NO DATA'}</span></div>
       <div class="status-row"><span>Radar frame</span><span class="timestamp">${d.radarFrameAt ? fmtTime(d.radarFrameAt) : 'NO DATA'}</span></div>

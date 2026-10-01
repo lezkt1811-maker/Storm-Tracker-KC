@@ -6,6 +6,7 @@ name: Aircraft Snapshot
 # GitHub Pages serves same-origin:
 #   data/aircraft.json          latest positions + short track segments
 #   data/aircraft-history.json  rolling 7-day aircraft-count history
+#   data/aircraft-tracks.json   rolling 24-hour archive of every run's tracks
 # Each run takes 5 samples 60 s apart, so the same aircraft seen in several
 # samples gives a real ~4-minute track segment. 48 runs x 5 = 240 requests a
 # day, inside OpenSky's anonymous allowance. Free for public repos, no secrets.
@@ -84,6 +85,32 @@ jobs:
               })
           hist["entries"] = hist["entries"][-336:]  # 7 days of 30-minute runs
           json.dump(hist, open(hist_path, "w"))
+
+          # Rolling 24-hour track archive: one entry per run, airborne aircraft
+          # only, values rounded so the file stays small (~50 runs).
+          arch_path = "data/aircraft-tracks.json"
+          try:
+              arch = json.load(open(arch_path))
+          except Exception:
+              arch = {"runs": []}
+          arch.update({"source": SOURCE, "windowHours": 24, "runEveryMinutes": 30,
+                       "pointFormat": ["unixTime", "lat", "lon", "baroAltM", "headingDeg", "groundSpeedMs", "vertRateMs"]})
+          if samples:
+              r = lambda v, n: None if v is None else (round(v, n) if n else int(round(v)))
+              airborne_ids = {x[0] for s in samples for x in s["states"] if not x[8]}
+              run_tracks = {}
+              for s in samples:
+                  for st in s["states"]:
+                      if st[0] not in airborne_ids or st[8] or st[5] is None or st[6] is None:
+                          continue
+                      tr = run_tracks.setdefault(st[0], {"callsign": (st[1] or "").strip(), "pts": []})
+                      if tr["pts"] and tr["pts"][-1][0] == (st[3] or s["t"]):
+                          continue  # same position report seen again
+                      tr["pts"].append([st[3] or s["t"], r(st[6], 4), r(st[5], 4), r(st[7], 0), r(st[10], 0), r(st[9], 1), r(st[11], 1)])
+              arch["runs"].append({"fetchedAt": now, "t": samples[-1]["t"], "samples": len(samples), "tracks": run_tracks})
+          cutoff = time.time() - 24 * 3600
+          arch["runs"] = [x for x in arch["runs"] if (x.get("t") or 0) >= cutoff]
+          json.dump(arch, open(arch_path, "w"), separators=(",", ":"))
           print("samples:", len(samples), "tracks:", len(out.get("tracks", {})))
           PY
 
@@ -91,7 +118,7 @@ jobs:
         run: |
           git config user.name "storm-tracker-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/aircraft.json data/aircraft-history.json
+          git add data/aircraft.json data/aircraft-history.json data/aircraft-tracks.json
           git diff --cached --quiet || git commit -m "Update aircraft snapshot [skip ci]"
           git pull --rebase --autostash -q || true
           git push

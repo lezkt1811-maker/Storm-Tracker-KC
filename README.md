@@ -203,12 +203,31 @@ weather monitoring, upper air, NOAA/NWS, aviation, air quality), never involveme
 weather modification. Environmental-permit locations aren't connected yet, because
 no free machine-readable feed was found.
 
+## Investigate tab: Flight History
+
+`data/aircraft-tracks.json` is a rolling 24-hour archive written by the same
+30-minute aircraft workflow: every run's ~4-minute recording of airborne aircraft
+(positions, altitude, heading, speed, vertical rate; values rounded to keep the file
+small). Investigate → ✈️ Flight History draws every recorded path for the last
+1/3/6/12/24 hours, filtered by height (above/below 25,000 ft), with:
+- a data-completeness figure (recordings found vs. expected, plus a warning when
+  the newest one is stale), since missing runs mean no data, not an empty sky;
+- the heights flown, in 5,000 ft bands, to compare with Trail Check and the
+  upper-air profile;
+- aircraft seen in two or more separate recordings, with the usual ordinary reasons
+  (scheduled routes, helicopters, training, approaches, survey flights).
+
+The 30-minute gaps between recordings are never drawn or interpolated. Aircraft type
+isn't shown, because OpenSky's state feed doesn't include it. There are no owner,
+pilot or crew lookups.
+
 ## Event Packets
 
 Vault → Capture Event Packet freezes everything at one moment: surface observation,
 active alerts, radar frame time, the GOES infrared, water-vapor and NEXRAD image
 tiles over KC (saved as images), the full upper-air profile, trail forecast,
-aerosol values, aircraft list and tracks, and your observations from ±2 hours.
+aerosol values, aircraft list and tracks, recorded flight history from the hour
+before, and your observations from ±2 hours.
 Each packet has an ID (e.g. `KC-2026-10-01-114539Z`), per-source provenance
 (product, URL, retrieval time, valid time, OK/unavailable) and a SHA-256 fingerprint
 of its captured content. You can mark a status (UNRESOLVED / EXPLAINED /
