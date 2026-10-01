@@ -1,0 +1,56 @@
+name: Probe data sources
+
+# Temporary diagnostic: checks which free data endpoints respond (status,
+# content type, CORS header) so only verified sources get wired into the app.
+on:
+  push:
+    branches: [claude/storm-tracker-audit-hcq0w8]
+    paths: ['.github/workflows/probe-sources.yml']
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe endpoints
+        run: |
+          probe() {
+            out=$(curl -s -m 25 -o /tmp/body -D /tmp/hdr -w "%{http_code} %{content_type} %{size_download}" -H "Origin: https://lezkt1811-maker.github.io" "$1")
+            cors=$(grep -i '^access-control-allow-origin' /tmp/hdr | tr -d '\r' | cut -d' ' -f2-)
+            echo "PROBE | $out | cors=${cors:-none} | $1"
+          }
+          T=$(date -u -d '-30 min' +%Y-%m-%dT%H:%M:00Z)
+          T10=$(date -u -d '-30 min' +%Y-%m-%dT%H)":$(( $(date -u -d '-30 min' +%M) / 10 ))0:00Z"
+          echo "times: $T $T10"
+          for L in GOES-East_ABI_Band13_Clean_Infrared GOES-East_ABI_Band8_High_Level_Water_Vapor GOES-East_ABI_GeoColor GOES-East_ABI_Band2_Red_Visible_1km; do
+            probe "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/$L/default/default/GoogleMapsCompatible_Level7/5/12/7.png"
+            probe "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/$L/default/$T10/GoogleMapsCompatible_Level7/5/12/7.png"
+          done
+          curl -s -m 60 "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml" -o /tmp/caps.xml
+          echo "GIBS GOES layers in capabilities:"; grep -o '<ows:Identifier>GOES[^<]*' /tmp/caps.xml | sed 's/<ows:Identifier>//' | sort -u | head -60
+          python3 - <<'PY'
+          import re
+          x=open('/tmp/caps.xml').read()
+          for name in ['GOES-East_ABI_Band13_Clean_Infrared','GOES-East_ABI_Band8_High_Level_Water_Vapor','GOES-East_ABI_GeoColor']:
+              i=x.find('<ows:Identifier>'+name+'</ows:Identifier>')
+              if i<0: print('MISSING',name); continue
+              seg=x[i:i+4000]
+              tms=re.findall(r'<TileMatrixSet>([^<]+)',seg)[:2]
+              dims=re.findall(r'<Default>([^<]+)</Default>',seg)[:1]
+              vals=re.findall(r'<Value>([^<]+)</Value>',seg)[:1]
+              fmt=re.findall(r'<Format>([^<]+)',seg)[:1]
+              print('LAYER',name,'tms=',tms,'default=',dims,'value=',vals,'fmt=',fmt)
+          PY
+          for L in goes-east-ir-4km-900913 goes-east-wv-4km-900913 goes-east-vis-1km-900913 nexrad-n0q-900913; do
+            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/$L/5/7/12.png"
+          done
+          probe "https://api.rainviewer.com/public/weather-maps.json"
+          P=$(curl -s -m 20 https://api.rainviewer.com/public/weather-maps.json | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['host']+d['radar']['past'][-1]['path'])")
+          probe "$P/256/7/30/48/2/1_1.png"
+          probe "$P/256/8/61/97/2/1_1.png"
+          probe "https://api.open-meteo.com/v1/forecast?latitude=39.0997&longitude=-94.5786&hourly=temperature_300hPa,relative_humidity_300hPa,geopotential_height_300hPa,wind_speed_500hPa,wind_direction_500hPa&forecast_days=1&timezone=GMT"
+          head -c 300 /tmp/body; echo
+          probe "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=39.0997&longitude=-94.5786&hourly=aerosol_optical_depth,dust,pm2_5&past_days=7&forecast_days=1&timezone=GMT"
+          head -c 300 /tmp/body; echo
+          probe "https://opensky-network.org/api/states/all?lamin=38.5&lomin=-95.3&lamax=39.7&lomax=-93.8"
+          head -c 200 /tmp/body; echo
