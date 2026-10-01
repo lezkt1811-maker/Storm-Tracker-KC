@@ -18,6 +18,32 @@ jobs:
             cors=$(grep -i '^access-control-allow-origin' /tmp/hdr | tr -d '\r' | cut -d' ' -f2-)
             echo "PROBE | $out | cors=${cors:-none} | $1"
           }
+          echo "=== GIBS GOES time dimensions (satellite history)"
+          curl -s -m 90 "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml" -o /tmp/caps0.xml
+          python3 - <<'PY'
+          import re
+          x=open('/tmp/caps0.xml').read()
+          for blk in re.findall(r'<Layer>.*?</Layer>', x, flags=re.S):
+              m=re.search(r'<ows:Identifier>(GOES-East[^<]*)</ows:Identifier>', blk)
+              if not m: continue
+              vals=re.findall(r'<Value>([^<]+)</Value>', blk)
+              tms=re.findall(r'<TileMatrixSet>([^<]+)', blk)
+              fmt=re.findall(r'<Format>([^<]+)', blk)
+              print('LAYER', m.group(1), '| tms', tms, '| fmt', fmt, '| default', re.findall(r'<Default>([^<]+)', blk)[:1], '| values', len(vals), vals[:2], vals[-2:])
+          PY
+          for H in 1 3 6 24 72 168; do
+            TT=$(date -u -d "-$H hour" +%Y-%m-%dT%H)":$(( $(date -u -d "-$H hour" +%M) / 10 ))0:00Z"
+            for L in GOES-East_ABI_GeoColor GOES-East_ABI_Band13_Clean_Infrared GOES-East_ABI_Air_Mass GOES-East_ABI_Band2_Red_Visible_1km; do
+              probe "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/$L/default/$TT/GoogleMapsCompatible_Level7/7/48/30.png"
+              probe "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/$L/default/$TT/GoogleMapsCompatible_Level6/6/24/15.png"
+            done
+          done
+          echo "=== IEM timestamped GOES / NEXRAD tile services"
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m30m/7/30/48.png"
+          TS=$(date -u -d '-2 hour' +%Y%m%d%H)"00"
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$TS/7/30/48.png"
+          probe "https://mesonet.agron.iastate.edu/json/goes.py?operation=list&product=IR&bird=EAST&start=$(date -u -d '-3 hour' +%Y-%m-%dT%H:%MZ)&end=$(date -u +%Y-%m-%dT%H:%MZ)"
+          head -c 400 /tmp/body; echo
           T=$(date -u -d '-30 min' +%Y-%m-%dT%H:%M:00Z)
           T10=$(date -u -d '-30 min' +%Y-%m-%dT%H)":$(( $(date -u -d '-30 min' +%M) / 10 ))0:00Z"
           echo "times: $T $T10"
