@@ -1,0 +1,32 @@
+name: Atmospheric Sites
+
+# Rebuilds data/atmospheric-sites.json (radar, upper-air, surface weather,
+# air-quality, airports, NWS offices within 200 miles of KC) from official /
+# public site-metadata feeds. Facilities rarely move, so monthly is plenty.
+on:
+  schedule:
+    - cron: '17 6 1 * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atmospheric-sites
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build site list
+        run: python3 scripts/build_atmospheric_sites.py
+      - name: Commit if changed
+        run: |
+          git config user.name "storm-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/atmospheric-sites.json
+          git diff --cached --quiet || git commit -m "Update atmospheric sites [skip ci]"
+          git pull --rebase --autostash -q || true
+          git push

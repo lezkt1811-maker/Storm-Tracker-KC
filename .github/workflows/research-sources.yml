@@ -20,43 +20,24 @@ jobs:
           txt() { python3 -c "import re,sys,html;t=open(sys.argv[1],errors='ignore').read();t=re.sub(r'(?is)<(script|style).*?</\1>','',t);t=re.sub(r'<[^>]+>',' ',t);t=html.unescape(re.sub(r'\s+',' ',t));print(t[:int(sys.argv[2])])" "$1" "$2"; }
           sec() { echo; echo "=============== $1"; }
 
-          sec "Kansas 2026 bills on kslegislature.gov"
-          for b in sb449 hb2439; do
-            for u in "https://www.kslegislature.gov/li/b2025_26/measures/$b/" "https://kslegislature.gov/li/b2025_26/measures/$b/"; do
-              c=$(get "$u" /tmp/b.html); echo "-- $u $c"; case "$c" in 200*) txt /tmp/b.html 3500; break;; esac
-            done; echo
-          done
-          sec "ksrevisor 82a-1401 and 82a-1405 full text (check for repeal notes)"
-          for n in 0001 0005; do u="https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_${n}.html"; get "$u" /tmp/s.html >/dev/null; python3 -c "
-          import re,html;t=open('/tmp/s.html',errors='ignore').read();t=re.sub(r'<[^>]+>',' ',t);t=html.unescape(re.sub(r'\s+',' ',t));i=t.find('82a-14');print(t[i:i+400]);print('...');print('REPEAL MENTIONS:',[t[max(0,m.start()-150):m.start()+150] for m in re.finditer(r'(?i)repeal',t)][:3]);print('HISTORY:',t[t.find('History:'):t.find('History:')+400])"; echo; done
-          sec "NOAA Library weather modification project reports page"
-          echo "$(get https://library.noaa.gov/weather-climate/weather-modification-project-reports /tmp/nl.html)"
+          sec "Zenodo dataset: NOAA cloud-seeding reports 2000-2025, filtered to KS/MO"
+          get https://zenodo.org/api/records/14925811 /tmp/z.json >/dev/null
           python3 - <<'PY'
-          import re,html
-          t=open('/tmp/nl.html',errors='ignore').read()
-          links=re.findall(r'href="([^"]+)"[^>]*>([^<]{0,120})',t)
-          for h,txt in links:
-              if re.search(r'(?i)kansas|missouri|report|xls|csv|spreadsheet|database|index|weather_mod|search',h+txt): print(' ',html.unescape(txt.strip())[:90],'|',h)
-          body=re.sub(r'<[^>]+>',' ',t); body=html.unescape(re.sub(r'\s+',' ',body))
-          i=body.find('Weather Modification'); print(body[i:i+2500])
+          import json, csv, io, urllib.request
+          rec = json.load(open('/tmp/z.json'))
+          print('title:', rec['metadata']['title'], '| version:', rec['metadata'].get('version'), '| published:', rec['metadata'].get('publication_date'))
+          for f in rec['files']:
+              print('file:', f['key'], f['size'])
+              if not f['key'].endswith('.csv'): continue
+              req = urllib.request.Request(f['links']['self'], headers={'User-Agent': 'StormTrackerKC/1.0'})
+              raw = urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'ignore')
+              rows = list(csv.DictReader(io.StringIO(raw)))
+              print('rows:', len(rows), 'columns:', list(rows[0].keys()))
+              states = {}
+              for r in rows: states[r.get('state','')] = states.get(r.get('state',''),0)+1
+              print('states:', sorted(states.items(), key=lambda x:-x[1]))
+              for r in rows:
+                  blob = ' '.join(str(v) for v in r.values())
+                  if any(k in blob for k in ('Kansas','Missouri')) or r.get('state','').strip() in ('KS','MO'):
+                      print('MATCH:', json.dumps(r))
           PY
-          sec "Nature Scientific Data paper: cloud seeding dataset 2000-2025"
-          echo "$(get https://www.nature.com/articles/s41597-025-06273-1 /tmp/nat.html)"
-          python3 - <<'PY'
-          import re,html
-          t=open('/tmp/nat.html',errors='ignore').read()
-          for h in sorted(set(re.findall(r'href="(https?://[^"]*(?:zenodo|figshare|github|dryad|doi\.org/10\.5281|osf)[^"]*)"',t))): print('DATA LINK:',h)
-          body=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t)))
-          for k in ['Data Records','Code availability','Data availability']:
-              i=body.find(k); print(k,':',body[i:i+900] if i>=0 else 'not found'); print()
-          PY
-          sec "GMD1 page full text (look for suspension date)"
-          get https://www.gmd1.org/weather-program /tmp/gmd1.html >/dev/null; python3 -c "
-          import re,html;t=open('/tmp/gmd1.html',errors='ignore').read();t=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t)));i=t.find('In the past four years');print(t[i:i+2500])"
-          sec "Site metadata feeds"
-          echo "radar stations: $(get 'https://api.weather.gov/radar/stations?stationType=WSR-88D' /tmp/radar.json)"; head -c 600 /tmp/radar.json; echo
-          echo "obs stations MO: $(get 'https://api.weather.gov/stations?state=MO&limit=500' /tmp/st.json)"; head -c 600 /tmp/st.json; echo
-          echo "IEM RAOB: $(get 'https://mesonet.agron.iastate.edu/geojson/network/RAOB.geojson' /tmp/raob.json)"; head -c 500 /tmp/raob.json; echo
-          echo "IEM KS_ASOS: $(get 'https://mesonet.agron.iastate.edu/geojson/network/KS_ASOS.geojson' /tmp/ksasos.json)"; head -c 300 /tmp/ksasos.json; echo
-          echo "AirNow sites: $(get 'https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat' /tmp/an.dat)"; head -c 800 /tmp/an.dat; echo
-          echo "NWS office EAX: $(get 'https://api.weather.gov/offices/EAX' /tmp/eax.json)"; head -c 900 /tmp/eax.json; echo
