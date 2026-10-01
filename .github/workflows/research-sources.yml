@@ -20,46 +20,39 @@ jobs:
           txt() { python3 -c "import re,sys,html;t=open(sys.argv[1],errors='ignore').read();t=re.sub(r'(?is)<(script|style).*?</\1>','',t);t=re.sub(r'<[^>]+>',' ',t);t=html.unescape(re.sub(r'\s+',' ',t));print(t[:int(sys.argv[2])])" "$1" "$2"; }
           sec() { echo; echo "=============== $1"; }
 
-          sec "GMD1 weather program page"
-          echo "$(get https://www.gmd1.org/weather-program /tmp/gmd1.html)"; txt /tmp/gmd1.html 5000
-
-          sec "NOAA weather modification library directory"
-          D="https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/"
-          echo "$(get "$D" /tmp/dir.html)"
+          sec "Kansas 2026 bills on kslegislature.gov"
+          for b in sb449 hb2439; do
+            for u in "https://www.kslegislature.gov/li/b2025_26/measures/$b/" "https://kslegislature.gov/li/b2025_26/measures/$b/"; do
+              c=$(get "$u" /tmp/b.html); echo "-- $u $c"; case "$c" in 200*) txt /tmp/b.html 3500; break;; esac
+            done; echo
+          done
+          sec "ksrevisor 82a-1401 and 82a-1405 full text (check for repeal notes)"
+          for n in 0001 0005; do u="https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_${n}.html"; get "$u" /tmp/s.html >/dev/null; python3 -c "
+          import re,html;t=open('/tmp/s.html',errors='ignore').read();t=re.sub(r'<[^>]+>',' ',t);t=html.unescape(re.sub(r'\s+',' ',t));i=t.find('82a-14');print(t[i:i+400]);print('...');print('REPEAL MENTIONS:',[t[max(0,m.start()-150):m.start()+150] for m in re.finditer(r'(?i)repeal',t)][:3]);print('HISTORY:',t[t.find('History:'):t.find('History:')+400])"; echo; done
+          sec "NOAA Library weather modification project reports page"
+          echo "$(get https://library.noaa.gov/weather-climate/weather-modification-project-reports /tmp/nl.html)"
           python3 - <<'PY'
-          import re, html, urllib.parse
-          t = open('/tmp/dir.html', errors='ignore').read()
-          links = [html.unescape(urllib.parse.unquote(h)) for h in re.findall(r'href="([^"]+)"', t)]
-          print('total links', len(links))
-          hits = [l for l in links if re.search(r'kansas|missouri|\bKS\b|\bMO\b', l, re.I)]
-          print('KS/MO-matching entries:', len(hits))
-          for h in hits: print('  ', h)
-          print('sample of all entries:')
-          for l in links[:40]: print('  ', l)
+          import re,html
+          t=open('/tmp/nl.html',errors='ignore').read()
+          links=re.findall(r'href="([^"]+)"[^>]*>([^<]{0,120})',t)
+          for h,txt in links:
+              if re.search(r'(?i)kansas|missouri|report|xls|csv|spreadsheet|database|index|weather_mod|search',h+txt): print(' ',html.unescape(txt.strip())[:90],'|',h)
+          body=re.sub(r'<[^>]+>',' ',t); body=html.unescape(re.sub(r'\s+',' ',body))
+          i=body.find('Weather Modification'); print(body[i:i+2500])
           PY
-
-          sec "NOAA documents: WKWMP 2014 operational plan + 2011 report"
-          for u in "${D}Operational%20Plan%20For%20Weather%20Modification%20Project%20-%20Western%20Kansas%20Weather%20Modification%202014.pdf" "${D}Western%20Kansas%20Weather%20Modification%20Program_11-1527_04.16.2011-09.15.2011.pdf"; do
-            echo "-- $u"; echo "$(get "$u" /tmp/doc.pdf)"; pdftotext -layout /tmp/doc.pdf - 2>/dev/null | tr -s ' \n' | head -c 4500; echo
-          done
-
-          sec "Kansas statutes (ksrevisor.gov)"
-          for n in 0001 0002 0003 0005 0006 0011 0014 0017; do
-            u="https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_${n}.html"
-            echo "-- $u $(get "$u" /tmp/s.html)"; txt /tmp/s.html 600; echo
-          done
-
-          sec "Kansas regulations K.A.R. 98-4 (Cornell LII mirror)"
-          for r in 98-4-1 98-4-2 98-4-4; do u="https://www.law.cornell.edu/regulations/kansas/K-A-R-${r}"; echo "-- $u $(get "$u" /tmp/r.html)"; txt /tmp/r.html 700; echo; done
-
-          sec "Missouri bills"
-          for u in "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2026&billid=379" "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/5461H.01I.pdf" "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/6079H.01I.pdf"; do
-            echo "-- $u $(get "$u" /tmp/m.bin)"
-            if file /tmp/m.bin | grep -q PDF; then pdftotext -layout /tmp/m.bin - | tr -s ' \n' | head -c 1800; else txt /tmp/m.bin 2500; fi; echo
-          done
-          echo "-- Missouri RSMo search for 'weather modification'"
-          echo "$(get "https://revisor.mo.gov/main/Search.aspx?tb1=weather%20modification" /tmp/rs.html)"; txt /tmp/rs.html 1500
-
+          sec "Nature Scientific Data paper: cloud seeding dataset 2000-2025"
+          echo "$(get https://www.nature.com/articles/s41597-025-06273-1 /tmp/nat.html)"
+          python3 - <<'PY'
+          import re,html
+          t=open('/tmp/nat.html',errors='ignore').read()
+          for h in sorted(set(re.findall(r'href="(https?://[^"]*(?:zenodo|figshare|github|dryad|doi\.org/10\.5281|osf)[^"]*)"',t))): print('DATA LINK:',h)
+          body=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t)))
+          for k in ['Data Records','Code availability','Data availability']:
+              i=body.find(k); print(k,':',body[i:i+900] if i>=0 else 'not found'); print()
+          PY
+          sec "GMD1 page full text (look for suspension date)"
+          get https://www.gmd1.org/weather-program /tmp/gmd1.html >/dev/null; python3 -c "
+          import re,html;t=open('/tmp/gmd1.html',errors='ignore').read();t=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t)));i=t.find('In the past four years');print(t[i:i+2500])"
           sec "Site metadata feeds"
           echo "radar stations: $(get 'https://api.weather.gov/radar/stations?stationType=WSR-88D' /tmp/radar.json)"; head -c 600 /tmp/radar.json; echo
           echo "obs stations MO: $(get 'https://api.weather.gov/stations?state=MO&limit=500' /tmp/st.json)"; head -c 600 /tmp/st.json; echo
