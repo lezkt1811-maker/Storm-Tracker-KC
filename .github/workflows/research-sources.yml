@@ -1,0 +1,69 @@
+name: Research official sources
+
+# On-demand, low-volume research job (a few dozen requests, run manually).
+# Fetches official pages/documents and site-metadata feeds and prints what
+# they say, so records in data/weather-modification.json and coordinates in
+# data/atmospheric-sites.json come from primary sources rather than memory.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tools
+        run: sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || true
+      - name: Research
+        run: |
+          UA="StormTrackerKC/1.0 (github.com/lezkt1811-maker/Storm-Tracker-KC)"
+          get() { curl -sSL -m 40 -A "$UA" -o "$2" -w "%{http_code} %{content_type} %{size_download}" "$1"; }
+          txt() { python3 -c "import re,sys,html;t=open(sys.argv[1],errors='ignore').read();t=re.sub(r'(?is)<(script|style).*?</\1>','',t);t=re.sub(r'<[^>]+>',' ',t);t=html.unescape(re.sub(r'\s+',' ',t));print(t[:int(sys.argv[2])])" "$1" "$2"; }
+          sec() { echo; echo "=============== $1"; }
+
+          sec "GMD1 weather program page"
+          echo "$(get https://www.gmd1.org/weather-program /tmp/gmd1.html)"; txt /tmp/gmd1.html 5000
+
+          sec "NOAA weather modification library directory"
+          D="https://library.oarcloud.noaa.gov/noaa_documents.lib/OAR/OWAQ/Weather_Modification_Project/"
+          echo "$(get "$D" /tmp/dir.html)"
+          python3 - <<'PY'
+          import re, html, urllib.parse
+          t = open('/tmp/dir.html', errors='ignore').read()
+          links = [html.unescape(urllib.parse.unquote(h)) for h in re.findall(r'href="([^"]+)"', t)]
+          print('total links', len(links))
+          hits = [l for l in links if re.search(r'kansas|missouri|\bKS\b|\bMO\b', l, re.I)]
+          print('KS/MO-matching entries:', len(hits))
+          for h in hits: print('  ', h)
+          print('sample of all entries:')
+          for l in links[:40]: print('  ', l)
+          PY
+
+          sec "NOAA documents: WKWMP 2014 operational plan + 2011 report"
+          for u in "${D}Operational%20Plan%20For%20Weather%20Modification%20Project%20-%20Western%20Kansas%20Weather%20Modification%202014.pdf" "${D}Western%20Kansas%20Weather%20Modification%20Program_11-1527_04.16.2011-09.15.2011.pdf"; do
+            echo "-- $u"; echo "$(get "$u" /tmp/doc.pdf)"; pdftotext -layout /tmp/doc.pdf - 2>/dev/null | tr -s ' \n' | head -c 4500; echo
+          done
+
+          sec "Kansas statutes (ksrevisor.gov)"
+          for n in 0001 0002 0003 0005 0006 0011 0014 0017; do
+            u="https://ksrevisor.gov/statutes/chapters/ch82a/082a_014_${n}.html"
+            echo "-- $u $(get "$u" /tmp/s.html)"; txt /tmp/s.html 600; echo
+          done
+
+          sec "Kansas regulations K.A.R. 98-4 (Cornell LII mirror)"
+          for r in 98-4-1 98-4-2 98-4-4; do u="https://www.law.cornell.edu/regulations/kansas/K-A-R-${r}"; echo "-- $u $(get "$u" /tmp/r.html)"; txt /tmp/r.html 700; echo; done
+
+          sec "Missouri bills"
+          for u in "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2026&billid=379" "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/5461H.01I.pdf" "https://documents.house.mo.gov/billtracking/bills261/hlrbillspdf/6079H.01I.pdf"; do
+            echo "-- $u $(get "$u" /tmp/m.bin)"
+            if file /tmp/m.bin | grep -q PDF; then pdftotext -layout /tmp/m.bin - | tr -s ' \n' | head -c 1800; else txt /tmp/m.bin 2500; fi; echo
+          done
+          echo "-- Missouri RSMo search for 'weather modification'"
+          echo "$(get "https://revisor.mo.gov/main/Search.aspx?tb1=weather%20modification" /tmp/rs.html)"; txt /tmp/rs.html 1500
+
+          sec "Site metadata feeds"
+          echo "radar stations: $(get 'https://api.weather.gov/radar/stations?stationType=WSR-88D' /tmp/radar.json)"; head -c 600 /tmp/radar.json; echo
+          echo "obs stations MO: $(get 'https://api.weather.gov/stations?state=MO&limit=500' /tmp/st.json)"; head -c 600 /tmp/st.json; echo
+          echo "IEM RAOB: $(get 'https://mesonet.agron.iastate.edu/geojson/network/RAOB.geojson' /tmp/raob.json)"; head -c 500 /tmp/raob.json; echo
+          echo "IEM KS_ASOS: $(get 'https://mesonet.agron.iastate.edu/geojson/network/KS_ASOS.geojson' /tmp/ksasos.json)"; head -c 300 /tmp/ksasos.json; echo
+          echo "AirNow sites: $(get 'https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat' /tmp/an.dat)"; head -c 800 /tmp/an.dat; echo
+          echo "NWS office EAX: $(get 'https://api.weather.gov/offices/EAX' /tmp/eax.json)"; head -c 900 /tmp/eax.json; echo
