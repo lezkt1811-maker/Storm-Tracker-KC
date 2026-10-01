@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-01T12:00:40Z",
+ "generatedAt": "2026-10-01T12:08:47Z",
  "center": {
   "lat": 39.0997,
   "lon": -94.5786,
@@ -11,74 +11,74 @@
   "AIR_QUALITY": 46,
   "AVIATION": 26,
   "RADAR": 8,
-  "UPPER_AIR": 6,
+  "UPPER_AIR": 3,
   "WEATHER_MONITORING": 110
  },
  "sources": [
   {
    "name": "National Weather Service API \u2014 radar stations",
    "url": "https://api.weather.gov/radar/stations",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 RAOB (upper-air) network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/RAOB.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 KS_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/KS_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 MO_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/MO_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 NE_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/NE_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 IA_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/IA_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 OK_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/OK_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "Iowa Environmental Mesonet \u2014 AR_ASOS network",
    "url": "https://mesonet.agron.iastate.edu/geojson/network/AR_ASOS.geojson",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "EPA AirNow \u2014 monitoring site locations",
    "url": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": ""
   },
   {
    "name": "OurAirports \u2014 airports.csv (public domain)",
    "url": "https://davidmegginson.github.io/ourairports-data/airports.csv",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": "Community-maintained; FAA is the authoritative source."
   },
   {
    "name": "National Weather Service API \u2014 offices",
    "url": "https://api.weather.gov/offices/{id}",
-   "retrievedAt": "2026-10-01T12:00:40Z",
+   "retrievedAt": "2026-10-01T12:08:47Z",
    "note": "Offices are listed by address only; the API publishes no coordinates, so they are not placed on the map."
   }
  ],
@@ -95,7 +95,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 0.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ202090021",
@@ -108,7 +108,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 3.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290950018",
@@ -121,7 +121,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 3.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290950043",
@@ -134,7 +134,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 11.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290470006",
@@ -147,7 +147,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 16.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290470005",
@@ -160,7 +160,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 17.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ200910010",
@@ -173,7 +173,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 20.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290370003",
@@ -186,7 +186,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 23.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201030003",
@@ -199,7 +199,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 25.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290470003",
@@ -212,7 +212,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 27.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290490001",
@@ -225,7 +225,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 29.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ200459991",
@@ -238,7 +238,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 36.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290210005",
@@ -251,7 +251,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 46.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290030001",
@@ -264,7 +264,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 60.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201770013",
@@ -277,7 +277,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 61.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290390001",
@@ -290,7 +290,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 101.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201330003",
@@ -303,7 +303,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 109.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290190011",
@@ -316,7 +316,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 121.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290970004",
@@ -329,7 +329,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 128.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191370002",
@@ -342,7 +342,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 131.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290970003",
@@ -355,7 +355,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 132.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290270002",
@@ -368,7 +368,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 136.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290770042",
@@ -381,7 +381,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 143.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310670005",
@@ -394,7 +394,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 144.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ290770036",
@@ -407,7 +407,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 145.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310250002",
@@ -420,7 +420,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 147.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQTT9209004",
@@ -433,7 +433,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 151.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ291370001",
@@ -446,7 +446,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 151.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ311530007",
@@ -459,7 +459,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 158.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ311090022",
@@ -472,7 +472,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 162.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310550052",
@@ -485,7 +485,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 164.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310550019",
@@ -498,7 +498,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 165.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310550054",
@@ -511,7 +511,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 166.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310550056",
@@ -524,7 +524,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 167.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ310550053",
@@ -537,7 +537,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 169.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ311090016",
@@ -550,7 +550,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 170.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191770006",
@@ -563,7 +563,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 175.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201730010",
@@ -576,7 +576,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 176.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201730018",
@@ -589,7 +589,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 178.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191530030",
@@ -602,7 +602,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 179.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191531427",
@@ -615,7 +615,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 180.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ170010007",
@@ -628,7 +628,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 181.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191535885",
@@ -641,7 +641,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 184.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ201910002",
@@ -654,7 +654,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 188.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ311770002",
@@ -667,7 +667,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 188.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AQ191531579",
@@ -680,7 +680,7 @@
    "sourceUrl": "https://files.airnowtech.org/airnow/today/Monitoring_Site_Locations_V2.dat",
    "distanceMi": 195.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKMKC",
@@ -693,7 +693,7 @@
    "sourceUrl": "https://ourairports.com/airports/KMKC/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 1.8,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKMCI",
@@ -706,7 +706,7 @@
    "sourceUrl": "https://ourairports.com/airports/KMCI/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 15.7,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKSTJ",
@@ -719,7 +719,7 @@
    "sourceUrl": "https://ourairports.com/airports/KSTJ/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 49.7,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKTOP",
@@ -732,7 +732,7 @@
    "sourceUrl": "https://ourairports.com/airports/KTOP/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 56.0,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKFOE",
@@ -745,7 +745,7 @@
    "sourceUrl": "https://ourairports.com/airports/KFOE/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 59.1,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKSZL",
@@ -758,7 +758,7 @@
    "sourceUrl": "https://ourairports.com/airports/KSZL/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 61.0,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKCNU",
@@ -771,7 +771,7 @@
    "sourceUrl": "https://ourairports.com/airports/KCNU/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 110.5,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKMHK",
@@ -784,7 +784,7 @@
    "sourceUrl": "https://ourairports.com/airports/KMHK/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 112.2,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKFRI",
@@ -797,7 +797,7 @@
    "sourceUrl": "https://ourairports.com/airports/KFRI/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 117.3,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKCOU",
@@ -810,7 +810,7 @@
    "sourceUrl": "https://ourairports.com/airports/KCOU/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 128.2,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKIRK",
@@ -823,7 +823,7 @@
    "sourceUrl": "https://ourairports.com/airports/KIRK/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 128.2,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKJLN",
@@ -836,7 +836,7 @@
    "sourceUrl": "https://ourairports.com/airports/KJLN/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 134.7,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKSGF",
@@ -849,7 +849,7 @@
    "sourceUrl": "https://ourairports.com/airports/KSGF/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 143.5,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKOFF",
@@ -862,7 +862,7 @@
    "sourceUrl": "https://ourairports.com/airports/KOFF/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 156.2,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKTBN",
@@ -875,7 +875,7 @@
    "sourceUrl": "https://ourairports.com/airports/KTBN/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 161.9,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKSLN",
@@ -888,7 +888,7 @@
    "sourceUrl": "https://ourairports.com/airports/KSLN/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 166.5,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKLNK",
@@ -901,7 +901,7 @@
    "sourceUrl": "https://ourairports.com/airports/KLNK/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 167.0,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKOMA",
@@ -914,7 +914,7 @@
    "sourceUrl": "https://ourairports.com/airports/KOMA/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 167.3,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKDSM",
@@ -927,7 +927,7 @@
    "sourceUrl": "https://ourairports.com/airports/KDSM/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 175.1,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKIAB",
@@ -940,7 +940,7 @@
    "sourceUrl": "https://ourairports.com/airports/KIAB/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 177.9,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKOTM",
@@ -953,7 +953,7 @@
    "sourceUrl": "https://ourairports.com/airports/KOTM/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 178.5,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKICT",
@@ -966,7 +966,7 @@
    "sourceUrl": "https://ourairports.com/airports/KICT/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 184.0,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKUIN",
@@ -979,7 +979,7 @@
    "sourceUrl": "https://ourairports.com/airports/KUIN/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 189.5,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKHUT",
@@ -992,7 +992,7 @@
    "sourceUrl": "https://ourairports.com/airports/KHUT/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 191.1,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKBBG",
@@ -1005,7 +1005,7 @@
    "sourceUrl": "https://ourairports.com/airports/KBBG/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 192.7,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "APTKXNA",
@@ -1018,7 +1018,7 @@
    "sourceUrl": "https://ourairports.com/airports/KXNA/",
    "documentation": "PUBLIC DATASET",
    "distanceMi": 195.3,
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KEAX",
@@ -1031,7 +1031,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KEAX",
    "distanceMi": 26.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "TMCI",
@@ -1044,7 +1044,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/TMCI",
    "distanceMi": 28.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KTWX",
@@ -1057,7 +1057,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KTWX",
    "distanceMi": 89.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KSGF",
@@ -1070,7 +1070,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KSGF",
    "distanceMi": 143.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KOAX",
@@ -1083,7 +1083,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KOAX",
    "distanceMi": 180.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KICT",
@@ -1096,7 +1096,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KICT",
    "distanceMi": 184.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KDMX",
@@ -1109,7 +1109,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/KDMX",
    "distanceMi": 187.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "TICH",
@@ -1122,20 +1122,7 @@
    "sourceUrl": "https://api.weather.gov/radar/stations/TICH",
    "distanceMi": 190.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
-  },
-  {
-   "id": "RAOBKTOP",
-   "category": "UPPER_AIR",
-   "name": "Topeka/Billard M  KS/US",
-   "lat": 39.07,
-   "lon": -95.6,
-   "what": "Upper-air sounding site: launches weather balloons (radiosondes) twice daily to measure temperature, humidity and wind up through the atmosphere.",
-   "source": "Iowa Environmental Mesonet station metadata (RAOB network)",
-   "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=KTOP&network=RAOB",
-   "distanceMi": 54.8,
-   "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "RAOB_TOP",
@@ -1148,20 +1135,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=_TOP&network=RAOB",
    "distanceMi": 57.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
-  },
-  {
-   "id": "RAOBKSGF",
-   "category": "UPPER_AIR",
-   "name": "Springfld Muni  MO/US",
-   "lat": 37.23,
-   "lon": -93.3,
-   "what": "Upper-air sounding site: launches weather balloons (radiosondes) twice daily to measure temperature, humidity and wind up through the atmosphere.",
-   "source": "Iowa Environmental Mesonet station metadata (RAOB network)",
-   "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=KSGF&network=RAOB",
-   "distanceMi": 146.7,
-   "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "RAOB_SGF",
@@ -1174,20 +1148,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=_SGF&network=RAOB",
    "distanceMi": 157.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
-  },
-  {
-   "id": "RAOBKOAX",
-   "category": "UPPER_AIR",
-   "name": "Omaha / Valley",
-   "lat": 41.32,
-   "lon": -95.6,
-   "what": "Upper-air sounding site: launches weather balloons (radiosondes) twice daily to measure temperature, humidity and wind up through the atmosphere.",
-   "source": "Iowa Environmental Mesonet station metadata (RAOB network)",
-   "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=KOAX&network=RAOB",
-   "distanceMi": 162.6,
-   "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "RAOB_OAX",
@@ -1200,7 +1161,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=_OAX&network=RAOB",
    "distanceMi": 180.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_MKC",
@@ -1213,7 +1174,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MKC&network=MO_ASOS",
    "distanceMi": 1.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_LXT",
@@ -1226,7 +1187,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LXT&network=MO_ASOS",
    "distanceMi": 14.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_MCI",
@@ -1239,7 +1200,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MCI&network=MO_ASOS",
    "distanceMi": 15.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_OJC",
@@ -1252,7 +1213,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OJC&network=KS_ASOS",
    "distanceMi": 19.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_GPH",
@@ -1265,7 +1226,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=GPH&network=MO_ASOS",
    "distanceMi": 21.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_IXD",
@@ -1278,7 +1239,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=IXD&network=KS_ASOS",
    "distanceMi": 25.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_LWC",
@@ -1291,7 +1252,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LWC&network=KS_ASOS",
    "distanceMi": 34.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_LRY",
@@ -1304,7 +1265,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LRY&network=MO_ASOS",
    "distanceMi": 36.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_EZZ",
@@ -1317,7 +1278,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EZZ&network=MO_ASOS",
    "distanceMi": 46.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_RCM",
@@ -1330,7 +1291,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=RCM&network=MO_ASOS",
    "distanceMi": 47.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_STJ",
@@ -1343,7 +1304,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=STJ&network=MO_ASOS",
    "distanceMi": 49.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_OWI",
@@ -1356,7 +1317,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OWI&network=KS_ASOS",
    "distanceMi": 53.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_TOP",
@@ -1369,7 +1330,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=TOP&network=KS_ASOS",
    "distanceMi": 55.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_FOE",
@@ -1382,7 +1343,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FOE&network=KS_ASOS",
    "distanceMi": 59.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_SZL",
@@ -1395,7 +1356,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=SZL&network=MO_ASOS",
    "distanceMi": 61.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_GLY",
@@ -1408,7 +1369,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=GLY&network=MO_ASOS",
    "distanceMi": 70.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_CDJ",
@@ -1421,7 +1382,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CDJ&network=MO_ASOS",
    "distanceMi": 73.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_MHL",
@@ -1434,7 +1395,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MHL&network=MO_ASOS",
    "distanceMi": 73.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_CHT",
@@ -1447,7 +1408,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CHT&network=MO_ASOS",
    "distanceMi": 74.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_DMO",
@@ -1460,7 +1421,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=DMO&network=MO_ASOS",
    "distanceMi": 80.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_UKL",
@@ -1473,7 +1434,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=UKL&network=KS_ASOS",
    "distanceMi": 82.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_RAW",
@@ -1486,7 +1447,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=RAW&network=MO_ASOS",
    "distanceMi": 84.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_K83",
@@ -1499,7 +1460,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=K83&network=KS_ASOS",
    "distanceMi": 84.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_FNB",
@@ -1512,7 +1473,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FNB&network=NE_ASOS",
    "distanceMi": 86.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_EVU",
@@ -1525,7 +1486,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EVU&network=MO_ASOS",
    "distanceMi": 88.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_FSK",
@@ -1538,7 +1499,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FSK&network=KS_ASOS",
    "distanceMi": 90.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_K88",
@@ -1551,7 +1512,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=K88&network=KS_ASOS",
    "distanceMi": 95.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_EMP",
@@ -1564,7 +1525,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EMP&network=KS_ASOS",
    "distanceMi": 101.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_VER",
@@ -1577,7 +1538,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=VER&network=MO_ASOS",
    "distanceMi": 102.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_CNU",
@@ -1590,7 +1551,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CNU&network=KS_ASOS",
    "distanceMi": 110.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_LWD",
@@ -1603,7 +1564,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LWD&network=IA_ASOS",
    "distanceMi": 111.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_MHK",
@@ -1616,7 +1577,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MHK&network=KS_ASOS",
    "distanceMi": 112.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_PTS",
@@ -1629,7 +1590,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=PTS&network=KS_ASOS",
    "distanceMi": 114.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_ICL",
@@ -1642,7 +1603,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=ICL&network=IA_ASOS",
    "distanceMi": 114.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_FRI",
@@ -1655,7 +1616,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FRI&network=KS_ASOS",
    "distanceMi": 117.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_MBY",
@@ -1668,7 +1629,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MBY&network=MO_ASOS",
    "distanceMi": 117.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_MYZ",
@@ -1681,7 +1642,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MYZ&network=KS_ASOS",
    "distanceMi": 121.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_SDA",
@@ -1694,7 +1655,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=SDA&network=IA_ASOS",
    "distanceMi": 122.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_AFK",
@@ -1707,7 +1668,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=AFK&network=NE_ASOS",
    "distanceMi": 124.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_13K",
@@ -1720,7 +1681,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=13K&network=KS_ASOS",
    "distanceMi": 126.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_COU",
@@ -1733,7 +1694,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=COU&network=MO_ASOS",
    "distanceMi": 128.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_OZS",
@@ -1746,7 +1707,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OZS&network=MO_ASOS",
    "distanceMi": 128.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_IRK",
@@ -1759,7 +1720,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=IRK&network=MO_ASOS",
    "distanceMi": 128.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_AIZ",
@@ -1772,7 +1733,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=AIZ&network=MO_ASOS",
    "distanceMi": 129.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_PPF",
@@ -1785,7 +1746,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=PPF&network=KS_ASOS",
    "distanceMi": 132.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_CSQ",
@@ -1798,7 +1759,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CSQ&network=IA_ASOS",
    "distanceMi": 133.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_JLN",
@@ -1811,7 +1772,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=JLN&network=MO_ASOS",
    "distanceMi": 134.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_JEF",
@@ -1824,7 +1785,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=JEF&network=MO_ASOS",
    "distanceMi": 135.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_RDK",
@@ -1837,7 +1798,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=RDK&network=IA_ASOS",
    "distanceMi": 136.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_TVK",
@@ -1850,7 +1811,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=TVK&network=IA_ASOS",
    "distanceMi": 141.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_BIE",
@@ -1863,7 +1824,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=BIE&network=NE_ASOS",
    "distanceMi": 142.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_I75",
@@ -1876,7 +1837,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=I75&network=IA_ASOS",
    "distanceMi": 142.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_SGF",
@@ -1889,7 +1850,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=SGF&network=MO_ASOS",
    "distanceMi": 143.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_LBO",
@@ -1902,7 +1863,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LBO&network=MO_ASOS",
    "distanceMi": 144.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_PMV",
@@ -1915,7 +1876,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=PMV&network=NE_ASOS",
    "distanceMi": 146.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_CNC",
@@ -1928,7 +1889,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CNC&network=IA_ASOS",
    "distanceMi": 147.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_MYJ",
@@ -1941,7 +1902,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MYJ&network=MO_ASOS",
    "distanceMi": 148.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_CFV",
@@ -1954,7 +1915,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CFV&network=KS_ASOS",
    "distanceMi": 148.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_IDP",
@@ -1967,7 +1928,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=IDP&network=KS_ASOS",
    "distanceMi": 149.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_EQA",
@@ -1980,7 +1941,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EQA&network=KS_ASOS",
    "distanceMi": 151.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "OK_ASOS_MIO",
@@ -1993,7 +1954,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MIO&network=OK_ASOS",
    "distanceMi": 152.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_HFJ",
@@ -2006,7 +1967,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=HFJ&network=MO_ASOS",
    "distanceMi": 154.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_OFF",
@@ -2019,7 +1980,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OFF&network=NE_ASOS",
    "distanceMi": 156.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_AIO",
@@ -2032,7 +1993,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=AIO&network=IA_ASOS",
    "distanceMi": 161.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_CBF",
@@ -2045,7 +2006,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CBF&network=IA_ASOS",
    "distanceMi": 161.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_TBN",
@@ -2058,7 +2019,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=TBN&network=MO_ASOS",
    "distanceMi": 161.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_EWK",
@@ -2071,7 +2032,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EWK&network=KS_ASOS",
    "distanceMi": 162.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_VIH",
@@ -2084,7 +2045,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=VIH&network=MO_ASOS",
    "distanceMi": 165.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_MLE",
@@ -2097,7 +2058,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MLE&network=NE_ASOS",
    "distanceMi": 165.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_LNK",
@@ -2110,7 +2071,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=LNK&network=NE_ASOS",
    "distanceMi": 166.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_SLN",
@@ -2123,7 +2084,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=SLN&network=KS_ASOS",
    "distanceMi": 166.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_CNK",
@@ -2136,7 +2097,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=CNK&network=KS_ASOS",
    "distanceMi": 167.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_3AU",
@@ -2149,7 +2110,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=3AU&network=KS_ASOS",
    "distanceMi": 167.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_OMA",
@@ -2162,7 +2123,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OMA&network=NE_ASOS",
    "distanceMi": 167.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_OXV",
@@ -2175,7 +2136,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OXV&network=IA_ASOS",
    "distanceMi": 170.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_AAO",
@@ -2188,7 +2149,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=AAO&network=KS_ASOS",
    "distanceMi": 170.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "OK_ASOS_GMJ",
@@ -2201,7 +2162,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=GMJ&network=OK_ASOS",
    "distanceMi": 172.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_BEC",
@@ -2214,7 +2175,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=BEC&network=KS_ASOS",
    "distanceMi": 172.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_HAE",
@@ -2227,7 +2188,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=HAE&network=MO_ASOS",
    "distanceMi": 172.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_DSM",
@@ -2240,7 +2201,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=DSM&network=IA_ASOS",
    "distanceMi": 175.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_MPR",
@@ -2253,7 +2214,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=MPR&network=KS_ASOS",
    "distanceMi": 175.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_HJH",
@@ -2266,7 +2227,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=HJH&network=NE_ASOS",
    "distanceMi": 175.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_HNR",
@@ -2279,7 +2240,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=HNR&network=IA_ASOS",
    "distanceMi": 176.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_IAB",
@@ -2292,7 +2253,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=IAB&network=KS_ASOS",
    "distanceMi": 177.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_FWB",
@@ -2305,7 +2266,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FWB&network=MO_ASOS",
    "distanceMi": 177.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "OK_ASOS_1K8",
@@ -2318,7 +2279,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=1K8&network=OK_ASOS",
    "distanceMi": 178.0,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_OTM",
@@ -2331,7 +2292,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OTM&network=IA_ASOS",
    "distanceMi": 178.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_BTA",
@@ -2344,7 +2305,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=BTA&network=NE_ASOS",
    "distanceMi": 179.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "OK_ASOS_BVO",
@@ -2357,7 +2318,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=BVO&network=OK_ASOS",
    "distanceMi": 179.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_ADU",
@@ -2370,7 +2331,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=ADU&network=IA_ASOS",
    "distanceMi": 180.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_PEA",
@@ -2383,7 +2344,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=PEA&network=IA_ASOS",
    "distanceMi": 180.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_AHQ",
@@ -2396,7 +2357,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=AHQ&network=NE_ASOS",
    "distanceMi": 182.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_OOA",
@@ -2409,7 +2370,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=OOA&network=IA_ASOS",
    "distanceMi": 183.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_ICT",
@@ -2422,7 +2383,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=ICT&network=KS_ASOS",
    "distanceMi": 184.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_IKV",
@@ -2435,7 +2396,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=IKV&network=IA_ASOS",
    "distanceMi": 186.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_WLD",
@@ -2448,7 +2409,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=WLD&network=KS_ASOS",
    "distanceMi": 188.8,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_PRO",
@@ -2461,7 +2422,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=PRO&network=IA_ASOS",
    "distanceMi": 189.5,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AR_ASOS_ROG",
@@ -2474,7 +2435,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=ROG&network=AR_ASOS",
    "distanceMi": 190.2,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_HUT",
@@ -2487,7 +2448,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=HUT&network=KS_ASOS",
    "distanceMi": 191.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AR_ASOS_VBT",
@@ -2500,7 +2461,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=VBT&network=AR_ASOS",
    "distanceMi": 191.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "NE_ASOS_FET",
@@ -2513,7 +2474,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FET&network=NE_ASOS",
    "distanceMi": 191.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_EOK",
@@ -2526,7 +2487,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EOK&network=IA_ASOS",
    "distanceMi": 191.9,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_FFL",
@@ -2539,7 +2500,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FFL&network=IA_ASOS",
    "distanceMi": 192.4,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_BBG",
@@ -2552,7 +2513,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=BBG&network=MO_ASOS",
    "distanceMi": 192.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_UUV",
@@ -2565,7 +2526,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=UUV&network=MO_ASOS",
    "distanceMi": 193.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "AR_ASOS_XNA",
@@ -2578,7 +2539,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=XNA&network=AR_ASOS",
    "distanceMi": 195.3,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "IA_ASOS_TNU",
@@ -2591,7 +2552,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=TNU&network=IA_ASOS",
    "distanceMi": 195.6,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_EGT",
@@ -2604,7 +2565,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=EGT&network=KS_ASOS",
    "distanceMi": 195.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "MO_ASOS_FYG",
@@ -2617,7 +2578,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=FYG&network=MO_ASOS",
    "distanceMi": 196.1,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "KS_ASOS_9K7",
@@ -2630,7 +2591,7 @@
    "sourceUrl": "https://mesonet.agron.iastate.edu/sites/site.php?station=9K7&network=KS_ASOS",
    "distanceMi": 197.7,
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   }
  ],
  "listOnly": [
@@ -2643,7 +2604,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/eax",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "TOP",
@@ -2654,7 +2615,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/top",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "SGF",
@@ -2665,7 +2626,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/sgf",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "OAX",
@@ -2676,7 +2637,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/oax",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "DMX",
@@ -2687,7 +2648,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/dmx",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "LSX",
@@ -2698,7 +2659,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/lsx",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "ICT",
@@ -2709,7 +2670,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/ict",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   },
   {
    "id": "CRH",
@@ -2720,7 +2681,7 @@
    "source": "National Weather Service API (offices)",
    "sourceUrl": "https://www.weather.gov/crh",
    "documentation": "OFFICIAL METADATA",
-   "retrievedAt": "2026-10-01T12:00:40Z"
+   "retrievedAt": "2026-10-01T12:08:47Z"
   }
  ],
  "places": {
