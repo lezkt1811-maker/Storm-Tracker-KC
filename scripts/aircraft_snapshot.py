@@ -1,0 +1,86 @@
+"""One aircraft recording near Kansas City (run by .github/workflows/aircraft-snapshot.yml).
+
+Takes 5 OpenSky samples 60 s apart and updates:
+  data/aircraft.json          latest positions + short track segments
+  data/aircraft-history.json  rolling 7-day aircraft-count history
+  data/aircraft-tracks.json   rolling 24-hour archive of every recording's tracks
+"""
+import json, time, urllib.request, datetime, os
+
+URL = "https://opensky-network.org/api/states/all?lamin=38.5&lomin=-95.3&lamax=39.7&lomax=-93.8"
+SOURCE = "OpenSky Network (opensky-network.org), fetched server-side via GitHub Actions"
+SAMPLES, GAP = 5, 60
+
+samples = []
+for i in range(SAMPLES):
+    try:
+        with urllib.request.urlopen(URL, timeout=20) as r:
+            d = json.load(r)
+        samples.append({"t": d.get("time"), "states": d.get("states") or []})
+    except Exception as e:
+        print("sample failed:", e)
+    if i < SAMPLES - 1:
+        time.sleep(GAP)
+
+now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+if not samples:
+    out = {"fetchedAt": now, "source": SOURCE, "openSkyTime": None, "states": [], "tracks": {},
+           "error": "OpenSky fetch failed for every sample this run"}
+else:
+    tracks = {}
+    for s in samples:
+        for st in s["states"]:
+            if st[5] is None or st[6] is None:
+                continue
+            tr = tracks.setdefault(st[0], {"callsign": (st[1] or "").strip(), "pts": []})
+            # [unix time, lat, lon, baro altitude m, heading deg, ground speed m/s, vertical rate m/s]
+            tr["pts"].append([st[3] or s["t"], st[6], st[5], st[7], st[10], st[9], st[11]])
+    tracks = {k: v for k, v in tracks.items() if len(v["pts"]) >= 2}
+    last = samples[-1]
+    out = {"fetchedAt": now, "source": SOURCE, "openSkyTime": last["t"], "states": last["states"],
+           "tracks": tracks, "trackWindowSeconds": GAP * (len(samples) - 1)}
+json.dump(out, open("data/aircraft.json", "w"))
+
+hist_path = "data/aircraft-history.json"
+try:
+    hist = json.load(open(hist_path))
+except Exception:
+    hist = {"source": SOURCE, "entries": []}
+if samples:
+    st = samples[-1]["states"]
+    airborne = [x for x in st if not x[8]]
+    hist["entries"].append({
+        "t": now,
+        "count": len(airborne),
+        "cruise": sum(1 for x in airborne if (x[7] or 0) >= 7620),
+        "noCallsign": sum(1 for x in airborne if not (x[1] or "").strip()),
+    })
+hist["entries"] = hist["entries"][-336:]  # 7 days of 30-minute runs
+json.dump(hist, open(hist_path, "w"))
+
+# Rolling 24-hour track archive: one entry per run, airborne aircraft
+# only, values rounded so the file stays small (~50 runs).
+arch_path = "data/aircraft-tracks.json"
+try:
+    arch = json.load(open(arch_path))
+except Exception:
+    arch = {"runs": []}
+arch.update({"source": SOURCE, "windowHours": 24, "runEveryMinutes": 30,
+             "pointFormat": ["unixTime", "lat", "lon", "baroAltM", "headingDeg", "groundSpeedMs", "vertRateMs"]})
+if samples:
+    r = lambda v, n: None if v is None else (round(v, n) if n else int(round(v)))
+    airborne_ids = {x[0] for s in samples for x in s["states"] if not x[8]}
+    run_tracks = {}
+    for s in samples:
+        for st in s["states"]:
+            if st[0] not in airborne_ids or st[8] or st[5] is None or st[6] is None:
+                continue
+            tr = run_tracks.setdefault(st[0], {"callsign": (st[1] or "").strip(), "pts": []})
+            if tr["pts"] and tr["pts"][-1][0] == (st[3] or s["t"]):
+                continue  # same position report seen again
+            tr["pts"].append([st[3] or s["t"], r(st[6], 4), r(st[5], 4), r(st[7], 0), r(st[10], 0), r(st[9], 1), r(st[11], 1)])
+    arch["runs"].append({"fetchedAt": now, "t": samples[-1]["t"], "samples": len(samples), "tracks": run_tracks})
+cutoff = time.time() - 24 * 3600
+arch["runs"] = [x for x in arch["runs"] if (x.get("t") or 0) >= cutoff]
+json.dump(arch, open(arch_path, "w"), separators=(",", ":"))
+print("samples:", len(samples), "tracks:", len(out.get("tracks", {})))

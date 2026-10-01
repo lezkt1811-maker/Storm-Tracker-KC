@@ -221,6 +221,27 @@ The 30-minute gaps between recordings are never drawn or interpolated. Aircraft 
 isn't shown, because OpenSky's state feed doesn't include it. There are no owner,
 pilot or crew lookups.
 
+## Investigate tab: Satellite Rewind
+
+Shows GOES-East imagery over KC at any 10-minute time in roughly the past 3 months,
+straight from NASA GIBS (WMTS with a TIME value). The probe workflow confirmed the
+layers, tile levels and time ranges from GIBS's capabilities file:
+- True color: `GOES-East_ABI_GeoColor`, Level 7
+- Visible: `GOES-East_ABI_Band2_Red_Visible_1km`, Level 7
+- Infrared: `GOES-East_ABI_Band13_Clean_Infrared`, Level 6
+- Air mass: `GOES-East_ABI_Air_Mass`, Level 6
+- Dust: `GOES-East_ABI_Dust`, Level 7, published only at some times
+
+There are also optional overlays:
+- past NEXRAD radar from Iowa Environmental Mesonet's archive
+  (`ridge::USCOMP-N0Q-YYYYMMDDHHMM`, 5-minute steps)
+- flight paths recorded within ±20 minutes, labeled CORRELATED (time only)
+
+You can use a 24-hour slider, ±10 min / ±1 h steps, a date box, or a 2-hour playback.
+The newest frames appear 40–70 minutes late. When a frame doesn't exist, the app
+says NO IMAGE FOR THIS TIME and why (too new, older than the archive, or a gap). It
+never fills one in. Nothing is stored in the repo; images load on demand.
+
 ## Event Packets
 
 Vault → Capture Event Packet freezes everything at one moment: surface observation,

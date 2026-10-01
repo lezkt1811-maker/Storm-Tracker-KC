@@ -393,6 +393,7 @@
         <button class="chip active" data-inv="ops">☁️ Atmospheric Operations</button>
         <button class="chip" data-inv="infra">📡 Infrastructure</button>
         <button class="chip" data-inv="flights">✈️ Flight History</button>
+        <button class="chip" data-inv="sat">🛰 Satellite Rewind</button>
       </div>
 
       <div id="inv-ops">
@@ -435,6 +436,30 @@
         <p class="section-note">Aircraft recorded in two or more separate 30-minute recordings in this time window. This is common and usually ordinary: scheduled flights on the same route, helicopters, training flights, aircraft circling to land, survey or photo flights.</p>
         <div id="flightRepeat"></div>
         <details class="card"><summary>Every recorded track in this window</summary><div id="flightAll"></div></details>
+      </div>
+
+      <div id="inv-sat" style="display:none;">
+        <p class="section-title">🛰 Satellite Rewind</p>
+        <p class="section-note">Look at the GOES-East weather satellite over Kansas City at an earlier time — up to about 3 months back, one picture every 10 minutes. Newest pictures show up about <strong>40–70 minutes late</strong>, because NASA processes them first.</p>
+        <p class="field-hint">1. Pick a picture type:</p>
+        <div class="chip-row" id="satProductChips"></div>
+        <p class="field-hint" id="satProductHelp"></p>
+        <p class="field-hint">2. Pick a time (slide for the last 24 hours, or type any date):</p>
+        <input type="range" id="satSlider" min="0" max="143" value="137" style="width:100%;accent-color:var(--cyan);">
+        <div class="chip-row" style="align-items:center;">
+          <button class="chip" data-step="-60">−1 h</button>
+          <button class="chip" data-step="-10">−10 min</button>
+          <button class="chip" data-step="10">+10 min</button>
+          <button class="chip" data-step="60">+1 h</button>
+          <input type="datetime-local" id="satDateInput" style="background:var(--panel2);color:var(--text);border:1px solid var(--edge);border-radius:8px;padding:0.35rem;font-size:0.8rem;">
+        </div>
+        <div class="chip-row">
+          <button class="chip" id="satPlayBtn">▶ Play last 2 hours</button>
+          <button class="chip" id="satRadarChip">🌧 Radar on top</button>
+          <button class="chip active" id="satFlightsChip">✈️ Flights near this time</button>
+        </div>
+        <div class="map-panel"><div class="map-wrap"><div id="satMap" style="height:min(55vh,440px);width:100%;"></div></div></div>
+        <div class="card" id="satMeta"><div class="empty-state">loading&hellip;</div></div>
       </div>
     </section>
 
@@ -528,7 +553,7 @@
     <p class="section-note">When you see something odd, tap "Capture Event Packet Now." It saves a snapshot of every measurement plus satellite and radar pictures, with an ID and a fingerprint so it can't be quietly changed later. Open it any time to note which normal explanations fit.</p>
 
     <p class="section-title">🔎 INVESTIGATE tab</p>
-    <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in. <strong>Flight History</strong> shows every aircraft path recorded over KC in the last 1–24 hours, which heights they flew, and which aircraft showed up more than once. Pick a time window, then tap a line on the map.</p>
+    <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in. <strong>Flight History</strong> shows every aircraft path recorded over KC in the last 1–24 hours, which heights they flew, and which aircraft showed up more than once. Pick a time window, then tap a line on the map. <strong>Satellite Rewind</strong> shows the satellite picture over KC at any time in the last ~3 months: pick a picture type, slide or type a time, and optionally put past radar and flights from that time on top.</p>
 
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
@@ -2154,9 +2179,10 @@ let infraMap = null, infraMapLayers = {};
 document.querySelectorAll('#investigateSubnav .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
     document.querySelectorAll('#investigateSubnav .chip').forEach(c=>c.classList.toggle('active', c === chip));
-    ['ops','infra','flights'].forEach(k=>{ document.getElementById('inv-' + k).style.display = chip.dataset.inv === k ? 'block' : 'none'; });
+    ['ops','infra','flights','sat'].forEach(k=>{ document.getElementById('inv-' + k).style.display = chip.dataset.inv === k ? 'block' : 'none'; });
     if(chip.dataset.inv === 'infra') renderInfrastructure();
     if(chip.dataset.inv === 'flights') renderFlightHistory(true);
+    if(chip.dataset.inv === 'sat') renderSatRewind();
   });
 });
 
@@ -2300,11 +2326,147 @@ async function renderFlightHistory(refetch){
 document.querySelectorAll('#flightWindowChips .chip').forEach(c=>c.addEventListener('click', ()=>{ flightState.windowH = +c.dataset.win; renderFlightHistory(false); }));
 document.querySelectorAll('#flightAltChips .chip').forEach(c=>c.addEventListener('click', ()=>{ flightState.alt = c.dataset.alt; renderFlightHistory(false); }));
 
+/* ---- Satellite Rewind: NASA GIBS keeps GOES-East imagery at 10-minute
+   steps for roughly the past 3 months (time dimensions and tile matrix
+   sets confirmed from GIBS WMTSCapabilities by the probe workflow). Past
+   NEXRAD composites come from Iowa Environmental Mesonet's archive
+   (ridge::USCOMP-N0Q-YYYYMMDDHHMM, 5-minute steps). Frames are requested
+   for the chosen time only; a missing frame is reported, never filled. ---- */
+const GIBS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/';
+const SAT_REWIND_PRODUCTS = {
+  geocolor: { label:'True color', layer:'GOES-East_ABI_GeoColor', level:7, lagMin:80,
+    help:'What your eyes would see from space in daylight. At night it switches to an infrared view with city lights.' },
+  visible: { label:'Visible', layer:'GOES-East_ABI_Band2_Red_Visible_1km', level:7, lagMin:50,
+    help:'Sharpest detail (1 km): clouds, haze, smoke and trails show up best. Daylight only — black at night.' },
+  ir: { label:'Infrared', layer:'GOES-East_ABI_Band13_Clean_Infrared', level:6, lagMin:50,
+    help:'Cloud-top temperature, day and night. Colder (higher) cloud tops are brighter/colored. High thin cirrus and spreading trails can show here.' },
+  airmass: { label:'Air mass', layer:'GOES-East_ABI_Air_Mass', level:6, lagMin:50,
+    help:'Colors show different air masses: red/orange = dry upper air, green = warm moist air, blue/purple = cold air. Good for jet streams and fronts.' },
+  dust: { label:'Dust', layer:'GOES-East_ABI_Dust', level:7, lagMin:80,
+    help:'Highlights airborne dust (pink/magenta). NASA only publishes this layer at some times, so many times will have no picture.' }
+};
+const satState = { product:'geocolor', t: null, radar:false, flights:true, playing:null };
+let satMap = null, satLayer = null, satRadarLayer = null, satFlightLayer = null;
+const TEN_MIN = 600000;
+function floorTo(ms, step){ return Math.floor(ms / step) * step; }
+function isoMinute(ms){ return new Date(ms).toISOString().slice(0, 16) + ':00Z'; }
+function gibsUrl(key, ms){
+  const p = SAT_REWIND_PRODUCTS[key];
+  return `${GIBS_BASE}${p.layer}/default/${isoMinute(ms)}/GoogleMapsCompatible_Level${p.level}/{z}/{y}/{x}.png`;
+}
+function iemRadarUrl(ms){
+  const d = new Date(floorTo(ms, 300000)).toISOString();
+  const stamp = d.slice(0,4) + d.slice(5,7) + d.slice(8,10) + d.slice(11,13) + d.slice(14,16);
+  return `https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-${stamp}/{z}/{x}/{y}.png`;
+}
+function satSliderBase(){ return floorTo(Date.now(), TEN_MIN) - 143 * TEN_MIN; }
+function toLocalInput(ms){ const d = new Date(ms - new Date(ms).getTimezoneOffset() * 60000); return d.toISOString().slice(0, 16); }
+
+// Swap in a new tile layer and report whether its tiles actually loaded.
+function swapSatLayer(old, url, opts, onResult){
+  const layer = L.tileLayer(url, opts);
+  let ok = 0, bad = 0, reported = false;
+  const report = ()=>{ if(reported) return; reported = true; onResult(ok, bad); if(old && satMap.hasLayer(old)) satMap.removeLayer(old); };
+  layer.on('tileload', ()=>{ ok++; });
+  layer.on('tileerror', ()=>{ bad++; });
+  layer.on('load', report);
+  setTimeout(report, 12000);
+  layer.addTo(satMap);
+  return layer;
+}
+
+function renderSatRewind(){
+  if(satState.t == null) satState.t = floorTo(Date.now() - 80 * 60000, TEN_MIN);
+  const chips = document.getElementById('satProductChips');
+  chips.innerHTML = Object.entries(SAT_REWIND_PRODUCTS).map(([k, p])=>`<button class="chip${satState.product === k ? ' active' : ''}" data-prod="${k}">${p.label}</button>`).join('');
+  chips.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>{ satState.product = c.dataset.prod; renderSatRewind(); }));
+  const prod = SAT_REWIND_PRODUCTS[satState.product];
+  document.getElementById('satProductHelp').textContent = prod.help;
+  const base = satSliderBase();
+  const idx = Math.round((satState.t - base) / TEN_MIN);
+  const slider = document.getElementById('satSlider');
+  slider.value = Math.max(0, Math.min(143, idx));
+  document.getElementById('satDateInput').value = toLocalInput(satState.t);
+  document.getElementById('satRadarChip').classList.toggle('active', satState.radar);
+  document.getElementById('satFlightsChip').classList.toggle('active', satState.flights);
+  const meta = document.getElementById('satMeta');
+  if(!LEAFLET_AVAILABLE){ meta.innerHTML = '<span class="badge insufficient">MAP LIBRARY NOT LOADED</span>'; return; }
+  if(!satMap){
+    satMap = lockedMap('satMap', [CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], 6);
+    satMap.createPane('baseTiles'); satMap.getPane('baseTiles').style.zIndex = 150;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { pane:'baseTiles', attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19 }).addTo(satMap);
+    L.marker([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon]).addTo(satMap).bindPopup(CURRENT_LOCATION.label);
+    satFlightLayer = L.layerGroup().addTo(satMap);
+  }
+  const t = satState.t;
+  const tooNew = t > Date.now() - prod.lagMin * 60000;
+  const tooOld = t < Date.now() - 90 * 86400000;
+  const when = `${fmtTime(t)} (${isoMinute(t).replace('T', ' ').replace(':00Z', ' UTC')})`;
+  meta.innerHTML = `<div class="row"><span class="badge info">LOADING</span><span class="timestamp">${escapeHtml(when)}</span></div>`;
+  const myT = t, myProd = satState.product;
+  satLayer = swapSatLayer(satLayer, gibsUrl(satState.product, t), { opacity: 0.8, zIndex: 3, maxNativeZoom: prod.level, maxZoom: 19, attribution: 'NASA GIBS / NOAA GOES-East' }, (ok, bad)=>{
+    if(myT !== satState.t || myProd !== satState.product) return;
+    const has = ok > 0;
+    const why = tooNew ? 'This time is newer than NASA has published yet — try 1 hour earlier.'
+      : tooOld ? 'NASA keeps about 3 months of these pictures; this time is older than that.'
+      : 'NASA has no picture for this exact time (the satellite record has gaps, and the Dust layer is only made at some times). Try ±10 minutes.';
+    meta.innerHTML = `<div class="row"><span class="badge ${has ? 'info' : 'insufficient'}">${has ? 'MEASURED · SATELLITE IMAGE' : 'NO IMAGE FOR THIS TIME'}</span><span class="timestamp">${escapeHtml(when)}</span></div>
+      ${has ? '' : `<p class="field-hint">${why} Nothing is filled in or guessed.</p>`}
+      <p style="margin:0.4rem 0 0;font-size:0.85rem;"><strong>${escapeHtml(prod.label)}</strong> · GOES-East ABI · ${prod.level === 6 ? '~2 km' : '~1 km'} map detail</p>
+      <p class="field-hint" id="satFlightNote"></p>
+      <span class="source-tag">SOURCE: NASA GIBS (${escapeHtml(prod.layer)}) · NOAA GOES-East${satState.radar ? ' · Radar: Iowa Environmental Mesonet NEXRAD composite (5-min)' : ''}</span>`;
+    renderSatFlights();
+  });
+  if(satState.radar){
+    satRadarLayer = swapSatLayer(satRadarLayer, iemRadarUrl(t), { opacity: 0.6, zIndex: 4, maxNativeZoom: 9, maxZoom: 19, attribution: 'Iowa Environmental Mesonet' }, ()=>{});
+  } else if(satRadarLayer){ satMap.removeLayer(satRadarLayer); satRadarLayer = null; }
+  setTimeout(()=>satMap.invalidateSize(), 50);
+}
+
+// Aircraft recorded within ±20 minutes of the frame: same time, not a cause.
+async function renderSatFlights(){
+  if(!satFlightLayer) return;
+  satFlightLayer.clearLayers();
+  const note = document.getElementById('satFlightNote');
+  if(!satState.flights){ if(note) note.textContent = ''; return; }
+  const arch = await loadFlightArchive(false);
+  const sec = satState.t / 1000;
+  const segs = arch ? flightSegments(arch, 24, 'all').filter(sg=>Math.abs(sg.runT - sec) <= 20 * 60) : [];
+  segs.forEach(sg=>{
+    const color = sg.maxAlt != null && sg.maxAlt >= CRUISE_M ? '#FF2EC4' : '#00E5FF';
+    const shape = sg.pts.length >= 2 ? L.polyline(sg.pts.map(p=>[p[1], p[2]]), { color, weight: 3, opacity: 0.9 }) : L.circleMarker([sg.pts[0][1], sg.pts[0][2]], { radius: 3, color });
+    shape.bindPopup(segPopup(sg)).addTo(satFlightLayer);
+  });
+  if(note){
+    note.innerHTML = !arch ? 'Flight history not available.'
+      : (Date.now() - satState.t > 24 * 3600000) ? 'Flight paths are only kept for 24 hours, so none are shown for this time.'
+      : segs.length ? `✈️ ${segs.length} recorded flight path${segs.length === 1 ? '' : 's'} within 20 minutes of this picture (pink = above 25,000 ft). <span class="badge unusual">CORRELATED</span> in time only — being on the same picture doesn't mean they're connected.`
+      : 'No flight recording within 20 minutes of this picture (the aircraft robot records every ~30 minutes, sometimes less often).';
+  }
+}
+
+function setSatTime(ms){ satState.t = Math.min(floorTo(Date.now(), TEN_MIN), floorTo(ms, TEN_MIN)); renderSatRewind(); }
+document.getElementById('satSlider').addEventListener('change', e=>{ stopSatPlay(); setSatTime(satSliderBase() + (+e.target.value) * TEN_MIN); });
+document.querySelectorAll('#inv-sat [data-step]').forEach(b=>b.addEventListener('click', ()=>{ stopSatPlay(); setSatTime(satState.t + (+b.dataset.step) * 60000); }));
+document.getElementById('satDateInput').addEventListener('change', e=>{ const v = Date.parse(e.target.value); if(!isNaN(v)){ stopSatPlay(); setSatTime(v); } });
+document.getElementById('satRadarChip').addEventListener('click', ()=>{ satState.radar = !satState.radar; renderSatRewind(); });
+document.getElementById('satFlightsChip').addEventListener('click', ()=>{ satState.flights = !satState.flights; renderSatFlights(); renderSatRewind(); });
+function stopSatPlay(){ if(satState.playing){ clearInterval(satState.playing); satState.playing = null; document.getElementById('satPlayBtn').textContent = '▶ Play last 2 hours'; } }
+document.getElementById('satPlayBtn').addEventListener('click', ()=>{
+  if(satState.playing){ stopSatPlay(); return; }
+  const end = floorTo(Date.now() - SAT_REWIND_PRODUCTS[satState.product].lagMin * 60000, TEN_MIN);
+  let i = 0;
+  setSatTime(end - 12 * TEN_MIN);
+  document.getElementById('satPlayBtn').textContent = '⏸ Stop';
+  satState.playing = setInterval(()=>{ i++; if(i > 12){ stopSatPlay(); return; } setSatTime(end - (12 - i) * TEN_MIN); }, 1500);
+});
+
 async function renderInvestigateTab(){
   await InfrastructureProvider.load();
   renderWxModRecords();
   if(document.getElementById('inv-infra').style.display !== 'none') renderInfrastructure();
   if(document.getElementById('inv-flights').style.display !== 'none') renderFlightHistory(true);
+  if(document.getElementById('inv-sat').style.display !== 'none') renderSatRewind();
 }
 
 function docLink(d){
