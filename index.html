@@ -288,6 +288,14 @@
       <p class="section-note">Whether plane trails (contrails) <em>should</em> form right now, from forecast temperature and humidity where jets cruise. Jet exhaust contains water vapor; below about &minus;40&deg;F/&minus;40&deg;C it freezes into ice. In dry air the trail vanishes fast; in air saturated with respect to ice it lasts and spreads. Log what you actually see with the ➕ button (pick "Trails") and it's compared with this forecast.</p>
       <div id="trailCheck"><div class="empty-state">loading upper-air forecast&hellip;</div></div>
 
+      <p class="section-title">🎈 Atmosphere Above KC</p>
+      <p class="section-note">Temperature, humidity and wind from about 5,000 to 39,000 ft, with how many tracked planes are near each level. Arrows point the way the wind is blowing.</p>
+      <div id="upperAirProfile"><div class="empty-state">loading&hellip;</div></div>
+
+      <p class="section-title">🌫 Aerosol Watch</p>
+      <p class="section-note">How hazy the air is (aerosol optical depth), plus dust and fine particles, compared with this spot's own last 7 days.</p>
+      <div id="aerosolCard"><div class="empty-state">loading&hellip;</div></div>
+
       <p class="section-title">Command Map</p>
       <p class="section-note">Toggle layers independently. Each layer states its own data source. The map background is plain geography (roads, parks, rivers) in muted colors — <strong>any bright blue/green/yellow/red you see is real rain</strong> from the Precipitation layer, not land features.</p>
       <div class="chip-row">
@@ -295,6 +303,9 @@
         <button class="chip active" id="layerAlerts" data-layer="alerts">⚠️ Alerts</button>
         <button class="chip" id="layerAircraft" data-layer="aircraft">✈️ Aircraft</button>
         <button class="chip" id="layerInfra" data-layer="infra">📡 Infrastructure</button>
+        <button class="chip" id="layerIr" data-layer="ir">☁️ Clouds (infrared)</button>
+        <button class="chip" id="layerWv" data-layer="wv">💧 Water vapor</button>
+        <button class="chip" id="layerGeo" data-layer="geo">🌍 Satellite color</button>
       </div>
       <div class="map-panel">
         <div class="map-wrap">
@@ -310,6 +321,7 @@
           <span class="frame-time" id="frame-time">loading frames&hellip;</span>
         </div>
       </div>
+      <p class="section-note" id="satelliteNote"></p>
       <p class="section-note" id="aircraftStatusNote">AIRCRAFT: checking OpenSky Network&hellip;</p>
 
       <p class="section-title">NWS Radar Loop — KEAX (Pleasant Hill, MO)</p>
@@ -330,6 +342,7 @@
         <button class="chip" data-filter="ALERT">Alerts</button>
         <button class="chip" data-filter="ANOMALY">Anomalies</button>
         <button class="chip" data-filter="OBSERVATION">Observations</button>
+        <button class="chip" data-filter="EVENT">Event Packets</button>
       </div>
       <div id="timelineList"><div class="empty-state">loading timeline&hellip;</div></div>
     </section>
@@ -344,6 +357,10 @@
           <span id="snapshotCount" class="timestamp">0</span>
         </div>
       </div>
+      <p class="section-title">✈️ Aircraft density baseline</p>
+      <p class="section-note">Built automatically every 30 minutes by the GitHub robot, so it grows even when the app is closed.</p>
+      <div id="aircraftBaseline"><div class="empty-state">loading&hellip;</div></div>
+
       <div id="anomalyList"><div class="empty-state">No snapshots yet. Enable Sentinel Mode or tap "Take Snapshot Now" in the Vault tab to begin building a baseline.</div></div>
 
       <p class="section-title">🔗 Correlation Engine</p>
@@ -376,6 +393,13 @@
         <p class="field-hint" id="sentinelLastRun">Last snapshot: none</p>
       </div>
 
+      <p class="section-title">📦 Event Packets</p>
+      <p class="section-note">See something odd? Tap below to freeze a record of <em>everything</em> the app can measure right now — surface weather, alerts, radar time, satellite images over KC, upper-air profile, aerosols, aircraft, and your observations from the last 2 hours. Each packet gets an ID, the source and time of every piece of data, and a fingerprint (SHA-256) so you can show later it wasn't changed.</p>
+      <div class="card">
+        <button class="btn primary" id="capturePacketBtn">📦 Capture Event Packet Now</button>
+        <p class="field-hint" id="capturePacketStatus"></p>
+      </div>
+
       <p class="section-title">📍 Location Settings</p>
       <div class="card">
         <div class="field"><label>Latitude</label><input type="number" step="0.0001" id="settingLat"></div>
@@ -399,6 +423,7 @@
         <button class="chip active" data-vault="observations">Observations</button>
         <button class="chip" data-vault="snapshots">Sentinel Snapshots</button>
         <button class="chip" data-vault="hypotheses">Hypotheses</button>
+        <button class="chip" data-vault="events">Event Packets</button>
       </div>
       <div id="vaultList"><div class="empty-state">Nothing stored yet.</div></div>
     </section>
@@ -428,6 +453,18 @@
 
     <p class="section-title">✈️ Trail Check (Map tab)</p>
     <p class="section-note">Says whether plane trails <em>should</em> form and last right now, based on how cold and humid the air is up where jets fly. <strong>Try this:</strong> next time you see trails, tap ➕, pick "Trails," choose what they did, and save. It gets marked "matches the forecast" or "doesn't match." Over time your log shows how often what you see fits the weather.</p>
+
+    <p class="section-title">🛰 Satellite buttons (Map tab)</p>
+    <p class="section-note">"Clouds (infrared)," "Water vapor," and "Satellite color" add live GOES weather-satellite pictures to the map. <strong>Try this:</strong> turn on Water vapor and Aircraft together to see planes over moist vs. dry upper air.</p>
+
+    <p class="section-title">✈️ Flight tracks</p>
+    <p class="section-note">With Aircraft on, lines show where planes actually flew over a few minutes (magenta = above 25,000 ft). Tap a line for its flight number, altitude, and heading.</p>
+
+    <p class="section-title">🎈 Atmosphere Above KC & 🌫 Aerosol Watch</p>
+    <p class="section-note">The conditions at each height from ~5,000 to ~39,000 ft, and how hazy the air is compared with the past week.</p>
+
+    <p class="section-title">📦 Event Packets (Vault tab)</p>
+    <p class="section-note">When you see something odd, tap "Capture Event Packet Now." It saves a snapshot of every measurement plus satellite and radar pictures, with an ID and a fingerprint so it can't be quietly changed later. Open it any time to note which normal explanations fit.</p>
 
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
@@ -555,8 +592,8 @@ let CURRENT_LOCATION = Object.assign({}, DEFAULT_LOCATION);
 
 /* ===================== INDEXEDDB LAYER ===================== */
 const DB_NAME = "StormTrackerKC";
-const DB_VERSION = 1;
-const STORES = ["observations", "hypotheses", "snapshots", "settings"];
+const DB_VERSION = 2;
+const STORES = ["observations", "hypotheses", "snapshots", "settings", "events"];
 let dbPromise = null;
 
 function openDB(){
@@ -569,6 +606,7 @@ function openDB(){
       if(!db.objectStoreNames.contains("observations")) db.createObjectStore("observations", { keyPath:"id", autoIncrement:true });
       if(!db.objectStoreNames.contains("hypotheses")) db.createObjectStore("hypotheses", { keyPath:"id", autoIncrement:true });
       if(!db.objectStoreNames.contains("snapshots")) db.createObjectStore("snapshots", { keyPath:"id", autoIncrement:true });
+      if(!db.objectStoreNames.contains("events")) db.createObjectStore("events", { keyPath:"id", autoIncrement:true });
       if(!db.objectStoreNames.contains("settings")) db.createObjectStore("settings", { keyPath:"key" });
     };
     req.onsuccess = (e)=> resolve(e.target.result);
@@ -708,43 +746,20 @@ const RadarProvider = {
 };
 
 /* ===================== PROVIDER: AIRCRAFT (OpenSky Network, anonymous/free) =====================
-   OpenSky's public REST API does not send CORS headers on states/all, so a
-   direct browser fetch is blocked by the browser itself in most cases —
-   independent of rate limits. We still try it directly first (free, and it
-   costs nothing to attempt), then fall back to a same-origin snapshot file
-   (data/aircraft.json) that .github/workflows/aircraft-snapshot.yml fetches
-   server-side on a schedule and commits into the repo, where CORS doesn't
-   apply. Both paths are real OpenSky data — the fallback is just not
-   real-time (it's as fresh as the last scheduled run, and says so). */
+   OpenSky's REST API only allows its own origin via CORS (confirmed by the
+   probe workflow), so browsers can't call it. .github/workflows/
+   aircraft-snapshot.yml fetches it server-side every 30 minutes and commits
+   data/aircraft.json (positions + short track segments), which the app
+   reads same-origin. Real OpenSky data, as fresh as the last run. */
 const AircraftProvider = {
-  status: "unknown", // unknown | ok | cached | error | not_connected
+  status: "unknown", // unknown | cached | not_connected
   lastError: null,
   lastUpdated: null,
   async getStatesNear(lat, lon, deltaDeg){
     deltaDeg = deltaDeg || 0.7;
     const lamin = lat - deltaDeg, lamax = lat + deltaDeg;
     const lomin = lon - deltaDeg, lomax = lon + deltaDeg;
-    const live = await this._fetchLive(lamin, lomin, lamax, lomax);
-    if(live) return live;
     return await this._fetchCachedSnapshot(lamin, lomin, lamax, lomax);
-  },
-  async _fetchLive(lamin, lomin, lamax, lomax){
-    const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`;
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), 6000);
-    try{
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timer);
-      if(res.status === 429){ this.lastError = "Rate limited by OpenSky anonymous tier"; return null; }
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      this.status = "ok"; this.lastError = null; this.lastUpdated = Date.now();
-      return this._normalize(data.states || [], "OpenSky Network (live)");
-    } catch(err){
-      clearTimeout(timer);
-      this.lastError = err.message;
-      return null;
-    }
   },
   async _fetchCachedSnapshot(lamin, lomin, lamax, lomax){
     try{
@@ -752,6 +767,8 @@ const AircraftProvider = {
       if(!res.ok) throw new Error('no snapshot available');
       const data = await res.json();
       this.lastUpdated = data.fetchedAt ? Date.parse(data.fetchedAt) : null;
+      this.tracks = data.tracks || {};
+      this.trackWindowSeconds = data.trackWindowSeconds || null;
       if(!data.fetchedAt || !data.states || !data.states.length){
         this.status = 'not_connected';
         this.lastError = data.error || 'No scheduled snapshot has run yet';
@@ -1031,7 +1048,45 @@ let map = null, centerMarker = null;
 let precipLayer = null, frames = [], currentFrame = 0, tileHost = '', playing = false, playTimer = null;
 let alertsLayer = null, aircraftLayer = null, infraLayer = null, aircraftPollTimer = null;
 const LEAFLET_AVAILABLE = (typeof L !== 'undefined');
-const LAYER_STATE = { precip:true, alerts:true, aircraft:false, infra:false };
+const LAYER_STATE = { precip:true, alerts:true, aircraft:false, infra:false, ir:false, wv:false, geo:false };
+// GOES-East satellite tiles, verified reachable with CORS * by the probe
+// workflow. IEM refreshes its GOES composites every ~5 minutes; GIBS
+// "default" time resolves to the latest available GeoColor frame.
+const SATELLITE_LAYERS = {
+  ir:  { url:'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', opacity:0.55,
+         product:'GOES-East infrared (cloud-top temperature), 4 km', source:'Iowa Environmental Mesonet / NOAA GOES-East', short:'Infrared clouds (brighter = colder, higher tops)', via:'Iowa Environmental Mesonet' },
+  wv:  { url:'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', opacity:0.55,
+         product:'GOES-East water vapor (upper-level moisture), 4 km', source:'Iowa Environmental Mesonet / NOAA GOES-East', short:'Water vapor (brighter = moister upper air)', via:'Iowa Environmental Mesonet' },
+  geo: { url:'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GOES-East_ABI_GeoColor/default/default/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', opacity:0.7, maxNativeZoom:7,
+         product:'GOES-East ABI GeoColor (true color by day, infrared by night)', source:'NASA GIBS / NOAA GOES-East', short:'True color', via:'NASA GIBS' }
+};
+const satTileLayers = {};
+let satRefreshTimer = null;
+function satUrl(key){ return SATELLITE_LAYERS[key].url + '?t=' + Math.floor(Date.now() / 300000); }
+function setSatelliteLayer(key, on){
+  if(!map) return;
+  if(on){
+    const cfg = SATELLITE_LAYERS[key];
+    if(!satTileLayers[key]){
+      satTileLayers[key] = L.tileLayer(satUrl(key), { opacity: cfg.opacity, zIndex: 3, maxNativeZoom: cfg.maxNativeZoom || 9, maxZoom: 19,
+        attribution: cfg.source });
+    }
+    satTileLayers[key].addTo(map);
+  } else if(satTileLayers[key]){
+    map.removeLayer(satTileLayers[key]);
+  }
+  const anyOn = Object.keys(SATELLITE_LAYERS).some(k=>LAYER_STATE[k]);
+  if(anyOn && !satRefreshTimer){
+    satRefreshTimer = setInterval(()=>{
+      Object.keys(SATELLITE_LAYERS).forEach(k=>{ if(LAYER_STATE[k] && satTileLayers[k]) satTileLayers[k].setUrl(satUrl(k)); });
+    }, 5 * 60 * 1000);
+  } else if(!anyOn && satRefreshTimer){ clearInterval(satRefreshTimer); satRefreshTimer = null; }
+  const note = document.getElementById('satelliteNote');
+  const active = Object.keys(SATELLITE_LAYERS).filter(k=>LAYER_STATE[k]);
+  note.textContent = active.length
+    ? 'SATELLITE ON: ' + active.map(k=>SATELLITE_LAYERS[k].short).join(' · ') + ' — SOURCE: NOAA GOES-East via ' + [...new Set(active.map(k=>SATELLITE_LAYERS[k].via))].join(' & ') + '. Updates every 5 min.'
+    : '';
+}
 
 function frameUrl(frame){ return tileHost + frame.path + '/256/{z}/{x}/{y}/2/1_1.png'; }
 function showFrame(i){
@@ -1085,10 +1140,27 @@ async function refreshAircraftLayer(){
   aircraftLayer.clearLayers();
   const statusNote = document.getElementById('aircraftStatusNote');
   const planes = await AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon);
-  if(AircraftProvider.status === 'ok' || AircraftProvider.status === 'cached'){
-    statusNote.textContent = AircraftProvider.status === 'ok'
-      ? `AIRCRAFT: ${planes.length} tracked live · SOURCE: OpenSky Network`
-      : `AIRCRAFT: ${planes.length} tracked (scheduled snapshot, updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions`;
+  if(AircraftProvider.status === 'cached'){
+    statusNote.textContent = `AIRCRAFT: ${planes.length} tracked (snapshot updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions`;
+    const tracks = AircraftProvider.tracks || {};
+    const trackIds = Object.keys(tracks);
+    trackIds.forEach(id=>{
+      const tr = tracks[id];
+      const pts = tr.pts.filter(p=>p[1] != null && p[2] != null);
+      if(pts.length < 2) return;
+      const alts = pts.map(p=>p[3]).filter(a=>a != null);
+      const high = alts.length && Math.max(...alts) >= 7620;
+      const line = L.polyline(pts.map(p=>[p[1], p[2]]), { color: high ? '#FF2EC4' : '#00E5FF', weight: 3, opacity: 0.85 });
+      const ft = a => Math.round(a * 3.28084 / 100) * 100;
+      const altText = alts.length ? `${ft(Math.min(...alts)).toLocaleString()}–${ft(Math.max(...alts)).toLocaleString()} ft` : 'unknown';
+      const mins = Math.round((pts[pts.length-1][0] - pts[0][0]) / 60);
+      const last = pts[pts.length-1];
+      line.bindPopup(`<strong>TRACK: ${escapeHtml(tr.callsign || 'no callsign')}</strong><br>${fmtTime(pts[0][0]*1000)} → ${fmtTime(last[0]*1000)} (${mins} min, ${pts.length} positions)<br>Altitude: ${altText}<br>Heading: ${last[4] != null ? Math.round(last[4]) + '°' : 'unknown'}<br>Ground speed: ${last[5] != null ? Math.round(last[5] * 1.94384) + ' kt' : 'unknown'}<br><span class="source-tag">SOURCE: OpenSky Network via GitHub Actions</span>`);
+      line.addTo(aircraftLayer);
+    });
+    if(trackIds.length){
+      statusNote.textContent += ` · ${trackIds.length} flight tracks (lines) over a ~${Math.round((AircraftProvider.trackWindowSeconds||240)/60)}-minute window. Magenta = above 25,000 ft, cyan = lower.`;
+    }
     planes.forEach(p=>{
       const marker = L.marker([p.lat, p.lon], { icon: aircraftIcon(p.heading) });
       marker.bindPopup(`<strong>${escapeHtml(p.callsign)}</strong><br>Altitude: ${p.altitude!=null? Math.round(p.altitude)+'m':'unknown'}<br>Speed: ${p.velocity!=null? Math.round(p.velocity*1.94384)+'kt':'unknown'}<br>Heading: ${p.heading!=null? Math.round(p.heading)+'°':'unknown'}<br><span class="source-tag">SOURCE: ${escapeHtml(p.source)}</span>`);
@@ -1171,6 +1243,7 @@ function initMap(){
           if(aircraftPollTimer){ clearInterval(aircraftPollTimer); aircraftPollTimer = null; }
         }
       }
+      if(SATELLITE_LAYERS[layer]) setSatelliteLayer(layer, LAYER_STATE[layer]);
       if(layer === 'infra'){
         if(LAYER_STATE.infra){ refreshInfraLayer(); infraLayer.addTo(map); }
         else map.removeLayer(infraLayer);
@@ -1200,8 +1273,7 @@ if(LEAFLET_AVAILABLE){
 // initial aircraft status probe (layer off by default, but tell the user honestly)
 AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon).then(planes=>{
   const note = document.getElementById('aircraftStatusNote');
-  if(AircraftProvider.status === 'ok') note.textContent = `AIRCRAFT: ${planes.length} nearby, live via OpenSky Network. Enable the layer to view on map.`;
-  else if(AircraftProvider.status === 'cached') note.textContent = `AIRCRAFT: ${planes.length} nearby from a scheduled snapshot (updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions. Enable the layer to view on map.`;
+  if(AircraftProvider.status === 'cached') note.textContent = `AIRCRAFT: ${planes.length} nearby from a scheduled snapshot (updated ${fmtTime(AircraftProvider.lastUpdated)}) · SOURCE: OpenSky Network via GitHub Actions. Enable the layer to view on map.`;
   else note.textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED (OpenSky Network unreachable, and no scheduled snapshot yet). No aircraft are simulated.';
 }).catch(()=>{
   document.getElementById('aircraftStatusNote').textContent = 'AIRCRAFT DATA SOURCE NOT CONNECTED. No aircraft are simulated.';
@@ -1349,8 +1421,11 @@ renderRegionalPoints();
    Magnus-type saturation vapor pressure formulas. Model humidity at cruise
    altitude has large, well-documented errors, so this is a rough estimate. */
 const TRAIL_LEVELS = [300, 250, 200];
+const PROFILE_LEVELS = [850, 700, 500, 300, 250, 200];
 const TRAIL_LABELS = { none:'No trails expected', short:'Short-lived trails', persistent:'Long-lasting / spreading trails possible' };
 let latestTrailForecast = null;
+let latestUpperAir;   // undefined = not fetched yet, null = fetch failed
+let latestAerosol;
 
 const TrailEngine = {
   rhIce(rhWater, tC){
@@ -1372,48 +1447,159 @@ const TrailEngine = {
   }
 };
 
-async function fetchTrailForecast(lat, lon){
-  const vars = TRAIL_LEVELS.flatMap(p=>[`temperature_${p}hPa`,`relative_humidity_${p}hPa`,`geopotential_height_${p}hPa`]).join(',');
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=${vars}&forecast_days=1&timezone=GMT`;
+function nearestPastIndex(times){
+  const now = Date.now();
+  let idx = 0;
+  for(let i=0;i<times.length;i++){ if(times[i] <= now) idx = i; }
+  return idx;
+}
+
+// One Open-Meteo request for the whole column: temperature, humidity,
+// height and wind at six pressure levels (~5,000 to ~39,000 ft).
+async function fetchUpperAir(lat, lon){
+  const vars = PROFILE_LEVELS.flatMap(p=>[`temperature_${p}hPa`,`relative_humidity_${p}hPa`,`geopotential_height_${p}hPa`,`wind_speed_${p}hPa`,`wind_direction_${p}hPa`]).join(',');
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=${vars}&wind_speed_unit=kn&forecast_days=1&timezone=GMT`;
   try{
     const res = await fetch(url);
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const times = data.hourly.time.map(t=>Date.parse(t + 'Z'));
-    const now = Date.now();
-    let idx = 0;
-    for(let i=0;i<times.length;i++){ if(times[i] <= now) idx = i; }
-    const levels = TRAIL_LEVELS.map(p=>{
+    const idx = nearestPastIndex(times);
+    const levels = PROFILE_LEVELS.map(p=>{
       const tC = data.hourly[`temperature_${p}hPa`][idx];
       const rh = data.hourly[`relative_humidity_${p}hPa`][idx];
       const hM = data.hourly[`geopotential_height_${p}hPa`][idx];
       return {
-        hPa: p, tC, rh, heightFt: hM != null ? Math.round(hM * 3.28084 / 100) * 100 : null,
+        hPa: p, tC, rh, heightM: hM, heightFt: hM != null ? Math.round(hM * 3.28084 / 100) * 100 : null,
+        windKt: data.hourly[`wind_speed_${p}hPa`][idx], windDir: data.hourly[`wind_direction_${p}hPa`][idx],
         rhIce: (tC != null && rh != null) ? TrailEngine.rhIce(rh, tC) : null,
         kind: TrailEngine.classify(tC, rh)
       };
     });
-    return { validAt: times[idx], levels, overall: TrailEngine.overall(levels) };
+    const trailLevels = levels.filter(l=>TRAIL_LEVELS.includes(l.hPa));
+    return { validAt: times[idx], retrievedAt: Date.now(), url, levels, trailLevels, overall: TrailEngine.overall(trailLevels) };
   } catch(err){
-    console.error('fetchTrailForecast', err);
+    console.error('fetchUpperAir', err);
     return null;
   }
 }
 
+// CAMS (Copernicus) atmospheric-composition model via Open-Meteo. This is a
+// model estimate, not a direct satellite measurement, and an aerosol value
+// says nothing about where the aerosol came from.
+async function fetchAerosol(lat, lon){
+  const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=aerosol_optical_depth,dust,pm2_5&past_days=7&forecast_days=1&timezone=GMT`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const times = data.hourly.time.map(t=>Date.parse(t + 'Z'));
+    const idx = nearestPastIndex(times);
+    const metric = key => {
+      const vals = data.hourly[key];
+      const current = vals[idx];
+      const past = vals.slice(0, idx).filter(v=>v != null);
+      const hour = new Date(times[idx]).getUTCHours();
+      const sameHour = vals.slice(0, idx).filter((v,i)=>v != null && new Date(times[i]).getUTCHours() === hour);
+      if(current == null || past.length < 24) return { current, n: past.length };
+      const mean = Stats.mean(past), sd = Stats.stddev(past, mean);
+      return { current, n: past.length, mean, sd, z: Stats.zscore(current, mean, sd),
+        sameHourMean: sameHour.length ? Stats.mean(sameHour) : null, sameHourN: sameHour.length };
+    };
+    return { validAt: times[idx], retrievedAt: Date.now(), url,
+      aod: metric('aerosol_optical_depth'), dust: metric('dust'), pm25: metric('pm2_5') };
+  } catch(err){
+    console.error('fetchAerosol', err);
+    return null;
+  }
+}
+
+function windArrow(dir){
+  // Meteorological direction is where wind comes FROM; arrow points where it's going.
+  return dir == null ? '' : `<span style="display:inline-block;transform:rotate(${(dir + 180) % 360}deg);">&uarr;</span>`;
+}
+function compass(dir){
+  if(dir == null) return '';
+  return ['N','NE','E','SE','S','SW','W','NW'][Math.round(dir / 45) % 8];
+}
+
+function aircraftByLevel(levels, planes){
+  const airborne = planes.filter(p=>!p.onGround && p.altitude != null);
+  const sorted = levels.filter(l=>l.heightM != null).slice().sort((a,b)=>a.heightM-b.heightM);
+  const counts = {}; let below = 0;
+  airborne.forEach(p=>{
+    if(!sorted.length) return;
+    if(p.altitude < (sorted[0].heightM) / 2){ below++; return; }
+    let best = sorted[0];
+    sorted.forEach(l=>{ if(Math.abs(l.heightM - p.altitude) < Math.abs(best.heightM - p.altitude)) best = l; });
+    counts[best.hPa] = (counts[best.hPa] || 0) + 1;
+  });
+  return { counts, below, total: airborne.length };
+}
+
+function renderProfile(ua, planes){
+  const wrap = document.getElementById('upperAirProfile');
+  if(!ua){ wrap.innerHTML = '<div class="empty-state">Upper-air forecast unavailable right now. SOURCE: Open-Meteo</div>'; return; }
+  const dist = AircraftProvider.status === 'cached' ? aircraftByLevel(ua.levels, planes) : null;
+  const rows = ua.levels.slice().sort((a,b)=>a.hPa-b.hPa).map(l=>`
+    <div class="status-row">
+      <span style="min-width:6.5rem;"><strong>~${l.heightFt != null ? l.heightFt.toLocaleString() + ' ft' : l.hPa + ' hPa'}</strong></span>
+      <span class="timestamp">${l.tC != null ? Math.round(l.tC) + '&deg;C' : '—'} · RH ${l.rh != null ? Math.round(l.rh) + '%' : '—'}</span>
+      <span class="timestamp">${windArrow(l.windDir)} ${l.windKt != null ? Math.round(l.windKt) + ' kt' : '—'} ${l.windDir != null ? 'from ' + compass(l.windDir) : ''}</span>
+      ${dist ? `<span class="badge info">✈ ${dist.counts[l.hPa] || 0}</span>` : ''}
+    </div>`).join('');
+  wrap.innerHTML = `<div class="card">
+    <p class="field-hint" style="margin:0 0 0.5rem;">Highest level at top · valid ${fmtTime(ua.validAt)} · FORECAST/MODEL</p>
+    ${rows}
+    <div class="status-row"><span><strong>Surface</strong></span><span class="timestamp">see Current Conditions above</span>${dist ? `<span class="badge info">✈ ${dist.below}</span>` : ''}</div>
+    ${dist ? `<p class="field-hint" style="margin-top:0.5rem;">✈ = aircraft in the latest snapshot closest to each level (${dist.total} airborne total, snapshot ${fmtTime(AircraftProvider.lastUpdated)}).</p>` : '<p class="field-hint">Aircraft data not connected, so no altitude counts.</p>'}
+    <p class="source-tag" style="display:block;margin-top:0.4rem;">SOURCE: Open-Meteo pressure-level forecast (temperature, humidity, wind) · OpenSky Network via GitHub Actions (aircraft)</p>
+  </div>`;
+}
+
+function renderAerosol(ae){
+  const wrap = document.getElementById('aerosolCard');
+  if(!ae){ wrap.innerHTML = '<div class="empty-state">Aerosol data unavailable right now. SOURCE: Open-Meteo / CAMS</div>'; return; }
+  const row = (label, m, units, digits) => {
+    if(m.current == null) return `<div class="status-row"><span>${label}</span><span class="badge insufficient">NO DATA</span></div>`;
+    let badgeHtml = '<span class="badge insufficient">BASELINE BUILDING</span>', detail = '';
+    if(m.mean != null){
+      const unusual = Math.abs(m.z) >= 2;
+      badgeHtml = unusual ? '<span class="badge unusual">UNUSUAL vs past 7 days</span>' : '<span class="badge normal">within past-7-day range</span>';
+      detail = `7-day avg ${m.mean.toFixed(digits)}${units} (n=${m.n}, z=${m.z.toFixed(1)})${m.sameHourMean != null ? ` · same-hour avg ${m.sameHourMean.toFixed(digits)}${units}` : ''}`;
+    }
+    return `<div class="list-item"><div class="row"><span><strong>${label}:</strong> ${m.current.toFixed(digits)}${units}</span>${badgeHtml}</div>${detail ? `<div class="meta"><span class="timestamp">${detail}</span></div>` : ''}</div>`;
+  };
+  wrap.innerHTML = `<div class="card">
+    <p class="field-hint" style="margin:0 0 0.5rem;">Valid ${fmtTime(ae.validAt)} · MODEL ESTIMATE</p>
+    ${row('Aerosol optical depth', ae.aod, '', 2)}
+    ${row('Dust (surface)', ae.dust, ' µg/m³', 1)}
+    ${row('PM2.5 (surface)', ae.pm25, ' µg/m³', 1)}
+    <p class="field-hint" style="margin-top:0.6rem;">"Unusual" here only means different from this location's own last 7 days. An aerosol reading measures how hazy/particle-laden the air is — it doesn't say what the particles are or where they came from (smoke, dust, pollen and pollution all raise it).</p>
+    <p class="source-tag" style="display:block;">SOURCE: Copernicus CAMS atmospheric-composition model via Open-Meteo (a model estimate, not a direct satellite reading)</p>
+  </div>`;
+}
+
 async function renderTrailCheck(){
   const wrap = document.getElementById('trailCheck');
-  const [fc, planes] = await Promise.all([
-    fetchTrailForecast(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon),
-    AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon)
+  const [ua, planes, ae] = await Promise.all([
+    fetchUpperAir(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon),
+    AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon),
+    fetchAerosol(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon)
   ]);
-  latestTrailForecast = fc;
+  latestUpperAir = ua;
+  latestAerosol = ae;
+  latestTrailForecast = ua ? { validAt: ua.validAt, levels: ua.trailLevels, overall: ua.overall } : null;
+  renderProfile(ua, planes);
+  renderAerosol(ae);
+  const fc = latestTrailForecast;
   if(!fc){
     wrap.innerHTML = '<div class="empty-state">Upper-air forecast unavailable right now. SOURCE: Open-Meteo</div>';
     return;
   }
   const cruise = planes.filter(p=>p.altitude != null && p.altitude >= 7620 && !p.onGround).length;
-  const aircraftLine = (AircraftProvider.status === 'ok' || AircraftProvider.status === 'cached')
-    ? `${cruise} aircraft nearby at cruise altitude (above 25,000 ft) · SOURCE: ${AircraftProvider.status === 'ok' ? 'OpenSky Network (live)' : 'OpenSky Network snapshot, updated ' + fmtTime(AircraftProvider.lastUpdated)}`
+  const aircraftLine = AircraftProvider.status === 'cached'
+    ? `${cruise} aircraft nearby at cruise altitude (above 25,000 ft) · SOURCE: OpenSky Network snapshot, updated ${fmtTime(AircraftProvider.lastUpdated)}`
     : 'Aircraft data not connected right now.';
   const badge = { none:'normal', short:'watch', persistent:'unusual' };
   wrap.innerHTML = `
@@ -1514,6 +1700,10 @@ async function buildTimelineEvents(){
   observations.forEach(o=>{
     events.push({ timestamp: o.timestamp, category:'OBSERVATION', source:'USER OBSERVATION', description: `[${o.category}/${o.classification}] ${o.description}${trailSummary(o)}` });
   });
+  const packets = await dbGetAll('events');
+  packets.forEach(pk=>{
+    events.push({ timestamp: pk.timestamp, category:'EVENT', source:'Event Packet (multiple sources)', description: `${pk.packetId} captured · ${pk.status} · ${pk.data.aircraft ? pk.data.aircraft.airborne + ' aircraft' : 'no aircraft data'} · trail forecast: ${pk.data.trailForecast ? TRAIL_LABELS[pk.data.trailForecast] : 'n/a'}` });
+  });
   const snapshots = await dbGetAll('snapshots');
   const metricsList = [
     { key:'tempC', label:'Temperature', units:'°C' },
@@ -1551,7 +1741,41 @@ async function renderTimelineTab(){
 }
 
 /* ===================== ANOMALIES TAB ===================== */
+async function renderAircraftBaseline(){
+  const wrap = document.getElementById('aircraftBaseline');
+  try{
+    const res = await fetch('data/aircraft-history.json', { cache:'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const entries = (await res.json()).entries || [];
+    if(entries.length < 2){ wrap.innerHTML = '<div class="empty-state">Not enough history yet — the robot adds one entry every 30 minutes.</div>'; return; }
+    const latest = entries[entries.length - 1], past = entries.slice(0, -1);
+    const hour = new Date(latest.t).getUTCHours();
+    const sameHour = past.filter(e=>new Date(e.t).getUTCHours() === hour);
+    const useSameHour = sameHour.length >= MIN_BASELINE_SAMPLES;
+    const baseline = useSameHour ? sameHour : past;
+    const baselineLabel = useSameHour ? 'Same time of day over the past week' : `All recent robot runs (same-hour baseline still building: ${sameHour.length} of ${MIN_BASELINE_SAMPLES} needed)`;
+    const row = (label, key) => {
+      const r = AnomalyEngine.classifyMetric(key, label, '', latest[key], baseline);
+      if(!r) return '';
+      return `<div class="list-item"><div class="row"><strong>${label}: ${latest[key]}</strong><span class="badge ${r.status}">${r.status === 'insufficient' ? 'INSUFFICIENT DATA' : r.status.toUpperCase()}</span></div>
+        <div class="desc" style="font-size:0.82rem;color:var(--text-dim);">${r.status === 'insufficient' ? escapeHtml(r.explanation) : `${baselineLabel}: average ${r.mean.toFixed(1)} (n=${r.sample}, z=${r.z.toFixed(2)}).`}</div></div>`;
+    };
+    wrap.innerHTML = `<div class="card">
+      <p class="field-hint" style="margin:0 0 0.4rem;">Latest robot run ${fmtTime(Date.parse(latest.t))} · ${entries.length} runs stored</p>
+      ${row('Airborne aircraft nearby','count')}
+      ${row('Above 25,000 ft','cruise')}
+      ${row('No callsign broadcast','noCallsign')}
+      <p class="field-hint" style="margin-top:0.5rem;">Unusual here means unusual relative to this robot's own recent history, nothing more. Airline schedules change by weekday, holidays and weather, and ADS-B coverage has gaps.</p>
+      <p class="source-tag" style="display:block;">SOURCE: OpenSky Network via GitHub Actions · data/aircraft-history.json</p>
+    </div>`;
+  } catch(err){
+    console.error('renderAircraftBaseline', err);
+    wrap.innerHTML = '<div class="empty-state">Aircraft history not available yet.</div>';
+  }
+}
+
 async function renderAnomaliesTab(){
+  renderAircraftBaseline();
   const snapshots = (await dbGetAll('snapshots')).sort((a,b)=>a.timestamp-b.timestamp);
   document.getElementById('snapshotCount').textContent = snapshots.length;
   const listEl = document.getElementById('anomalyList');
@@ -1714,7 +1938,9 @@ async function renderStatusPanel(){
   const rows = [
     { label:'NWS / WEATHER', ok: WeatherProvider.status==='ok', warn: WeatherProvider.status==='unknown', text: WeatherProvider.status==='ok'?'CONNECTED':(WeatherProvider.status==='unknown'?'CHECKING':'ERROR') },
     { label:'RADAR (RainViewer)', ok: RadarProvider.status==='ok', warn: RadarProvider.status==='unknown', text: RadarProvider.status==='ok'?'CONNECTED':(RadarProvider.status==='unknown'?'CHECKING':'ERROR') },
-    { label:'AIRCRAFT (OpenSky)', ok: AircraftProvider.status==='ok'||AircraftProvider.status==='cached', warn: AircraftProvider.status==='unknown', text: AircraftProvider.status==='ok'?'CONNECTED (live)':AircraftProvider.status==='cached'?'CONNECTED (snapshot)':(AircraftProvider.status==='unknown'?'CHECKING':'NOT CONNECTED') },
+    { label:'AIRCRAFT (OpenSky)', ok: AircraftProvider.status==='cached', warn: AircraftProvider.status==='unknown', text: AircraftProvider.status==='cached'?'CONNECTED (snapshot)':(AircraftProvider.status==='unknown'?'CHECKING':'NOT CONNECTED') },
+    { label:'UPPER AIR (Open-Meteo)', ok: !!latestUpperAir, warn: latestUpperAir === undefined, text: latestUpperAir ? 'CONNECTED' : (latestUpperAir === undefined ? 'CHECKING' : 'ERROR') },
+    { label:'AEROSOL (Open-Meteo/CAMS)', ok: !!latestAerosol, warn: latestAerosol === undefined, text: latestAerosol ? 'CONNECTED' : (latestAerosol === undefined ? 'CHECKING' : 'ERROR') },
     { label:'AI', ok:true, warn:false, text:'LOCAL' },
     { label:'LOCATION', ok: geoState==='granted', warn: geoState==='prompt'||geoState==='unknown', text: geoState.toUpperCase() },
     { label:'STORAGE (IndexedDB)', ok: storageOk, warn:false, text: storageOk?'AVAILABLE':'ERROR' },
@@ -1783,11 +2009,18 @@ async function renderVaultList(store){
     if(store==='observations') desc = `[${item.category}/${item.classification}] ${item.description}${trailSummary(item)}`;
     else if(store==='snapshots') desc = `temp:${item.tempC ?? 'NO DATA'} pressure:${item.pressurePa ?? 'NO DATA'} aircraft:${item.aircraftCount}`;
     else if(store==='hypotheses') desc = item.claim;
+    else if(store==='events'){
+      const ok = item.sources.filter(x=>x.status === 'OK').length;
+      desc = `${item.packetId} · ${item.status} · ${ok}/${item.sources.length} sources · tap to open`;
+    }
     const ts = item.timestamp || item.createdAt;
     listEl.appendChild(el(`<div class="list-item">
       <div class="row"><span class="timestamp">${fmtTime(ts)}</span><button class="btn ghost" data-del="${item.id}" data-store="${store}" style="padding:0.3rem 0.6rem;font-size:0.7rem;">Delete</button></div>
-      <div class="desc">${escapeHtml(desc)}</div>
+      <div class="desc"${store==='events' ? ` data-open-packet="${item.id}" style="cursor:pointer;color:var(--cyan);"` : ''}>${escapeHtml(desc)}</div>
     </div>`));
+  });
+  listEl.querySelectorAll('[data-open-packet]').forEach(elm=>{
+    elm.addEventListener('click', ()=> openPacketDetail(parseInt(elm.dataset.openPacket, 10)));
   });
   listEl.querySelectorAll('[data-del]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
@@ -1797,10 +2030,199 @@ async function renderVaultList(store){
   });
 }
 
+
+/* ===================== EVENT PACKETS =====================
+   A frozen, timestamped record of every data source at one moment, with
+   per-source provenance (product, URL, retrieval time, valid time) and a
+   SHA-256 fingerprint of the captured content. Satellite/radar images are
+   saved as the single z7 tile covering KC (IEM tiles send CORS *, verified
+   by the probe workflow). Ordinary explanations are the user's to assess;
+   the app never fills them in. */
+const ORDINARY_EXPLANATIONS = ['Frontal boundary','Temperature inversion','Convection / thunderstorms','Ordinary contrails','Natural cirrus','Smoke / wildfire','Dust','Pollen / agriculture','Radar artifact / ground clutter','Anomalous radar propagation','Satellite artifact','Data outage or stale data'];
+const EXPLANATION_STATES = ['not assessed','supported by evidence','ruled out by evidence','unclear'];
+const PACKET_STATUSES = ['UNRESOLVED','EXPLAINED','INSUFFICIENT DATA'];
+const PACKET_IMAGERY = {
+  ir:    { product:'GOES-East infrared (cloud-top temperature)', url:'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-ir-4km-900913/{z}/{x}/{y}.png', source:'Iowa Environmental Mesonet / NOAA GOES-East' },
+  wv:    { product:'GOES-East water vapor', url:'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/goes-east-wv-4km-900913/{z}/{x}/{y}.png', source:'Iowa Environmental Mesonet / NOAA GOES-East' },
+  radar: { product:'NEXRAD base reflectivity composite', url:'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', source:'Iowa Environmental Mesonet / NWS NEXRAD' }
+};
+
+function packetIdFor(ts){
+  const d = new Date(ts), p = n=>String(n).padStart(2,'0');
+  return `KC-${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())}-${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}Z`;
+}
+async function sha256Hex(text){
+  try{
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  } catch(e){ return null; }
+}
+function tileFor(lat, lon, z){
+  const n = Math.pow(2, z), r = lat * Math.PI / 180;
+  return { z, x: Math.floor((lon + 180) / 360 * n), y: Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * n) };
+}
+async function fetchImageDataUrl(url){
+  try{
+    const res = await fetch(url, { cache:'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const blob = await res.blob();
+    return await new Promise((resolve, reject)=>{ const fr = new FileReader(); fr.onload = ()=>resolve(fr.result); fr.onerror = reject; fr.readAsDataURL(blob); });
+  } catch(e){ console.error('fetchImageDataUrl', url, e); return null; }
+}
+
+async function capturePacket(){
+  const lat = CURRENT_LOCATION.lat, lon = CURRENT_LOCATION.lon;
+  const capturedAt = Date.now();
+  const t = tileFor(lat, lon, 7);
+  const imageryKeys = Object.keys(PACKET_IMAGERY);
+  const [weather, alerts, planes, ua, ae, ...images] = await Promise.all([
+    WeatherProvider.getForecastAndNow(lat, lon),
+    WeatherProvider.getActiveAlerts(lat, lon),
+    AircraftProvider.getStatesNear(lat, lon),
+    fetchUpperAir(lat, lon),
+    fetchAerosol(lat, lon),
+    ...imageryKeys.map(k=>fetchImageDataUrl(PACKET_IMAGERY[k].url.replace('{z}',t.z).replace('{x}',t.x).replace('{y}',t.y) + '?t=' + capturedAt))
+  ]);
+  latestUpperAir = ua; latestAerosol = ae;
+  const obsP = weather && weather.observation ? weather.observation.properties : null;
+  const allObs = await dbGetAll('observations');
+  const nearbyObs = allObs.filter(o=>Math.abs(o.timestamp - capturedAt) <= 2 * 3600000);
+  const airborne = planes.filter(p=>!p.onGround);
+  const radarFrame = frames.length ? frames[frames.length - 1].time * 1000 : null;
+
+  const sources = [
+    { name:'National Weather Service', product:'Latest station observation', url:'https://api.weather.gov', status: obsP ? 'OK' : 'UNAVAILABLE', validAt: obsP && obsP.timestamp ? Date.parse(obsP.timestamp) : null },
+    { name:'National Weather Service', product:'Active alerts (CAP)', url:`https://api.weather.gov/alerts/active?point=${lat},${lon}`, status: WeatherProvider.status === 'ok' ? 'OK' : 'UNAVAILABLE', validAt: capturedAt },
+    { name:'OpenSky Network via GitHub Actions', product:'Aircraft positions + tracks', url:'data/aircraft.json', status: AircraftProvider.status === 'cached' ? 'OK' : 'UNAVAILABLE', validAt: AircraftProvider.lastUpdated },
+    { name:'Open-Meteo', product:'Pressure-level forecast (850–200 hPa)', url: ua ? ua.url : 'https://api.open-meteo.com', status: ua ? 'OK' : 'UNAVAILABLE', validAt: ua ? ua.validAt : null },
+    { name:'Open-Meteo / Copernicus CAMS', product:'Aerosol optical depth, dust, PM2.5 (model)', url: ae ? ae.url : 'https://air-quality-api.open-meteo.com', status: ae ? 'OK' : 'UNAVAILABLE', validAt: ae ? ae.validAt : null },
+    { name:'RainViewer', product:'Radar composite frame time', url:'https://api.rainviewer.com/public/weather-maps.json', status: radarFrame ? 'OK' : 'UNAVAILABLE', validAt: radarFrame },
+    ...imageryKeys.map((k,i)=>({ name: PACKET_IMAGERY[k].source, product: PACKET_IMAGERY[k].product + ` (tile ${t.z}/${t.x}/${t.y})`, url: PACKET_IMAGERY[k].url, status: images[i] ? 'OK' : 'UNAVAILABLE', validAt: null }))
+  ].map(x=>Object.assign({ retrievedAt: capturedAt }, x));
+
+  const data = {
+    surface: obsP ? {
+      description: obsP.textDescription || null,
+      tempC: obsP.temperature ? obsP.temperature.value : null,
+      pressurePa: obsP.barometricPressure ? obsP.barometricPressure.value : null,
+      humidityPct: obsP.relativeHumidity ? obsP.relativeHumidity.value : null,
+      windKmh: obsP.windSpeed ? obsP.windSpeed.value : null,
+      windDir: obsP.windDirection ? obsP.windDirection.value : null,
+      visibilityM: obsP.visibility ? obsP.visibility.value : null
+    } : null,
+    alerts: alerts.map(f=>({ event: f.properties.event, headline: f.properties.headline, effective: f.properties.effective })),
+    aircraft: AircraftProvider.status === 'cached' ? {
+      snapshotAt: AircraftProvider.lastUpdated, airborne: airborne.length,
+      cruise: airborne.filter(p=>p.altitude != null && p.altitude >= 7620).length,
+      noCallsign: airborne.filter(p=>!p.callsign || p.callsign === 'unknown').length,
+      tracks: Object.keys(AircraftProvider.tracks || {}).length,
+      list: airborne.map(p=>({ callsign: p.callsign, altFt: p.altitude != null ? Math.round(p.altitude * 3.28084) : null, heading: p.heading != null ? Math.round(p.heading) : null, speedKt: p.velocity != null ? Math.round(p.velocity * 1.94384) : null }))
+    } : null,
+    upperAir: ua ? ua.levels.map(l=>({ hPa:l.hPa, heightFt:l.heightFt, tC:l.tC, rh:l.rh, windKt:l.windKt, windDir:l.windDir })) : null,
+    trailForecast: ua ? ua.overall : null,
+    aerosol: ae ? { aod: ae.aod.current, aodZ: ae.aod.z ?? null, dust: ae.dust.current, pm25: ae.pm25.current } : null,
+    radarFrameAt: radarFrame,
+    imagery: Object.fromEntries(imageryKeys.map((k,i)=>[k, images[i] ? { product: PACKET_IMAGERY[k].product, tile:`${t.z}/${t.x}/${t.y}`, dataUrl: images[i] } : null])),
+    observations: nearbyObs.map(o=>({ id:o.id, timestamp:o.timestamp, category:o.category, classification:o.classification, description:o.description + trailSummary(o) }))
+  };
+  const packetId = packetIdFor(capturedAt);
+  const hash = await sha256Hex(JSON.stringify({ packetId, timestamp: capturedAt, location: CURRENT_LOCATION, sources, data }));
+  const packet = { packetId, timestamp: capturedAt, location: Object.assign({}, CURRENT_LOCATION), status:'UNRESOLVED', explanations:{}, notes:'', sources, data, hash };
+  packet.id = await dbAdd('events', packet);
+  return packet;
+}
+
+document.getElementById('capturePacketBtn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('capturePacketBtn'), st = document.getElementById('capturePacketStatus');
+  btn.disabled = true; st.textContent = 'Capturing from every source…';
+  try{
+    const pk = await capturePacket();
+    const ok = pk.sources.filter(x=>x.status === 'OK').length;
+    st.textContent = `Saved ${pk.packetId} — ${ok} of ${pk.sources.length} sources captured.`;
+    document.querySelectorAll('.chip[data-vault]').forEach(c=>c.classList.toggle('active', c.dataset.vault === 'events'));
+    renderVaultList('events');
+    openPacketDetail(pk.id);
+  } catch(err){
+    console.error('capturePacket', err);
+    st.textContent = 'Capture failed: ' + err.message;
+  }
+  btn.disabled = false;
+});
+
+function explanationCounts(pk){
+  const v = Object.values(pk.explanations || {});
+  return { supported: v.filter(x=>x === 'supported by evidence').length, ruledOut: v.filter(x=>x === 'ruled out by evidence').length, unclear: v.filter(x=>x === 'unclear').length };
+}
+
+async function openPacketDetail(id){
+  const pk = await dbGet('events', id);
+  if(!pk) return;
+  const d = pk.data, sheet = document.getElementById('cardSheet');
+  const dash = v => v == null ? '—' : v;
+  const c = explanationCounts(pk);
+  const img = (k, label) => d.imagery && d.imagery[k] ? `<figure style="margin:0;flex:1;min-width:30%;"><img src="${d.imagery[k].dataUrl}" alt="${escapeHtml(label)}" style="width:100%;border-radius:8px;border:1px solid var(--edge);"><figcaption class="source-tag">${escapeHtml(label)}</figcaption></figure>` : '';
+  sheet.innerHTML = `
+    <div class="sheet-handle"></div>
+    <p class="sheet-title">${escapeHtml(pk.packetId)}</p>
+    <p class="source-tag">Captured ${fmtTime(pk.timestamp)} · ${escapeHtml(pk.location.label)}</p>
+    <div class="field" style="margin-top:0.8rem;"><label>Status</label>
+      <select id="pkStatus">${PACKET_STATUSES.map(x=>`<option${x === pk.status ? ' selected' : ''}>${x}</option>`).join('')}</select></div>
+
+    <p class="section-title">Satellite & radar over KC</p>
+    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${img('ir','Infrared')}${img('wv','Water vapor')}${img('radar','Radar')}</div>
+    <p class="field-hint">Each image is the ~240 km-wide map tile containing Kansas City.</p>
+
+    <p class="section-title">Conditions</p>
+    <div class="card tight">
+      <div class="status-row"><span>Surface</span><span class="timestamp">${d.surface ? `${escapeHtml(d.surface.description || '')} ${d.surface.tempC != null ? Math.round(d.surface.tempC) + '°C' : ''} · ${d.surface.pressurePa != null ? Math.round(d.surface.pressurePa / 100) + ' hPa' : ''}` : 'NO DATA'}</span></div>
+      <div class="status-row"><span>Alerts</span><span class="timestamp">${d.alerts.length ? d.alerts.map(a=>escapeHtml(a.event)).join(', ') : 'none active'}</span></div>
+      <div class="status-row"><span>Aircraft</span><span class="timestamp">${d.aircraft ? `${d.aircraft.airborne} airborne · ${d.aircraft.cruise} above 25,000 ft · ${d.aircraft.tracks} tracks · ${d.aircraft.noCallsign} no callsign` : 'NO DATA'}</span></div>
+      <div class="status-row"><span>Trail forecast</span><span class="timestamp">${d.trailForecast ? TRAIL_LABELS[d.trailForecast] : 'NO DATA'}</span></div>
+      <div class="status-row"><span>Aerosol (AOD)</span><span class="timestamp">${d.aerosol && d.aerosol.aod != null ? d.aerosol.aod.toFixed(2) + (d.aerosol.aodZ != null ? ` (z=${d.aerosol.aodZ.toFixed(1)} vs 7 days)` : '') : 'NO DATA'}</span></div>
+      <div class="status-row"><span>Radar frame</span><span class="timestamp">${d.radarFrameAt ? fmtTime(d.radarFrameAt) : 'NO DATA'}</span></div>
+      ${(d.upperAir || []).map(l=>`<div class="status-row"><span>~${dash(l.heightFt) !== '—' ? l.heightFt.toLocaleString() + ' ft' : l.hPa + ' hPa'}</span><span class="timestamp">${l.tC != null ? Math.round(l.tC) + '°C' : '—'} · RH ${l.rh != null ? Math.round(l.rh) + '%' : '—'} · ${l.windKt != null ? Math.round(l.windKt) + ' kt from ' + compass(l.windDir) : '—'}</span></div>`).join('')}
+    </div>
+
+    <p class="section-title">Your observations (±2 h)</p>
+    ${d.observations.length ? d.observations.map(o=>`<div class="list-item"><span class="timestamp">${fmtTime(o.timestamp)}</span><div class="desc">${escapeHtml(o.description)}</div></div>`).join('') : '<p class="section-note">None logged within 2 hours of this capture.</p>'}
+
+    <p class="section-title">Possible ordinary explanations</p>
+    <p class="section-note">Your assessment, not the app's. Supported: ${c.supported} · Ruled out: ${c.ruledOut} · Unclear: ${c.unclear}</p>
+    ${ORDINARY_EXPLANATIONS.map((e,i)=>`<div class="status-row"><span>${escapeHtml(e)}</span><select data-expl="${i}" style="max-width:11rem;background:var(--bg2);color:var(--text);border:1px solid var(--edge);border-radius:6px;padding:0.3rem;">${EXPLANATION_STATES.map(x=>`<option${(pk.explanations[e] || 'not assessed') === x ? ' selected' : ''}>${x}</option>`).join('')}</select></div>`).join('')}
+    <div class="field" style="margin-top:0.8rem;"><label>Notes</label><textarea id="pkNotes">${escapeHtml(pk.notes || '')}</textarea></div>
+
+    <p class="section-title">Sources</p>
+    ${pk.sources.map(x=>`<div class="list-item"><div class="row"><span>${escapeHtml(x.product)}</span><span class="badge ${x.status === 'OK' ? 'normal' : 'insufficient'}">${x.status}</span></div><div class="meta"><span class="source-tag">${escapeHtml(x.name)} · retrieved ${fmtTime(x.retrievedAt)}${x.validAt ? ' · valid ' + fmtTime(x.validAt) : ''}</span></div></div>`).join('')}
+    <p class="field-hint" style="word-break:break-all;">Fingerprint (SHA-256 of captured data): ${pk.hash || 'unavailable in this browser'}</p>
+
+    <div class="btn-row" style="margin-top:1rem;">
+      <button class="btn primary" id="pkSaveBtn">Save</button>
+      <button class="btn danger" id="pkDeleteBtn">Delete</button>
+      <button class="btn ghost" id="pkCloseBtn">Close</button>
+    </div>`;
+  const overlay = document.getElementById('cardOverlay');
+  document.getElementById('pkCloseBtn').addEventListener('click', ()=> overlay.classList.remove('open'));
+  document.getElementById('pkDeleteBtn').addEventListener('click', async ()=>{
+    await dbDelete('events', id); overlay.classList.remove('open'); renderVaultList('events');
+  });
+  document.getElementById('pkSaveBtn').addEventListener('click', async ()=>{
+    pk.status = document.getElementById('pkStatus').value;
+    pk.notes = document.getElementById('pkNotes').value;
+    sheet.querySelectorAll('[data-expl]').forEach(sel=>{
+      const name = ORDINARY_EXPLANATIONS[parseInt(sel.dataset.expl, 10)];
+      if(sel.value === 'not assessed') delete pk.explanations[name]; else pk.explanations[name] = sel.value;
+    });
+    await dbPut('events', pk);
+    overlay.classList.remove('open');
+    renderVaultList('events');
+  });
+  overlay.classList.add('open');
+}
+
 /* ===================== EXPORT / IMPORT ===================== */
 async function exportAllData(){
-  const [observations, hypotheses, snapshots] = await Promise.all([dbGetAll('observations'), dbGetAll('hypotheses'), dbGetAll('snapshots')]);
-  return { exportedAt: new Date().toISOString(), location: CURRENT_LOCATION, observations, hypotheses, snapshots };
+  const [observations, hypotheses, snapshots, events] = await Promise.all([dbGetAll('observations'), dbGetAll('hypotheses'), dbGetAll('snapshots'), dbGetAll('events')]);
+  return { exportedAt: new Date().toISOString(), location: CURRENT_LOCATION, observations, hypotheses, snapshots, events };
 }
 function downloadFile(filename, content, mime){
   const blob = new Blob([content], { type: mime });
@@ -1824,6 +2246,12 @@ document.getElementById('exportHtmlBtn').addEventListener('click', async ()=>{
   ${data.observations.map(o=>`<div class="item"><strong>${fmtTime(o.timestamp)}</strong> [${escapeHtml(o.category)}/${escapeHtml(o.classification)}]<br>${escapeHtml(o.description + trailSummary(o))}<br><span class="src">SOURCE: USER OBSERVATION</span></div>`).join('')}
   <h2>Hypotheses (${data.hypotheses.length})</h2>
   ${data.hypotheses.map(h=>`<div class="item"><strong>${escapeHtml(h.claim)}</strong> — status: ${escapeHtml(computeHypStatus(h))}<br>Supporting: ${h.supporting.length}, Contradicting: ${h.contradicting.length}</div>`).join('')}
+  <h2>Event Packets (${data.events.length})</h2>
+  ${data.events.map(e=>{ const c = explanationCounts(e); return `<div class="item"><strong>${escapeHtml(e.packetId)}</strong> — ${escapeHtml(e.status)}<br>
+    ${e.data.imagery ? Object.values(e.data.imagery).filter(Boolean).map(i=>`<img src="${i.dataUrl}" alt="${escapeHtml(i.product)}" style="width:30%;margin-right:2%;">`).join('') : ''}<br>
+    Aircraft: ${e.data.aircraft ? e.data.aircraft.airborne + ' airborne, ' + e.data.aircraft.cruise + ' above 25,000 ft' : 'no data'} · Trail forecast: ${e.data.trailForecast ? TRAIL_LABELS[e.data.trailForecast] : 'no data'} · Alerts: ${e.data.alerts.length}<br>
+    Ordinary explanations — supported: ${c.supported}, ruled out: ${c.ruledOut}, unclear: ${c.unclear}${e.notes ? '<br>Notes: ' + escapeHtml(e.notes) : ''}<br>
+    <span class="src">Sources: ${e.sources.map(x=>escapeHtml(x.product) + ' (' + x.status + ')').join('; ')}<br>SHA-256: ${e.hash || 'n/a'}</span></div>`; }).join('')}
   <h2>Sentinel Snapshots (${data.snapshots.length})</h2>
   ${data.snapshots.map(s=>`<div class="item">${fmtTime(s.timestamp)} — temp:${s.tempC ?? 'NO DATA'} pressure:${s.pressurePa ?? 'NO DATA'} aircraft:${s.aircraftCount}<br><span class="src">SOURCE: NWS / OpenSky Network / Local Statistical Engine</span></div>`).join('')}
   </body></html>`;
@@ -1839,6 +2267,7 @@ document.getElementById('importFile').addEventListener('change', async (e)=>{
     for(const o of (data.observations||[])){ const copy = Object.assign({}, o); delete copy.id; await dbAdd('observations', copy); }
     for(const h of (data.hypotheses||[])){ const copy = Object.assign({}, h); delete copy.id; await dbAdd('hypotheses', copy); }
     for(const s of (data.snapshots||[])){ const copy = Object.assign({}, s); delete copy.id; await dbAdd('snapshots', copy); }
+    for(const ev of (data.events||[])){ const copy = Object.assign({}, ev); delete copy.id; await dbAdd('events', copy); }
     renderVaultList('observations');
     renderAnomaliesTab();
     renderLabTab();

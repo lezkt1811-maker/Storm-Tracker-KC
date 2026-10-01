@@ -1,11 +1,10 @@
 name: Probe data sources
 
-# Temporary diagnostic: checks which free data endpoints respond (status,
-# content type, CORS header) so only verified sources get wired into the app.
+# On-demand diagnostic (Actions tab -> Probe data sources -> Run workflow).
+# Checks which free data endpoints respond (status, content type, CORS
+# header) from GitHub's servers, since they can't be reached from every
+# development environment. Run it whenever a layer looks blank.
 on:
-  push:
-    branches: [claude/storm-tracker-audit-hcq0w8]
-    paths: ['.github/workflows/probe-sources.yml']
   workflow_dispatch: {}
 
 jobs:

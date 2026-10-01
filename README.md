@@ -48,6 +48,11 @@ build or install.
 |---|---|---|
 | Forecast & current conditions | [api.weather.gov](https://api.weather.gov) (NWS) | Free, keyless, official |
 | Active alerts/warnings | api.weather.gov `/alerts/active` | Rendered as map polygons + timeline events |
+| GOES-East satellite: infrared, water vapor | [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu) tile cache | Free, keyless, CORS-enabled; updates ~5 min |
+| GOES-East satellite: GeoColor (true color) | [NASA GIBS](https://earthdata.nasa.gov/gibs) WMTS | Free, keyless, CORS-enabled |
+| Radar image saved in Event Packets | Iowa Environmental Mesonet NEXRAD composite | Free, keyless |
+| Upper-air wind (Atmosphere Above KC) | Open-Meteo pressure-level forecast, 850–200 hPa | Free, keyless |
+| Aerosol optical depth, dust, PM2.5 | [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api) (Copernicus CAMS model) | Model estimate, not a satellite measurement |
 | Upper-air temperature/humidity (Trail Check) | [Open-Meteo](https://open-meteo.com) pressure-level forecast (300/250/200 hPa) | Free, keyless |
 | Precipitation radar | [RainViewer](https://www.rainviewer.com/api.html) | Free public tile API |
 | NWS radar loop (KEAX) | [radar.weather.gov](https://radar.weather.gov) | Static animated GIF, lazy-loaded |
@@ -109,6 +114,11 @@ phased plan) or **architecturally prepared but not built in this pass**:
 - Regional rainfall/Excessive Rainfall Outlook map layer, flood watch/warning
   explainer layer, tropical remnant tracking, moisture-flow arrows, auto-generated
   regional event card, multi-model confidence ranges, "What's Coming?" mode
+- Lightning (GOES GLM): only published as raw NetCDF files, which would need a
+  processing job; not built yet
+- NEXRAD dual-polarization diagnostics (velocity, ZDR, CC): raw Level II only;
+  not built yet
+- Scrubbable replay of a whole event window (Event Packets capture single moments)
 - True background/server-side Sentinel collection (beyond the aircraft snapshot)
 - Historical Event Replay UI
 - Cross-storm Pattern Discovery scoreboard
@@ -129,6 +139,40 @@ Vault tab → **Export Investigation (JSON)** downloads a complete machine-reada
 dump. **Export Readable Report** downloads a self-contained HTML summary you can
 open in any browser or share. **Import JSON** merges a previously exported file back
 into the Vault (existing records are kept; imported records are added).
+
+## Verifying data sources
+
+Some development environments can't reach these services directly, so the repo
+includes `.github/workflows/probe-sources.yml`. Run it from the Actions tab
+(Probe data sources → Run workflow) and its log shows, for every endpoint the app
+uses, the HTTP status, content type, size and CORS header as seen from GitHub's
+servers. That's how the current sources were chosen — and how we confirmed that
+OpenSky blocks browsers (hence the snapshot robot) and that RainViewer's free tiles
+stop at zoom 7.
+
+## Aircraft tracks and history
+
+The aircraft robot (`.github/workflows/aircraft-snapshot.yml`) now takes five
+OpenSky samples 60 seconds apart every 30 minutes. Aircraft seen in two or more
+samples become ~4-minute track segments in `data/aircraft.json`, drawn on the map
+as lines (magenta above 25,000 ft, cyan below). Each run also appends airborne,
+above-25,000-ft and no-callsign counts to `data/aircraft-history.json` (7 days
+rolling), which the Anomalies tab uses as a same-hour-of-day baseline that keeps
+growing even when nobody has the app open. Positions only — no crew or owner
+lookups.
+
+## Event Packets
+
+Vault → Capture Event Packet freezes everything at one moment: surface observation,
+active alerts, radar frame time, the GOES infrared, water-vapor and NEXRAD image
+tiles over KC (saved as images), the full upper-air profile, trail forecast,
+aerosol values, aircraft list and tracks, and your observations from ±2 hours.
+Each packet has an ID (e.g. `KC-2026-10-01-114539Z`), per-source provenance
+(product, URL, retrieval time, valid time, OK/unavailable) and a SHA-256 fingerprint
+of its captured content. You can mark a status (UNRESOLVED / EXPLAINED /
+INSUFFICIENT DATA) and assess a list of ordinary explanations; the app never fills
+those in itself. Packets appear in the Timeline and are included in JSON and HTML
+exports.
 
 ## How Trail Check works
 
