@@ -18,6 +18,11 @@ jobs:
             cors=$(grep -i '^access-control-allow-origin' /tmp/hdr | tr -d '\r' | cut -d' ' -f2-)
             echo "PROBE | $out | cors=${cors:-none} | $1"
           }
+          echo "=== CORS for IEM radar scan-list JSON"
+          probe "https://mesonet.agron.iastate.edu/json/radar.py?operation=list&radar=EAX&product=N0S&start=$(date -u -d '-1 hour' +%Y-%m-%dT%H:%MZ)&end=$(date -u +%Y-%m-%dT%H:%MZ)"
+          head -c 300 /tmp/body; echo
+          probe "https://mesonet.agron.iastate.edu/json/radar.py?operation=list&radar=EAX&product=N0B&start=$(date -u -d '-25 hour' +%Y-%m-%dT%H:%MZ)&end=$(date -u -d '-24 hour' +%Y-%m-%dT%H:%MZ)"
+          head -c 300 /tmp/body; echo
           echo "=== IEM single-radar archive (KEAX): scan list + products"
           S=$(date -u -d '-3 hour' +%Y-%m-%dT%H:%MZ); E=$(date -u +%Y-%m-%dT%H:%MZ)
           for PR in N0B N0Q N0U N0G N0S N0C N0X N0K N0H HHC EET DVL NET N0R; do
