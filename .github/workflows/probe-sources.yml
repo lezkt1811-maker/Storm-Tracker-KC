@@ -18,6 +18,31 @@ jobs:
             cors=$(grep -i '^access-control-allow-origin' /tmp/hdr | tr -d '\r' | cut -d' ' -f2-)
             echo "PROBE | $out | cors=${cors:-none} | $1"
           }
+          echo "=== IEM single-radar archive (KEAX): scan list + products"
+          S=$(date -u -d '-3 hour' +%Y-%m-%dT%H:%MZ); E=$(date -u +%Y-%m-%dT%H:%MZ)
+          for PR in N0B N0Q N0U N0G N0S N0C N0X N0K N0H HHC EET DVL NET N0R; do
+            curl -sL -m 25 -o /tmp/l.json -w "LIST $PR %{http_code} %{size_download} " "https://mesonet.agron.iastate.edu/json/radar.py?operation=list&radar=EAX&product=$PR&start=$S&end=$E"
+            python3 -c "import json;d=json.load(open('/tmp/l.json'));sc=d.get('scans',[]);print(len(sc), sc[:1], sc[-1:])" 2>/dev/null || head -c 200 /tmp/l.json; echo
+          done
+          curl -sL -m 25 -o /tmp/p.json "https://mesonet.agron.iastate.edu/json/radar.py?operation=products&radar=EAX&start=$S"
+          echo "PRODUCTS:"; head -c 1500 /tmp/p.json; echo
+          curl -sL -m 25 -o /tmp/l.json "https://mesonet.agron.iastate.edu/json/radar.py?operation=list&radar=EAX&product=N0B&start=$S&end=$E"
+          TS=$(python3 -c "import json;d=json.load(open('/tmp/l.json'));t=d['scans'][-1]['ts'];print(t[0:4]+t[5:7]+t[8:10]+t[11:13]+t[14:16])" 2>/dev/null)
+          echo "latest EAX scan stamp: $TS"
+          for PR in N0B N0Q N0U N0G N0S N0C N0X N0K N0H; do
+            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-$TS/8/61/97.png"
+            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-0/8/61/97.png"
+          done
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-24 hour' +%Y%m%d%H)00/7/30/48.png"
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-7 day' +%Y%m%d%H)00/7/30/48.png"
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-24 hour' +%Y%m%d%H)07/7/30/48.png"
+          probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-24 hour' +%Y%m%d%H)07/7/30/48.png"
+          md5sum /tmp/body
+          curl -s -m 25 "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-209901010000/7/30/48.png" -o /tmp/bogus.png -w "BOGUS %{http_code} %{size_download}\n"
+          md5sum /tmp/bogus.png
+          probe "https://radar.weather.gov/ridge/standard/KEAX_loop.gif"
+          probe "https://radar.weather.gov/ridge/standard/CENTGRLAKES_loop.gif"
+          probe "https://radar.weather.gov/ridge/standard/CONUS-LARGE_loop.gif"
           echo "=== GIBS GOES time dimensions (satellite history)"
           curl -s -m 90 "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml" -o /tmp/caps0.xml
           python3 - <<'PY'
