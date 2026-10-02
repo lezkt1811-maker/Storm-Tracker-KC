@@ -221,6 +221,28 @@ The 30-minute gaps between recordings are never drawn or interpolated. Aircraft 
 isn't shown, because OpenSky's state feed doesn't include it. There are no owner,
 pilot or crew lookups.
 
+## Map tab: Radar Theater
+
+A playable radar history built from Iowa Environmental Mesonet's NEXRAD archive.
+The probe workflow checked every product and the scan-list JSON (CORS `*`).
+- **All radars (region):** the national composite base reflectivity,
+  `ridge::USCOMP-N0Q-YYYYMMDDHHMM`, at 5-minute steps.
+- **KC radar · rain:** the KEAX super-resolution reflectivity,
+  `ridge::EAX-N0B-<scan>`.
+- **KC radar · wind:** the KEAX storm-relative velocity, `ridge::EAX-N0S-<scan>`.
+  Scan times come from `json/radar.py?operation=list`.
+
+You can play back 1 h, 3 h, 6 h, 12 h, 24 h or 3 days, with up to 37 frames spread
+evenly. It also has play, pause, step, a slider, 0.5×/1×/2× speed, full screen, and
+an optional overlay of flights recorded within 20 minutes. The radar pictures load
+only when the section scrolls into view. A missing frame is labeled NO DATA. Dual-pol
+products (correlation coefficient, differential reflectivity, hydrometeor class)
+aren't in that archive, so they aren't offered.
+
+The official NWS KEAX loop GIF now shows uncropped, at full width. Tapping it opens
+a full-screen viewer with zoom buttons, and a color guide explains what the
+colors and weak echoes mean.
+
 ## Investigate tab: Satellite Rewind
 
 Shows GOES-East imagery over KC at any 10-minute time in roughly the past 3 months,

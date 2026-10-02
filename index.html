@@ -217,7 +217,22 @@
   .map-controls input[type=range]{ flex:1; min-width:100px; accent-color:var(--pink); }
   .frame-time{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--green); min-width:120px; text-align:right; }
 
-  .hud-frame{ max-width:260px; margin:0.6rem auto 0; border-radius:14px; padding:3px;
+.nws-loop-frame{ background:#000; border:1px solid var(--edge); border-radius:12px; overflow:hidden; margin:0.6rem 0; cursor:zoom-in; }
+  .nws-loop-frame img{ display:block; width:100%; height:auto; }
+  .theater-stamp{ position:absolute; left:0.6rem; bottom:2.6rem; z-index:900; background:rgba(5,3,12,0.8); color:var(--text);
+    border:1px solid var(--edge); border-radius:8px; padding:0.35rem 0.6rem; font-family:'IBM Plex Mono', monospace; font-size:0.78rem; pointer-events:none; }
+  /* .tab-content is its own stacking context (z-index 1), so lift it above the header/nav while full screen. */
+  body.theater-full .tab-content{ z-index:5000; }
+  #theaterWrap.is-full{ position:fixed; inset:0; z-index:5000; background:#000; }
+  #theaterWrap.is-full .theater-stamp{ bottom:calc(7.5rem + env(safe-area-inset-bottom,0px)); }
+  #theaterPanel.is-full .map-controls{ padding-bottom:calc(0.7rem + env(safe-area-inset-bottom,0px)); }
+  #theaterWrap.is-full #theaterMap{ height:100% !important; }
+  #theaterPanel.is-full .map-controls{ position:fixed; left:0; right:0; bottom:0; z-index:5001; }
+  .img-viewer{ position:fixed; inset:0; z-index:6000; background:#000; overflow:auto; display:none; touch-action:pinch-zoom pan-x pan-y; }
+  .img-viewer.open{ display:block; }
+  .img-viewer img{ display:block; width:100%; max-width:none; height:auto; margin:3.2rem auto 0; }
+  .img-viewer .close{ position:fixed; top:0.6rem; right:0.6rem; z-index:6001; }
+    .hud-frame{ max-width:260px; margin:0.6rem auto 0; border-radius:14px; padding:3px;
     background: linear-gradient(120deg, var(--pink), var(--purple), var(--cyan), var(--green)); background-size:300% 300%; }
   .hud-inner{ border-radius:11px; overflow:hidden; background:#000; aspect-ratio:9/16; }
   .hud-inner img{ display:block; width:100%; height:100%; object-fit:cover; }
@@ -324,9 +339,47 @@
       <p class="section-note" id="satelliteNote"></p>
       <p class="section-note" id="aircraftStatusNote">AIRCRAFT: checking OpenSky Network&hellip;</p>
 
+      <p class="section-title">📡 Radar Theater — rewind the radar</p>
+      <p class="section-note"><strong>What this is:</strong> weather radar sends out radio pulses and measures what bounces back — mostly rain, hail and snow, but also bugs, birds, dust and smoke. Here you can play it back for up to <strong>3 days</strong>, zoom in on any neighborhood, go full screen, and switch the KC radar between "what's falling" and "which way it's moving."</p>
+      <p class="field-hint">1. Pick a view:</p>
+      <div class="chip-row" id="theaterViewChips">
+        <button class="chip active" data-view="region">🗺 All radars (region)</button>
+        <button class="chip" data-view="kc">📍 KC radar · rain</button>
+        <button class="chip" data-view="vel">🌀 KC radar · wind</button>
+      </div>
+      <p class="field-hint">2. How far back:</p>
+      <div class="chip-row" id="theaterLenChips">
+        <button class="chip" data-len="1">1 h</button>
+        <button class="chip active" data-len="3">3 h</button>
+        <button class="chip" data-len="6">6 h</button>
+        <button class="chip" data-len="12">12 h</button>
+        <button class="chip" data-len="24">24 h</button>
+        <button class="chip" data-len="72">3 days</button>
+      </div>
+      <div class="map-panel" id="theaterPanel">
+        <div class="map-wrap" id="theaterWrap">
+          <div id="theaterMap" style="height:min(60vh,520px);width:100%;"></div>
+          <button class="map-recenter-btn" id="theaterFullBtn" style="top:0.6rem;right:0.6rem;z-index:1100;">⛶ Full screen</button>
+          <div class="theater-stamp" id="theaterStamp">—</div>
+        </div>
+        <div class="map-controls">
+          <button class="btn" id="theaterPrev" aria-label="Previous frame">⏮</button>
+          <button class="btn" id="theaterPlay">▶ Play</button>
+          <button class="btn" id="theaterNext" aria-label="Next frame">⏭</button>
+          <input type="range" id="theaterSlider" min="0" max="0" value="0">
+          <button class="btn ghost" id="theaterSpeed">1×</button>
+        </div>
+      </div>
+      <div class="chip-row">
+        <button class="chip" id="theaterFlightsChip">✈️ Flights at that time</button>
+      </div>
+      <div class="card tight" id="theaterLegend"></div>
+      <p class="field-hint" id="theaterStatus"></p>
+
       <p class="section-title">NWS Radar Loop — KEAX (Pleasant Hill, MO)</p>
-      <p class="section-note">SOURCE: radar.weather.gov · no key, no cost.</p>
-      <div class="hud-frame"><div class="hud-inner"><img id="nws-loop" alt="NWS KEAX radar loop"></div></div>
+      <p class="section-note">The official National Weather Service loop of the KC radar (last ~1 hour). <strong>Tap the picture to see it full screen</strong> — then pinch to zoom. SOURCE: radar.weather.gov · no key, no cost.</p>
+      <div class="nws-loop-frame"><img id="nws-loop" alt="NWS KEAX radar loop — tap to enlarge"></div>
+      <p class="field-hint"><strong>Reading the colors:</strong> green = light rain · yellow = moderate · orange/red = heavy rain · pink/purple = hail likely. White, gray and pale blue = very weak echoes: drizzle, rain drying up before it reaches the ground, or non-weather targets like bugs and birds (common around sunset and at night). Streaks or rings around the radar are often not weather at all. The time at the bottom right is UTC (5 hours ahead of KC in summer, 6 in winter).</p>
 
       <p class="section-title">Windy — Zoom Out to See the Whole Country</p>
       <p class="section-note">SOURCE: windy.com (free embed). Use the controls inside it (bottom-left) to switch between radar, satellite, wind and temperature, and pinch out to see storm systems well beyond Kansas City.</p>
@@ -528,6 +581,7 @@
 </div>
 
 <!-- ===== Sheet: Help & Guide ===== -->
+<div class="img-viewer" id="imgViewer"><div class="close" style="display:flex;gap:0.4rem;"><button class="btn" id="imgViewerOut">−</button><button class="btn" id="imgViewerIn">+</button><button class="btn" id="imgViewerClose">✕ Close</button></div><img id="imgViewerImg" alt=""></div>
 <div class="sheet-overlay" id="helpSheetOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -551,6 +605,9 @@
 
     <p class="section-title">📦 Event Packets (Vault tab)</p>
     <p class="section-note">When you see something odd, tap "Capture Event Packet Now." It saves a snapshot of every measurement plus satellite and radar pictures, with an ID and a fingerprint so it can't be quietly changed later. Open it any time to note which normal explanations fit.</p>
+
+    <p class="section-title">📡 Radar Theater (Map tab)</p>
+    <p class="section-note">Plays the radar back for up to 3 days. Pick a view: <strong>All radars</strong> for the big picture, <strong>KC radar · rain</strong> for the sharpest detail, or <strong>KC radar · wind</strong> for which way things are moving (green = toward the radar, red = away). Pick how far back, then press ▶ Play. ⛶ Full screen fills your phone. Pinch or use + / − to zoom.</p>
 
     <p class="section-title">🔎 INVESTIGATE tab</p>
     <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in. <strong>Flight History</strong> shows every aircraft path recorded over KC in the last 1–24 hours, which heights they flew, and which aircraft showed up more than once. Pick a time window, then tap a line on the map. <strong>Satellite Rewind</strong> shows the satellite picture over KC at any time in the last ~3 months: pick a picture type, slide or type a time, and optionally put past radar and flights from that time on top.</p>
@@ -1409,6 +1466,193 @@ AircraftProvider.getStatesNear(CURRENT_LOCATION.lat, CURRENT_LOCATION.lon).then(
 // app) rather than hidden behind a "tap to expand" control users had no way
 // to discover.
 document.getElementById('nws-loop').src = RadarProvider.keaxLoopUrl();
+
+// Full-screen viewer for the NWS loop GIF (the page disables pinch zoom, so
+// it has its own + / − buttons and scrolls to pan).
+(function(){
+  const viewer = document.getElementById('imgViewer'), img = document.getElementById('imgViewerImg');
+  let scale = 1;
+  const apply = ()=>{ img.style.width = (scale * 100) + '%'; };
+  document.querySelector('.nws-loop-frame').addEventListener('click', ()=>{
+    img.src = document.getElementById('nws-loop').src; scale = 1; apply(); viewer.classList.add('open');
+  });
+  document.getElementById('imgViewerIn').addEventListener('click', e=>{ e.stopPropagation(); scale = Math.min(4, scale + 0.5); apply(); });
+  document.getElementById('imgViewerOut').addEventListener('click', e=>{ e.stopPropagation(); scale = Math.max(1, scale - 0.5); apply(); });
+  document.getElementById('imgViewerClose').addEventListener('click', ()=>{ viewer.classList.remove('open'); img.src = ''; });
+})();
+
+/* ---- Radar Theater: playable radar history from Iowa Environmental
+   Mesonet's NEXRAD archive (verified by the probe workflow):
+   - region: national composite base reflectivity, ridge::USCOMP-N0Q-
+     YYYYMMDDHHMM at 5-minute steps (7+ days back confirmed);
+   - KC radar (KEAX, Pleasant Hill): ridge::EAX-N0B-<scan> super-resolution
+     reflectivity and ridge::EAX-N0S-<scan> storm-relative velocity, scan
+     times from IEM's json/radar.py list. Dual-pol products (CC, ZDR,
+     hydrometeor class) aren't in this archive, so they aren't offered.
+   Missing frames are labeled, never filled in. ---- */
+const IEM_TILE = 'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/';
+const THEATER_VIEWS = {
+  region: { product:'USCOMP-N0Q', zoom:7, label:'All radars (national composite, base reflectivity)',
+    legend:`<strong>Colors = how strongly the radar signal bounced back</strong> (rain/hail size and amount): green = light rain · yellow = moderate · orange/red = heavy · pink/purple = hail likely. Pale blue/gray = very weak echoes — drizzle, rain evaporating before it lands, or bugs/birds/dust. One picture every 5 minutes, from all nearby radars combined.` },
+  kc: { product:'EAX-N0B', zoom:8, label:'KEAX Pleasant Hill radar — super-resolution reflectivity',
+    legend:`<strong>The KC radar alone, at its sharpest detail</strong>, one picture per radar scan (every ~4–10 minutes). Same colors as above. Near the radar (Pleasant Hill, southeast of KC) you may see speckles or rings that are ground clutter or bugs/birds, not weather — especially at night. Echoes far away are seen higher up, because the beam rises with distance.` },
+  vel: { product:'EAX-N0S', zoom:8, label:'KEAX Pleasant Hill radar — storm-relative velocity',
+    legend:`<strong>Which way things are moving</strong>, with the storms' own motion subtracted: <span style="color:#3fdc6a">green = toward the radar</span>, <span style="color:#ff5a5a">red = away from it</span>. Bright green right next to bright red can mean rotation — that's what forecasters look for before tornado warnings. It measures movement of whatever is in the air (rain, bugs, birds, dust), along the radar beam only. Gray/blank = nothing detected.` }
+};
+const theater = { view:'region', lenH:3, frames:[], layers:[], idx:0, timer:null, speed:1, flights:false, map:null, flightLayer:null, started:false, loadToken:0 };
+function stampFor(ms){ const d = new Date(ms).toISOString(); return d.slice(0,4) + d.slice(5,7) + d.slice(8,10) + d.slice(11,13) + d.slice(14,16); }
+
+async function theaterFrameTimes(){
+  const now = Date.now(), lenMs = theater.lenH * 3600000;
+  if(theater.view === 'region'){
+    const step = Math.max(5, Math.ceil(theater.lenH * 60 / 36 / 5) * 5) * 60000;
+    const end = Math.floor((now - 10 * 60000) / 300000) * 300000;
+    const out = [];
+    for(let t = end - Math.floor(lenMs / step) * step; t <= end; t += step) out.push(t);
+    return out;
+  }
+  const iso = ms => new Date(ms).toISOString().slice(0, 16) + 'Z';
+  const res = await fetch(`https://mesonet.agron.iastate.edu/json/radar.py?operation=list&radar=EAX&product=${THEATER_VIEWS[theater.view].product.split('-')[1]}&start=${iso(now - lenMs)}&end=${iso(now)}`);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const scans = ((await res.json()).scans || []).map(x=>Date.parse(x.ts)).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
+  if(scans.length <= 36) return scans;
+  const out = [];
+  for(let i = 0; i < 36; i++) out.push(scans[Math.round(i * (scans.length - 1) / 35)]);
+  return out;
+}
+
+function theaterShow(i){
+  const n = theater.frames.length;
+  if(!n) return;
+  theater.idx = (i + n) % n;
+  theater.layers.forEach((l, k)=>{ if(l) l.setOpacity(k === theater.idx ? 0.8 : 0); });
+  document.getElementById('theaterSlider').value = theater.idx;
+  const f = theater.frames[theater.idx];
+  const ago = Math.round((Date.now() - f.t) / 60000);
+  const agoText = ago < 120 ? `${ago} min ago` : (ago < 2880 ? `${Math.round(ago / 60)} h ago` : `${Math.round(ago / 1440)} days ago`);
+  document.getElementById('theaterStamp').innerHTML = `${escapeHtml(fmtTime(f.t))} · ${agoText} · ${theater.idx + 1}/${n}${f.state === 'missing' ? ' · <span style="color:#ffb020">NO DATA</span>' : (f.state === 'loading' ? ' · loading…' : '')}`;
+  if(theater.flights) theaterFlights(f.t);
+}
+
+async function theaterFlights(t){
+  if(!theater.flightLayer) return;
+  theater.flightLayer.clearLayers();
+  if(!theater.flights) return;
+  const arch = await loadFlightArchive(false);
+  if(!arch) return;
+  flightSegments(arch, 24, 'all').filter(sg=>Math.abs(sg.runT * 1000 - t) <= 20 * 60000).forEach(sg=>{
+    const color = sg.maxAlt != null && sg.maxAlt >= CRUISE_M ? '#FF2EC4' : '#00E5FF';
+    const shape = sg.pts.length >= 2 ? L.polyline(sg.pts.map(p=>[p[1], p[2]]), { color, weight: 3, opacity: 0.9 }) : L.circleMarker([sg.pts[0][1], sg.pts[0][2]], { radius: 3, color });
+    shape.bindPopup(segPopup(sg)).addTo(theater.flightLayer);
+  });
+}
+
+function theaterStop(){ if(theater.timer){ clearTimeout(theater.timer); theater.timer = null; } document.getElementById('theaterPlay').textContent = '▶ Play'; }
+function theaterTick(){
+  const n = theater.frames.length;
+  theaterShow(theater.idx + 1);
+  const delay = (theater.idx === n - 1 ? 1800 : 700) / theater.speed;
+  theater.timer = setTimeout(theaterTick, delay);
+}
+
+async function theaterLoad(){
+  if(!LEAFLET_AVAILABLE){ document.getElementById('theaterStatus').textContent = 'Map library not loaded — Radar Theater unavailable.'; return; }
+  const token = ++theater.loadToken;
+  theaterStop();
+  const v = THEATER_VIEWS[theater.view];
+  document.querySelectorAll('#theaterViewChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.view === theater.view));
+  document.querySelectorAll('#theaterLenChips .chip').forEach(c=>c.classList.toggle('active', +c.dataset.len === theater.lenH));
+  document.getElementById('theaterLegend').innerHTML = `<p style="margin:0;font-size:0.85rem;line-height:1.55;">${v.legend}</p>`;
+  const status = document.getElementById('theaterStatus');
+  status.textContent = 'Loading radar pictures…';
+  if(!theater.map){
+    theater.map = lockedMap('theaterMap', [CURRENT_LOCATION.lat, CURRENT_LOCATION.lon], v.zoom);
+    theater.map.createPane('baseTiles'); theater.map.getPane('baseTiles').style.zIndex = 150;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { pane:'baseTiles', attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19 }).addTo(theater.map);
+    L.marker([CURRENT_LOCATION.lat, CURRENT_LOCATION.lon]).addTo(theater.map).bindPopup(CURRENT_LOCATION.label);
+    // Radar position from the official NWS radar-station list (data/atmospheric-sites.json).
+    InfrastructureProvider.load().then(()=>{
+      const r = InfrastructureProvider.all().find(x=>x.id === 'KEAX');
+      if(r) L.circleMarker([r.lat, r.lon], { radius:5, color:'#FF2E2E', weight:2, fillOpacity:0.6 }).addTo(theater.map).bindPopup(`${escapeHtml(r.name)}<br><span class="source-tag">SOURCE: ${escapeHtml(r.source)}</span>`);
+    });
+    theater.flightLayer = L.layerGroup().addTo(theater.map);
+  } else {
+    theater.map.setZoom(v.zoom);
+  }
+  theater.layers.forEach(l=>{ if(l) theater.map.removeLayer(l); });
+  theater.layers = []; theater.frames = [];
+  let times;
+  try { times = await theaterFrameTimes(); }
+  catch(e){
+    console.error('theaterFrameTimes', e);
+    if(token !== theater.loadToken) return;
+    status.innerHTML = `<span class="badge insufficient">KC RADAR SCAN LIST UNAVAILABLE</span> Iowa Environmental Mesonet didn't answer (${escapeHtml(e.message)}). Try "All radars (region)", which doesn't need the list.`;
+    document.getElementById('theaterStamp').textContent = '—';
+    return;
+  }
+  if(token !== theater.loadToken) return;
+  if(!times.length){ status.innerHTML = '<span class="badge insufficient">NO RADAR SCANS IN THIS PERIOD</span> The radar may have been offline for maintenance.'; return; }
+  theater.frames = times.map(t=>({ t, state:'loading' }));
+  const slider = document.getElementById('theaterSlider');
+  slider.max = theater.frames.length - 1;
+  let done = 0, missing = 0;
+  theater.frames.forEach((f, i)=>{
+    const layer = L.tileLayer(`${IEM_TILE}ridge::${v.product}-${stampFor(f.t)}/{z}/{x}/{y}.png`, { opacity: 0, zIndex: 5, maxNativeZoom: 10, maxZoom: 19, attribution: 'NEXRAD via Iowa Environmental Mesonet' });
+    let ok = 0, bad = 0;
+    layer.on('tileload', ()=>{ ok++; });
+    layer.on('tileerror', ()=>{ bad++; });
+    layer.once('load', ()=>{
+      if(token !== theater.loadToken) return;
+      f.state = ok > 0 ? 'ok' : 'missing';
+      done++; if(f.state === 'missing') missing++;
+      status.innerHTML = `${done < theater.frames.length ? `Loading… ${done} of ${theater.frames.length} pictures` : `${theater.frames.length} pictures loaded`}${missing ? ` · ${missing} not available (gaps in the archive, shown as NO DATA)` : ''} · <span class="source-tag">MEASURED · SOURCE: NOAA NEXRAD via Iowa Environmental Mesonet · ${escapeHtml(v.label)}</span>`;
+      if(i === theater.idx) theaterShow(theater.idx);
+    });
+    layer.addTo(theater.map);
+    theater.layers.push(layer);
+  });
+  theaterShow(theater.frames.length - 1);
+}
+
+document.querySelectorAll('#theaterViewChips .chip').forEach(c=>c.addEventListener('click', ()=>{ theater.view = c.dataset.view; theaterLoad(); }));
+document.querySelectorAll('#theaterLenChips .chip').forEach(c=>c.addEventListener('click', ()=>{ theater.lenH = +c.dataset.len; theaterLoad(); }));
+document.getElementById('theaterPlay').addEventListener('click', ()=>{
+  if(theater.timer){ theaterStop(); return; }
+  if(!theater.frames.length) return;
+  document.getElementById('theaterPlay').textContent = '⏸ Pause';
+  if(theater.idx === theater.frames.length - 1) theater.idx = -1;
+  theaterTick();
+});
+document.getElementById('theaterPrev').addEventListener('click', ()=>{ theaterStop(); theaterShow(theater.idx - 1); });
+document.getElementById('theaterNext').addEventListener('click', ()=>{ theaterStop(); theaterShow(theater.idx + 1); });
+document.getElementById('theaterSlider').addEventListener('input', e=>{ theaterStop(); theaterShow(+e.target.value); });
+document.getElementById('theaterSpeed').addEventListener('click', e=>{
+  theater.speed = theater.speed === 1 ? 2 : (theater.speed === 2 ? 0.5 : 1);
+  e.target.textContent = (theater.speed === 0.5 ? '½' : theater.speed) + '×';
+});
+document.getElementById('theaterFlightsChip').addEventListener('click', e=>{
+  theater.flights = !theater.flights; e.target.classList.toggle('active', theater.flights);
+  if(theater.frames.length) theater.flights ? theaterFlights(theater.frames[theater.idx].t) : theater.flightLayer.clearLayers();
+});
+document.getElementById('theaterFullBtn').addEventListener('click', ()=>{
+  const wrap = document.getElementById('theaterWrap'), panel = document.getElementById('theaterPanel');
+  const full = !wrap.classList.contains('is-full');
+  wrap.classList.toggle('is-full', full); panel.classList.toggle('is-full', full);
+  document.body.classList.toggle('theater-full', full);
+  document.getElementById('theaterFullBtn').textContent = full ? '✕ Exit full screen' : '⛶ Full screen';
+  if(full){ const ov = wrap.querySelector('.map-lock-overlay'); if(ov) ov.click(); }
+  if(theater.map) setTimeout(()=>theater.map.invalidateSize(), 80);
+});
+// Load when the section scrolls into view, so opening the app doesn't
+// download dozens of radar pictures nobody looked at.
+(function(){
+  const el = document.getElementById('theaterPanel');
+  const start = ()=>{ if(!theater.started){ theater.started = true; theaterLoad(); } };
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(entries=>{ if(entries.some(e=>e.isIntersecting)){ io.disconnect(); start(); } }, { rootMargin:'200px' });
+    io.observe(el);
+  } else start();
+})();
 document.getElementById('windyMount').innerHTML = `<iframe src="https://embed.windy.com/embed2.html?lat=${CURRENT_LOCATION.lat}&lon=${CURRENT_LOCATION.lon}&detailLat=${CURRENT_LOCATION.lat}&detailLon=${CURRENT_LOCATION.lon}&width=650&height=450&zoom=4&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=6" title="Windy radar, satellite, wind and temperature map"></iframe>`;
 
 async function loadAlmanac(){
