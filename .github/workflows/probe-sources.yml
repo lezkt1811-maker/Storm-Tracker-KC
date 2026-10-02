@@ -30,8 +30,8 @@ jobs:
           TS=$(python3 -c "import json;d=json.load(open('/tmp/l.json'));t=d['scans'][-1]['ts'];print(t[0:4]+t[5:7]+t[8:10]+t[11:13]+t[14:16])" 2>/dev/null)
           echo "latest EAX scan stamp: $TS"
           for PR in N0B N0Q N0U N0G N0S N0C N0X N0K N0H; do
-            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-$TS/8/61/97.png"
-            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-0/8/61/97.png"
+            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-$TS/8/60/97.png"
+            probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::EAX-$PR-0/8/60/97.png"
           done
           probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-24 hour' +%Y%m%d%H)00/7/30/48.png"
           probe "https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0Q-$(date -u -d '-7 day' +%Y%m%d%H)00/7/30/48.png"
