@@ -1,0 +1,38 @@
+name: Earth Core Layers
+
+# Rebuilds data/earthcore/*.json (plate boundaries, active faults, borders,
+# volcanoes) for the EARTH CORE tab from their published sources. These change
+# slowly, so monthly is plenty. Earthquakes are NOT stored here - the app reads
+# them live from the USGS API in the browser.
+on:
+  schedule:
+    - cron: '41 6 3 * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - scripts/build_earthcore_layers.py
+      - .github/workflows/earthcore-layers.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: earthcore-layers
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Earth Core layers
+        run: python3 scripts/build_earthcore_layers.py
+      - name: Commit if changed
+        run: |
+          git config user.name "storm-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/earthcore/
+          git diff --cached --quiet || git commit -m "Update Earth Core layers [skip ci]"
+          git pull --rebase --autostash -q || true
+          git push

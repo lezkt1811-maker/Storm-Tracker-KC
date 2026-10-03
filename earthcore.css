@@ -1,0 +1,56 @@
+/* ===== EARTH CORE tab (3D Seismic + Tectonic Explorer) =====
+   Uses the app's existing color tokens from index.html (:root). */
+.ec-globe-wrap{
+  position:relative; height:min(60vh, 520px); width:100%;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(37,99,255,0.10), transparent 65%),
+    #03020A;
+  overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none;
+}
+#ecCanvas{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+#ecCanvas:active{ cursor:grabbing; }
+.ec-globe-btns{ position:absolute; top:0.6rem; right:0.6rem; display:flex; flex-direction:column; gap:0.4rem; z-index:2; }
+.ec-globe-btns .icon-btn{ background:rgba(18,11,34,0.85); width:36px; height:36px; font-size:1rem; }
+.ec-stamp{
+  position:absolute; left:0.6rem; bottom:0.6rem; right:3.5rem; z-index:2; pointer-events:none;
+  font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--text);
+  text-shadow:0 0 4px #000, 0 0 8px #000;
+}
+.ec-notice{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3; text-align:center;
+  background:rgba(5,3,12,0.88); border:1px solid var(--red); color:var(--red); border-radius:10px;
+  padding:0.8rem 1rem; font-family:'IBM Plex Mono', monospace; font-size:0.85rem; letter-spacing:0.04em; max-width:85%;
+}
+.ec-nc{ color:var(--red); font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.04em; }
+.ec-chip-err{ border-color:var(--red) !important; color:var(--red) !important; }
+#ecPanel .map-controls .btn{ padding:0.45rem 0.8rem; min-width:96px; }
+#ecScrub{ accent-color:var(--cyan); }
+
+.ec-inspector .ec-big{ font-family:'Orbitron', sans-serif; font-weight:700; font-size:1.15rem; }
+.badge.ec-calc{ color:var(--purple); }
+
+.ec-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:0.3rem; vertical-align:middle; }
+.ec-line{ display:inline-block; width:16px; height:3px; border-radius:2px; margin-right:0.3rem; vertical-align:middle; }
+.ec-tri{ display:inline-block; width:0; height:0; margin-right:0.3rem; vertical-align:middle;
+  border-left:5px solid transparent; border-right:5px solid transparent; border-bottom:9px solid var(--orange); }
+.ec-legend-row{ display:flex; flex-wrap:wrap; gap:0.25rem 0.8rem; align-items:center; font-size:0.78rem; margin-bottom:0.35rem; }
+.ec-legend-row .status-label{ min-width:72px; }
+
+.ec-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 0.7rem; }
+.ec-grid .field{ margin-bottom:0.7rem; }
+.ec-subhead{ font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin:0.2rem 0 0.4rem; }
+
+.ec-bar{ display:grid; grid-template-columns:92px 1fr 52px; align-items:center; gap:0.5rem; margin:0.3rem 0; font-size:0.8rem; }
+.ec-bar-label{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--text-dim); }
+.ec-bar-track{ height:10px; background:var(--bg2); border-radius:5px; overflow:hidden; }
+.ec-bar-track span{ display:block; height:100%; border-radius:5px; }
+.ec-bar-n{ font-family:'IBM Plex Mono', monospace; font-size:0.75rem; text-align:right; }
+.ec-top{ cursor:pointer; }
+.ec-top:active{ background:rgba(0,229,255,0.06); }
+
+/* Full screen: same stacking trick the Radar Theater uses. */
+body.ec-full .tab-content{ z-index:5000; }
+#ecPanel.is-full{ position:fixed; inset:0; z-index:5000; margin:0; border-radius:0; border:none; background:#000; display:flex; flex-direction:column; }
+#ecPanel.is-full .ec-globe-wrap{ flex:1 1 auto; height:auto; }
+#ecPanel.is-full .ec-globe-btns{ top:calc(0.6rem + env(safe-area-inset-top,0px)); }
+#ecPanel.is-full .map-controls{ padding-bottom:calc(0.7rem + env(safe-area-inset-bottom,0px)); }

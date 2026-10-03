@@ -6,6 +6,7 @@
 <title>Storm Tracker KC</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="earthcore.css">
 <style>
   :root{
     --bg:#05030C;
@@ -87,11 +88,12 @@
     padding-bottom: env(safe-area-inset-bottom,0px);
   }
   .nav-btn{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-    background:none; border:none; color:var(--text-dim); padding:0.55rem 0.2rem 0.5rem;
-    font-family:'IBM Plex Mono', monospace; font-size:0.62rem; letter-spacing:0.02em;
+    flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    background:none; border:none; color:var(--text-dim); padding:0.55rem 0.1rem 0.5rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.56rem; letter-spacing:0;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-  .nav-btn .icon{ font-size:1.35rem; line-height:1; }
+  .nav-btn .icon{ font-size:1.3rem; line-height:1; }
   .nav-btn.active{ color:var(--cyan); }
   .nav-btn.active .icon{ filter: drop-shadow(0 0 6px rgba(0,229,255,0.7)); }
 
@@ -566,6 +568,105 @@
       <div id="vaultList"><div class="empty-state">Nothing stored yet.</div></div>
     </section>
 
+    <!-- ===================== EARTH CORE TAB ===================== -->
+    <!-- Logic: earthcore.js · styles: earthcore.css · static layers: data/earthcore/ -->
+    <section class="tab-panel" id="tab-earth">
+      <p class="section-title">🌎 EARTH CORE <span class="source-tag">3D Seismic + Tectonic Explorer</span></p>
+      <p class="section-note">Earthquakes placed at their real latitude, longitude <strong>and depth</strong> inside a see-through Earth, with plate boundaries, active faults and volcanoes. Every layer says where it comes from.</p>
+      <div class="card tight" style="font-size:0.82rem;line-height:1.7;">
+        <span class="badge info">MEASURED</span> USGS earthquake records &nbsp;
+        <span class="badge normal">DOCUMENTED</span> published plate, fault &amp; volcano maps &nbsp;
+        <span class="badge ec-calc">CALCULATED</span> distances worked out here &nbsp;
+        <span class="badge unusual">CORRELATED</span> close in place or time — not cause
+      </div>
+
+      <div class="map-panel" id="ecPanel">
+        <div class="ec-globe-wrap" id="ecGlobeWrap">
+          <canvas id="ecCanvas" aria-label="3D globe of earthquakes, plate boundaries, faults and volcanoes"></canvas>
+          <div class="ec-globe-btns">
+            <button class="icon-btn" id="ecZoomIn" title="Zoom in">+</button>
+            <button class="icon-btn" id="ecZoomOut" title="Zoom out">−</button>
+            <button class="icon-btn" id="ecHome" title="Center on Kansas City">⌂</button>
+            <button class="icon-btn" id="ecFull" title="Full screen">⛶</button>
+          </div>
+          <div class="ec-stamp" id="ecStamp"></div>
+          <div class="ec-notice" id="ecNotice" hidden></div>
+        </div>
+        <div class="map-controls">
+          <button class="btn primary" id="ecPlay">▶ PLAY</button>
+          <input type="range" id="ecScrub" min="0" max="1000" value="1000" aria-label="Timeline">
+          <span class="frame-time" id="ecCursorLabel">—</span>
+        </div>
+      </div>
+      <div class="card ec-inspector" id="ecInspector" hidden></div>
+      <p class="field-hint">Drag to spin · pinch or +/− to zoom · tap a dot or 🌋 for its source record · ▶ PLAY replays the window in time order.</p>
+
+      <p class="ec-subhead">Playback speed</p>
+      <div class="chip-row" id="ecSpeedChips">
+        <button class="chip" data-v="60">🐢 Slow (60 s)</button>
+        <button class="chip" data-v="20">Normal (20 s)</button>
+        <button class="chip" data-v="6">⚡ Fast (6 s)</button>
+      </div>
+      <p class="ec-subhead">While playing, show</p>
+      <div class="chip-row" id="ecTrailChips">
+        <button class="chip" data-v="all">Everything so far</button>
+        <button class="chip" data-v="recent">Only the most recent 10%</button>
+      </div>
+
+      <p class="section-title">🧭 View</p>
+      <div class="chip-row" id="ecModeChips">
+        <button class="chip" data-v="xray">🩻 X-RAY DEPTH</button>
+        <button class="chip" data-v="surface">🌍 SURFACE</button>
+      </div>
+      <div class="chip-row" id="ecColorChips">
+        <button class="chip" data-v="depth">🎨 DEPTH MODE</button>
+        <button class="chip" data-v="magnitude">💥 MAGNITUDE MODE</button>
+      </div>
+      <p class="ec-subhead">Depth stretch (X-ray)</p>
+      <div class="chip-row" id="ecExagChips">
+        <button class="chip" data-v="1">1× true scale</button>
+        <button class="chip" data-v="3">3×</button>
+        <button class="chip" data-v="6">6×</button>
+        <button class="chip" id="ecPinsChip">📍 Depth pins</button>
+      </div>
+      <div class="card tight" id="ecLegend"></div>
+
+      <p class="section-title">🗂 Layers</p>
+      <div class="chip-row" id="ecLayerChips"></div>
+      <div id="ecLayerErr"></div>
+
+      <p class="section-title">🔍 Earthquake filters <span class="source-tag">USGS FDSN event API</span></p>
+      <div class="card">
+        <p class="ec-subhead">Time window</p>
+        <div class="chip-row" id="ecTimeChips"></div>
+        <div class="ec-grid" id="ecCustomDates" hidden>
+          <div class="field"><label for="ecStart">Start date (UTC)</label><input type="date" id="ecStart"></div>
+          <div class="field"><label for="ecEnd">End date (UTC)</label><input type="date" id="ecEnd"></div>
+        </div>
+        <div class="ec-grid">
+          <div class="field"><label for="ecMinMag">Min magnitude</label><input type="number" id="ecMinMag" step="0.1" min="-2" max="10" inputmode="decimal" placeholder="any"></div>
+          <div class="field"><label for="ecMaxMag">Max magnitude</label><input type="number" id="ecMaxMag" step="0.1" min="-2" max="10" inputmode="decimal" placeholder="any"></div>
+          <div class="field"><label for="ecMinDepth">Min depth (km)</label><input type="number" id="ecMinDepth" step="1" min="-100" max="1000" inputmode="decimal" placeholder="surface"></div>
+          <div class="field"><label for="ecMaxDepth">Max depth (km)</label><input type="number" id="ecMaxDepth" step="1" min="-100" max="1000" inputmode="decimal" placeholder="deepest"></div>
+        </div>
+        <p class="ec-subhead">Region</p>
+        <div class="chip-row" id="ecRegionChips"></div>
+        <div class="chip-row"><button class="chip" id="ecNonQuakeChip">☐ Include non-earthquake events (quarry blasts, explosions…)</button></div>
+        <div class="btn-row"><button class="btn primary" id="ecApply">Load USGS data</button></div>
+        <p class="field-hint" id="ecQueryStatus"></p>
+      </div>
+
+      <p class="section-title">📊 Depth profile</p>
+      <div class="card" id="ecDepthStats"></div>
+
+      <p class="section-title">🏆 Largest events in this window</p>
+      <div class="card" id="ecTopList"></div>
+
+      <p class="section-title">📚 Data sources</p>
+      <p class="section-note">Earthquakes are read live from USGS by your browser. Plates, faults, volcanoes and borders are copies of published datasets saved in this repo by a GitHub robot (monthly). If any source can't be loaded you'll see <span class="ec-nc">DATA SOURCE NOT CONNECTED</span> — nothing is ever filled in or simulated.</p>
+      <div class="card" id="ecSources"></div>
+    </section>
+
   </div>
 
   <button class="fab" id="addObservationFab" title="Log Sky Observation">+</button>
@@ -576,6 +677,7 @@
     <button class="nav-btn" data-tab="anomalies"><span class="icon">⚠️</span>ANOMALIES</button>
     <button class="nav-btn" data-tab="lab"><span class="icon">🔬</span>LAB</button>
     <button class="nav-btn" data-tab="investigate"><span class="icon">🔎</span>INVESTIGATE</button>
+    <button class="nav-btn" data-tab="earth"><span class="icon">🌎</span>EARTH</button>
     <button class="nav-btn" data-tab="vault"><span class="icon">🗃</span>VAULT</button>
   </nav>
 </div>
@@ -611,6 +713,9 @@
 
     <p class="section-title">🔎 INVESTIGATE tab</p>
     <p class="section-note"><strong>Atmospheric Operations</strong> lists every documented weather-modification program in Kansas and Missouri, with links to the actual laws, plans and NOAA reports, and a list of what was searched. <strong>Infrastructure</strong> maps the radars, weather stations, balloon sites, airports and air monitors around KC, and says what each one actually does. A facility's category describes what it is, not anything it's involved in. <strong>Flight History</strong> shows every aircraft path recorded over KC in the last 1–24 hours, which heights they flew, and which aircraft showed up more than once. Pick a time window, then tap a line on the map. <strong>Satellite Rewind</strong> shows the satellite picture over KC at any time in the last ~3 months: pick a picture type, slide or type a time, and optionally put past radar and flights from that time on top.</p>
+
+    <p class="section-title">🌎 EARTH tab</p>
+    <p class="section-note">A 3D globe of real earthquakes from the US Geological Survey, shown at the depth they actually happened — with tectonic plate boundaries, active faults and volcanoes. Drag to spin, pinch to zoom. <strong>Try this:</strong> tap "30d", raise Min magnitude to 4.5, press Load, then ▶ PLAY and watch where the deep (pink) quakes line up. Tap any dot to see its official USGS record and how far it is from the nearest plate boundary.</p>
 
     <p class="section-title">⏱ TIMELINE tab</p>
     <p class="section-note">A list of things that happened, newest first — official storm warnings, plus anything you log yourself. It'll say "no events yet" until a warning is issued or you add one — that's normal, not broken.</p>
@@ -3107,6 +3212,7 @@ init();
 
 })();
 </script>
+<script src="earthcore.js"></script>
 
 <footer class="app-footer" style="display:none;">
   Radar: <a href="https://radar.weather.gov" target="_blank" rel="noopener">NWS/NOAA</a> ·

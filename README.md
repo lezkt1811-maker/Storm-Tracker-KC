@@ -61,6 +61,7 @@ build or install.
 | Infrastructure reference points | Public FAA/NWS station locations (hardcoded, documented) | Not a live feed — see below |
 | Map tiles | [OpenStreetMap](https://www.openstreetmap.org/copyright) standard tiles | Dark look applied with a CSS filter — see note below |
 | Baseline / anomaly / correlation analysis | Local, client-side statistics | No external AI API |
+| Earthquakes (EARTH tab) | [USGS FDSN event API](https://earthquake.usgs.gov/fdsnws/event/1/) | Free, keyless, CORS-enabled — see the EARTH tab section |
 
 **OpenSky Network limitations:** OpenSky's public REST API does not send CORS
 headers, so a direct request from a browser is blocked by the browser itself,
@@ -356,6 +357,45 @@ rather than a guess if it can't be verified.
 No account, no tracking, no analytics, no server component. Location is only
 requested when you explicitly tap "Attach GPS" or "Use My GPS Location," and it is
 stored only in your browser.
+
+## EARTH tab: 3D Seismic + Tectonic Explorer
+
+A see-through 3D globe (drawn on a plain `<canvas>`, no 3D library) that places each
+earthquake at its real latitude, longitude **and depth**, with plate boundaries,
+active faults, volcanoes and borders. Code lives in `earthcore.js` + `earthcore.css`
+so the rest of the app is untouched; `index.html` only adds the tab, its nav button,
+and a Help entry.
+
+| Layer | Source | How it gets to the app |
+|---|---|---|
+| Earthquakes | [USGS FDSN event API](https://earthquake.usgs.gov/fdsnws/event/1/) (ANSS ComCat), public domain | **Live** — your browser queries USGS directly (CORS-enabled, keyless) |
+| Plate boundaries | PB2002, Bird (2003), via [fraxen/tectonicplates](https://github.com/fraxen/tectonicplates), ODC-By | `data/earthcore/plates.json` |
+| Active faults | [GEM Global Active Faults Database](https://github.com/GEMScienceTools/gem-global-active-faults), CC BY-SA 4.0 | `data/earthcore/faults.json` (≈1.3 MB, loaded only when Faults is switched on) |
+| Volcanoes | [Smithsonian Global Volcanism Program](https://volcano.si.edu/), Holocene volcanoes | `data/earthcore/volcanoes.json` |
+| Borders & coastlines | [Natural Earth](https://www.naturalearthdata.com/) 1:50m, public domain | `data/earthcore/borders.json` |
+
+The four static files are built by `scripts/build_earthcore_layers.py`, run by
+`.github/workflows/earthcore-layers.yml` (monthly, on demand, and whenever the
+script changes). Geometry is only *reduced* for phones (rounded to 0.01°, lightly
+simplified); nothing is added. Each file carries its own source, license, retrieval
+date and processing note, which the tab's **Data sources** card displays. If any
+file or USGS can't be loaded, that layer shows **"DATA SOURCE NOT CONNECTED"** and
+nothing is drawn in its place.
+
+Controls: time window (6 h – 30 d or custom dates), min/max magnitude, min/max depth,
+region (global, within 1,000 km of KC, lower-48 US, or 2,500 km around the globe's
+current center), optional non-earthquake events (quarry blasts, explosions as
+classified by USGS), ▶ PLAY / pause / scrub / speed, X-RAY DEPTH vs SURFACE view,
+DEPTH MODE vs MAGNITUDE MODE coloring, depth stretch (1×/3×/6×), and per-layer toggles.
+Tapping a quake shows its USGS record (time, depth, coordinates, status, event ID,
+link) plus a **CALCULATED** distance to the nearest mapped plate boundary — labeled as
+geometry, not cause.
+
+Limits: USGS returns at most 20,000 events per request (the app says so and shows the
+newest 20,000); magnitudes/depths are as published by USGS and can be revised;
+plate boundaries are a 2003 model; the fault database is incomplete in some regions
+(including much of the central US); volcanoes appear only after the workflow's first
+run.
 
 ## Known limitations
 
